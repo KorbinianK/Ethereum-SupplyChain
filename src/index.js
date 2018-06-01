@@ -1,4 +1,8 @@
+import jQuery from "jquery";
+window.$ = window.jQuery = jQuery;
 import "./scss/styles.scss";
+import bootstrap from "bootstrap";
+
 
 // Import libraries we need.
 import {
@@ -8,89 +12,109 @@ import {
     default as contract
 } from 'truffle-contract'
 
-// Import our contract artifacts and turn them into usable abstractions.
-import metacoin_artifacts from '../build/contracts/MetaCoin.json'
-
-// MetaCoin is our usable abstraction, which we'll use through the code below.
-var MetaCoin = contract(metacoin_artifacts);
-
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
-var accounts;
-var account;
 
 window.App = {
-    start: function () {
-        var self = this;
+    web3Provider: null,
+    contracts: {},
 
-        // Bootstrap the MetaCoin abstraction for Use.
-        MetaCoin.setProvider(web3.currentProvider);
+    init: function () {
+        return App.initWeb3();
+    },
 
-        // Get the initial account balance so it can be displayed.
-        web3.eth.getAccounts(function (err, accs) {
-            if (err != null) {
-                alert("There was an error fetching your accounts.");
-                return;
+    initWeb3: function () {
+        // Initialize web3 and set the provider to the testRPC.
+        if (typeof web3 !== 'undefined') {
+            App.web3Provider = web3.currentProvider;
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:7545');
+            web3 = new Web3(App.web3Provider);
+        }
+        
+        return App.initContract();
+    },
+
+    initContract: function () {
+       
+        $.getJSON('../build/contracts/TutorialToken.json', function (data) {
+            // Get the necessary contract artifact file and instantiate it with truffle-contract.
+            var TutorialTokenArtifact = data;
+            
+            App.contracts.TutorialToken = TruffleContract(TutorialTokenArtifact);
+
+            // Set the provider for our contract.
+            App.contracts.TutorialToken.setProvider(App.web3Provider);
+
+            // Use our contract to retieve and mark the adopted pets.
+            return App.getBalances();
+        });
+
+        return App.bindEvents();
+    },
+
+    bindEvents: function () {
+        $(document).on('click', '#transferButton', App.handleTransfer);
+    },
+
+    handleTransfer: function (event) {
+        event.preventDefault();
+
+        var amount = parseInt($('#TTTransferAmount').val());
+        var toAddress = $('#TTTransferAddress').val();
+
+        console.log('Transfer ' + amount + ' TT to ' + toAddress);
+
+        var tutorialTokenInstance;
+
+        web3.eth.getAccounts(function (error, accounts) {
+            if (error) {
+                console.error(error);
             }
 
-            if (accs.length == 0) {
-                alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
-                return;
-            }
+            var account = accounts[0];
 
-            accounts = accs;
-            account = accounts[0];
+            App.contracts.TutorialToken.deployed().then(function (instance) {
+                tutorialTokenInstance = instance;
 
-            self.refreshBalance();
+                return tutorialTokenInstance.transfer(toAddress, amount, {
+                    from: account
+                });
+            }).then(function (result) {
+                alert('Transfer Successful!');
+                return App.getBalances();
+            }).catch(function (err) {
+                console.error(err.message);
+            });
         });
     },
 
-    setStatus: function (message) {
-        var status = document.getElementById("status");
-        status.innerHTML = message;
-    },
+    getBalances: function () {
+        console.log('Getting balances...');
 
-    refreshBalance: function () {
-        var self = this;
+        var tutorialTokenInstance;
 
-        var meta;
-        MetaCoin.deployed().then(function (instance) {
-            meta = instance;
-            return meta.getBalance.call(account, {
-                from: account
+        web3.eth.getAccounts(function (error, accounts) {
+            if (error) {
+                console.error(error);
+            }
+
+            var account = accounts[0];
+
+            App.contracts.TutorialToken.deployed().then(function (instance) {
+                tutorialTokenInstance = instance;
+
+                return tutorialTokenInstance.balanceOf(account);
+            }).then(function (result) {
+                var balance = result.c[0];
+
+                $('#TTBalance').text(balance);
+            }).catch(function (err) {
+                console.error(err.message);
             });
-        }).then(function (value) {
-            var balance_element = document.getElementById("balance");
-            balance_element.innerHTML = value.valueOf();
-        }).catch(function (e) {
-            console.log(e);
-            self.setStatus("Error getting balance; see log.");
-        });
-    },
-
-    sendCoin: function () {
-        var self = this;
-
-        var amount = parseInt(document.getElementById("amount").value);
-        var receiver = document.getElementById("receiver").value;
-
-        this.setStatus("Initiating transaction... (please wait)");
-
-        var meta;
-        MetaCoin.deployed().then(function (instance) {
-            meta = instance;
-            return meta.sendCoin(receiver, amount, {
-                from: account
-            });
-        }).then(function () {
-            self.setStatus("Transaction complete!");
-            self.refreshBalance();
-        }).catch(function (e) {
-            console.log(e);
-            self.setStatus("Error sending coin; see log.");
         });
     }
+
 };
 
 window.addEventListener('load', function () {
@@ -105,5 +129,5 @@ window.addEventListener('load', function () {
         window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:9545"));
     }
 
-    window.App.start();
+    window.App.init();
 });

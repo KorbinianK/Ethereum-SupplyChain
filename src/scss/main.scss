@@ -1,0 +1,7 @@
+@import "./bootstrap/colors";
+@mixin transition($seconds) {
+    -webkit-transition: all $seconds linear;
+    -moz-transition: all $seconds linear;
+    transition: all $seconds linear;
+}
+

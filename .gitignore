@@ -1,7 +1,4 @@
 node_modules/
 build/
 dist/
-truffle.min.js
-webpack.config.min.js
-src/index.min.js
-postcss.config.min.js
+*.min.js
