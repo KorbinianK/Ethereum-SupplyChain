@@ -124,7 +124,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
-
+// const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const DEV_MODE = process.env.NODE_ENV === 'dev';
 
 module.exports = {
@@ -223,6 +223,14 @@ module.exports = {
                 removeComments: true,
             },
         }),
-        new ExtractTextPlugin('styles.[contenthash].css'),
+        // new UglifyJSPlugin({
+        //     parallel: true,
+        //     uglifyOptions: {
+        //         ecma: 6,
+        //         compress: false // hangs without this
+        //     },
+        //     cache: path.join(__dirname, 'webpack-cache/uglify-cache'),
+        // }),
+        new ExtractTextPlugin('styles.css'),
     ],
 };
