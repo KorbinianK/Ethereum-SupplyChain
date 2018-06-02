@@ -1,5 +1,4 @@
-# Truffle Webpack 4 #
-
+# Truffle + Webpack + Bootstrap 4 #
 
 <a target="_blank" href="https://opensource.org/licenses/MIT">
   <img src="https://img.shields.io/badge/License-MIT-green.svg?longCache=true&style=flat-square">
@@ -10,8 +9,7 @@
 
 ## Description
 
-This is a basic boilerplate to get started with your Ethereum ÐAPP. It has all the basic setup included, the Tutorial Token, Boostrap and Webpack.
-
+This is a basic boilerplate to get started with your Ethereum ÐAPP. It has all the basics setup for you, including the Tutorial Token, Boostrap and Webpack.
 
 
 ## Features
