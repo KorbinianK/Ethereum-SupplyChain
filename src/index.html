@@ -18,13 +18,36 @@
                 <br/>
             </div>
         </div>
+        <div class="row my-5">
+            <div class="col"><h2>Harvests:</h2></div>
+            <div class="col">
+                <div class="input-group row">
+                    <label for="harvestSelect">Select Harvest</label>
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-secondary" type="button">Button</button>
+                    </div>
+                    <select class="form-control" id="harvestSelect">
+                
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row my-5">
+            <div class="input-group mb-3">
+            
+                <input type="number" id="newHarvest" class="form-control" placeholder="New Harvest " aria-label="newHarvest">
+                <div class="input-group-append">
+                    <button class="text-white btn btn-secondary " onclick="App.newHarvest()" type="button">New</button>
+                </div>
+            </div>
+        </div>
         <div id="fields" class="row card-columns flex-nowrap">
         </div>
         <div class="row">
             <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary btn-lg btn-block">New Field</button>
         </div>
         <div class="row">
-            <button type="button" name="newField" id="newFieldBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
+            <button type="button" name="harvest" id="harvestBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
         </div>
     </div>
 </body>

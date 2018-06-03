@@ -14,10 +14,8 @@ contract Harvest is TransactionOwner {
     address[] owner;
     
     
-    constructor(uint _year, address[] _owner) public{
+    constructor(uint _year) public{
         year = _year;
-        owner = _owner;
-       
     }
    
     function addField(address _fieldAddress) public returns (bool success){
@@ -42,6 +40,10 @@ contract Harvest is TransactionOwner {
     
     function getFieldIndex(address _fieldAddress) public view returns(uint) {
         return fieldIndex[_fieldAddress];
+    }
+
+    function getYear() public view returns(uint){
+        return year;
     }
     
 }

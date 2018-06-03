@@ -10,7 +10,7 @@
     <div class="card-body">
        
         <p class="card-text">{{field_details}}</p>
-        <p class="card-text"><small class="text-white">{{field_address}}</small></p>
+        <p class="card-text"><small class="text-white fieldaddress">{{field_address}}</small></p>
         
         <div class="input-group mb-3">
                 <div class="input-group-prepend">

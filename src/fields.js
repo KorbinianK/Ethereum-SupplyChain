@@ -1,10 +1,6 @@
 import Mustache from "mustache";
 
 
-export function printMessage() {
-    console.log('Hi! This is the Checkout module.');
-}
-
 export function updateName(address,newName) {
     web3.eth.getAccounts(function (error, accounts) {
         if (error) {
@@ -97,18 +93,15 @@ export function newField() {
             console.error(error);
         }
         var account = accounts[0];
-        console.log(account);
+        console.log("selected",account);
 
         App.contracts.FieldHandler.deployed().then(function (instance) {
             fieldHandlerInstance = instance;
-            console.log(fieldHandlerInstance);
             return fieldHandlerInstance.newField({
                 from: account
             });
         }).then(function (result) {
             console.log(result);
-
-           
             for (var i = 0; i < result.logs.length; i++) {
                 var log = result.logs[i];
 
@@ -118,7 +111,7 @@ export function newField() {
                     console.log("addr:", fieldAddr);
                     App.fields = fieldAddr;
                     var output = Mustache.render(App.fieldsTemplate, {
-                        field_address: address,
+                        field_address: fieldAddr,
                         timestamp: ""
                     });
                     return document.getElementById('fields').innerHTML += output;

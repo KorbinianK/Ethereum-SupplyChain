@@ -4,6 +4,7 @@ import "./scss/styles.scss";
 import bootstrap from "bootstrap";
 import Mustache from "mustache";
 import * as FieldModule from "./fields.js";
+import * as HarvestModule from "./harvests.js";
 import Router from "./router.js";
 
 // Import libraries we need.
@@ -32,9 +33,9 @@ window.App = {
             web3 = new Web3(web3.currentProvider);
         } else {
             // set the provider you want from Web3.providers
-            App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
-            Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
-            web3 = new Web3(App.web3Provider);
+            var web3 = new Web3(); web3.setProvider(new Web3.providers.HttpProvider("http://localhost:9545"));
+            // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
+            // web3 = new Web3(App.web3Provider);
         }
         return App.initContracts();
     },
@@ -68,13 +69,30 @@ window.App = {
             App.contracts.Field.setProvider(App.web3Provider);
         });
 
+        $.getJSON('../build/contracts/HarvestHandler.json', function (data) {
+            let HarvestHandlerArtifact = data;
+            App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
+            App.contracts.HarvestHandler.setProvider(App.web3Provider);
+            return App.loadHarvests();
+        });
+
+         $.getJSON('../build/contracts/Harvest.json', function (data) {
+             let HarvestArtifact = data;
+             App.contracts.Harvest = TruffleContract(HarvestArtifact);
+             App.contracts.Harvest.setProvider(App.web3Provider);
+            
+         });
+
         $.getJSON('../build/contracts/FieldHandler.json', function (data) {
             let FieldHandlerArtifact = data;
             App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
             App.contracts.FieldHandler.setProvider(App.web3Provider);
             return App.getFields();
         });
+
+
         App.initTemplates();
+       
 
         return App.bindEvents();
     },
@@ -96,9 +114,41 @@ window.App = {
         let address = $(event.currentTarget).data("address");
         let newName = document.getElementById(address + "-nameInput").value;
         Router.modules.FieldModule().then(module => module.updateName(address,newName));
-      
-    }
+    },
 
+    /***
+     *  HARVESTS
+     */
+
+     loadHarvests: function (){
+        Router.modules
+            .HarvestModule()
+            .then(module => module.loadAll());
+     },
+
+     newHarvest: function () {
+         Router.modules
+             .HarvestModule()
+             .then(module => module.newHarvest());
+     },
+
+     harvest: function () {
+         
+          $('.field-selected').each(function () {
+              if ($(this).is(":checked")) {
+                  let address = $(this)
+                    .closest(".card")
+                    .find(".fieldaddress")
+                    .text();
+                  Router.modules
+                    .HarvestModule()
+                    .then(module => module.addField(address));
+              }
+          })
+        //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();
+        //  console.log(yourArray);
+         
+     }
 };
 
 window.addEventListener('load', function () {

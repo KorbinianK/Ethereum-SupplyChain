@@ -10,9 +10,9 @@ contract HarvestHandler{
     mapping(uint => address) harvests;
 
     
-    function newHarvest(uint _year,address[] _owner) public returns(bool success) {
+    function newHarvest(uint _year) public returns(bool success) {
         if(harvests[_year] == 0x0){
-            Harvest h = new Harvest(_year,_owner);
+            Harvest h = new Harvest(_year);
             harvests[_year] = h;
             harvestAddresses.push(h);
             return true;
