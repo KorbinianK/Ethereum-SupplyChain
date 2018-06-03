@@ -3,9 +3,9 @@
 <head>
     <title>TutorialToken - Truffle Webpack Demo w/ Frontend</title>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <!-- <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.main.css %>"> -->
+    <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.main.css %>">
 
-    <!-- <script src="<%= htmlWebpackPlugin.files.chunks.main.entry %>"></script> -->
+    <script src="<%= htmlWebpackPlugin.files.chunks.main.entry %>"></script>
 </head>
 
 <body>
@@ -49,6 +49,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <div class="row">
+            <div id="fields" class="card-columns">
+                
+            </div>
+        </div>
+        
+
+        <div class="row">
+            <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary btn-lg btn-block">New Field</button>
         </div>
     </div>
 </body>

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -p --progress --mode production --config webpack.config.js",
+    "build": "webpack --max_old_space_size=4096 -p --progress --mode production --config webpack.config.js",
     "dev": "cross-env NODE_ENV=dev webpack-dev-server --progress --mode development --config webpack.config.js"
   },
   "author": "",
@@ -27,7 +27,6 @@
     "prettier-package-json": "^1.6.0",
     "sass-loader": "^7.0.1",
     "style-loader": "^0.21.0",
-    "uglifyjs-webpack-plugin": "^1.2.5",
     "webpack": "^4.10.2",
     "webpack-cli": "^2.1.4",
     "webpack-dev-server": "^3.1.4",
@@ -37,9 +36,11 @@
     "bootstrap": "^4.1.1",
     "cross-env": "^5.1.6",
     "jquery": "^3.3.1",
+    "mustache": "^2.3.0",
     "openzeppelin-solidity": "^1.9.0",
     "popper.js": "^1.14.3",
     "truffle-contract": "^3.0.5",
-    "web3": "^1.0.0-beta.34"
+    "web3": "^1.0.0-beta.34",
+    "webpack-uglify-js-plugin": "^1.1.9"
   }
 }

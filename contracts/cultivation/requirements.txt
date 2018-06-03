@@ -1,0 +1,33 @@
+### Field
+Data
+-Name bytes
+-Owner address
+-Location
+    -Lat bytes
+    -Long bytes
+-Picture bytes
+-Harvests address[]
+-Transactions StructArray[]
+    -Data bytes
+    -sender address
+
+HarvestDetails
+-HarvestAddress address
+(-TransactionIndexAtLastHarvest uint)
+    
+Functions
+-getTransactionSenderAtIndex
+-getTransactionDataFromSenderAtIndex
+-getTotalTransactionCount
+-getLatitude
+-getLongitude
+-getPicture
+-setPicture
+-getName
+-setName
+-harvest
+   ( -setTransactionIndexAtHarvest )
+   -storeHarvestAddress
+-getHarvestAtIndex
+
+### Field Handler
