@@ -1,9 +1,22 @@
-<div class="card text-white bg-primary">
+<div id="{{field_address}}-card" class="card text-white bg-primary mx-1">
+    <div class="card-header">
+     <h5 class="card-title">{{field_name}}
+       <input class="float-right field-selected" type="checkbox" aria-label="Checkbox for selecting field">
+     
+     </h5>
+      
+    </div>
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">
     <div class="card-body">
-        <h5 class="card-title">{{field_name}}</h5>
+       
         <p class="card-text">{{field_details}}</p>
         <p class="card-text"><small class="text-white">{{field_address}}</small></p>
+        
+        <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <button class="text-white btn btn-secondary btn-block changeFieldName" data-address="{{field_address}}" type="button">Change Name</button>
+                </div>
+                <input type="text" id="{{field_address}}-nameInput" class="form-control" placeholder="New name " aria-label="Name" aria-describedby="nameLabel">
+            </div>
     </div>
-     <button class="text-white btn btn-primary btn-block changeFieldName" data-address="{{field_address}}" type="button">Change Name</button>
 </div>

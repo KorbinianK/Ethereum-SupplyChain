@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TutorialToken - Truffle Webpack Demo w/ Frontend</title>
+    <title>Wine Supply Chain</title>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="<%=htmlWebpackPlugin.files.chunks.main.css %>">
 
@@ -13,53 +13,18 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <h1 class="text-center">TutorialToken</h1>
+                <h1 class="text-center">Supply Chain Interaction</h1>
                 <hr/>
                 <br/>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">My Wallet</h3>
-                    </div>
-                    <div class="panel-body">
-                        <h4>Balance</h4>
-                        <strong>Balance</strong>:
-                        <span id="TTBalance"></span> TT
-                        <br/>
-                        <br/>
-                        <h4>Transfer</h4>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="addrLabel">Address</span>
-                            </div>
-                            <input type="text" id="TTTransferAddress" class=" form-control " placeholder="Address " aria-label="Address" aria-describedby="addrLabel">
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="amntLabel">Amount</span>
-                            </div>
-                            <input type="number" id="TTTransferAmount" class="form-control " placeholder="Amount " aria-label="Amount" aria-describedby="amntLabel">
-                        </div>
-
-                        <button class="btn btn-primary" id="transferButton" type="button">Transfer</button>
-                    </div>
-                </div>
-            </div>
+        <div id="fields" class="row card-columns flex-nowrap">
         </div>
-        
-        <div class="row">
-            <div id="fields" class="card-columns">
-                
-            </div>
-        </div>
-        
-
         <div class="row">
             <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary btn-lg btn-block">New Field</button>
+        </div>
+        <div class="row">
+            <button type="button" name="newField" id="newFieldBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
         </div>
     </div>
 </body>
