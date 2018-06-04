@@ -1,7 +1,8 @@
 {
 
 "presets": [
-  "env"
+  "env",
+   "es2015", "stage-0" 
 ],
 "plugins": [
   "syntax-dynamic-import"

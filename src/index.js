@@ -6,7 +6,6 @@ import Mustache from "mustache";
 import * as FieldModule from "./fields.js";
 import * as HarvestModule from "./harvests.js";
 import Router from "./router.js";
-
 // Import libraries we need.
 import {
     default as Web3
@@ -33,15 +32,15 @@ window.App = {
             web3 = new Web3(web3.currentProvider);
         } else {
             // set the provider you want from Web3.providers
-            var web3 = new Web3(); web3.setProvider(new Web3.providers.HttpProvider("http://localhost:9545"));
-            // Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
-            // web3 = new Web3(App.web3Provider);
+            App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
+            Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
+            web3 = new Web3(App.web3Provider);
         }
         return App.initContracts();
     },
 
     initTemplates: function () {
-        const template_fields = "src/templates/cultivation/fieldcard.mst"
+        const template_fields = "src/templates/cultivation/fieldcard.html"
         var fields_loaded;
        
         fetch(template_fields)
@@ -55,10 +54,7 @@ window.App = {
     },
 
 
-    newField: function () {
-        Router.modules.FieldModule().then(module => module.newField());
-    },
-
+  
    
 
     initContracts: function () {
@@ -91,11 +87,14 @@ window.App = {
         });
 
 
-        App.initTemplates();
+        // App.initTemplates();
        
 
         return App.bindEvents();
     },
+   /***
+    *  FIELDS
+    */
 
     getFields: function () {
         Router.modules.FieldModule().then(module => module.getAll());
@@ -104,6 +103,15 @@ window.App = {
     loadField: function(address){
          Router.modules.FieldModule().then(module => module.load(address));
     },
+
+    newField: function () {
+        Router.modules.FieldModule().then(module => module.newField());
+    },
+
+    openField: function (address) {
+        Router.modules.FieldModule().then(module => module.openField(address));
+    },
+
 
     bindEvents: function () {
         $(document).on("click", ".changeFieldName", App.changeFieldName);
