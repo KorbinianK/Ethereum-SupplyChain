@@ -170,23 +170,42 @@ export function openHarvest(address){
          .catch(error => console.log('Unable to get the template: ', error.message));
 }
 
-export function harvestAsJson (address) {
-     
-    return new Promise((resolve, reject) => {
-        var json;
 
+export function harvestAsJson(address) { 
+     return new Promise((resolve, reject) => {
+        var json;
+        loadDetails(address).then(function(result){
+            json = result;
+        for (var key in result.fields){
+            let field = result.fields[key];
+            console.log("field:", field.address);
+            getFieldName(field.address).then(function (name) {
+                    field.name = web3.utils.hexToString(name);
+                    return field.name;
+                })
+            }
+         }).then(function (params) {
+           console.log("par",params);
+             
+         });
+         resolve(json);
+    });
+};
+
+export function loadDetails(address){
+    return new Promise((resolve,reject) => {
+        var harvestInstance;
+        var json;
         let owners = [];
         let year;
         let picture;
-        
         let transactionCount;
         let txSender = [];
-        var harvestInstance;
         App.contracts.Harvest.at(address).then(function (instance) {
             harvestInstance = instance;
             return harvestInstance.getAllDetails();
         }).then( function (result) {
-                
+
             fields              = result[0];
             year                = result[1];
             owners              = result[2];
@@ -201,51 +220,41 @@ export function harvestAsJson (address) {
                     "transactionCount": transactionCount.toString(),
                     "txSender": [],
                 }
-                for (let i = 0; i < owners.length; i++) {
-                    let owner = {
-                        "address":owners[i]
-                    };
-                    json["owners"].push(owner);
-                }
-                for (let i = 0; i < txSender.length; i++) {
-                    let sender = {
-                        "address": txSender[i]
-                    };
-                    json["txSender"].push(sender);
-                }
-                var output = [];
-               
-                    for (let i = 0; i < fields.length; i++) {
-                        var fieldInstance;
-                        App.contracts.Field.at(fields[i]).then(function (instance) {
-                            fieldInstance = instance;
-                            output.push(fieldInstance.getName()) 
-                        })
-                        
-                    }
-                    console.log("o",output);
-                    
-                    return output;
-                }).then(function(ouput){
-                    Promise.all(output)
-                    .then(function (names) {
-                        console.log("d",names);
-                        for (let i = names.length - 1; i >= 0; i--) {
-                            var name = names[i];
-                            console.log(name);
-                        }
-                        return yearPromises;
-                    }) 
-                })
-    })
+            for (let i = 0; i < owners.length; i++) {
+                let owner = {
+                    "address":owners[i]
+                };
+                json["owners"].push(owner);
+            }
+            for (let i = 0; i < txSender.length; i++) {
+                let sender = {
+                    "address": txSender[i]
+                };
+                json["txSender"].push(sender);
+            }
+             for (let i = 0; i < fields.length; i++) {
+                 let field = {
+                     "address": fields[i],
+                     "name":""
+                 };
+                 json["fields"].push(field);
+             }
+            resolve(json);
+        })
+    });
 }
 
 export function getFieldName(address){
     return new Promise((resolve, reject) => {
         var fieldInstance;
+        
         App.contracts.Field.at(address).then(function (instance) {
             fieldInstance = instance;
             return fieldInstance.getName();
+        }).then(function (result) {
+            console.log("name",result);
+            
+            resolve(result);
         })
     })
 }

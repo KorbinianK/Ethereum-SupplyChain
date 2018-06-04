@@ -98,7 +98,6 @@ export function fieldAsJson (address) {
             }
              resolve(json);
             });
-       
     });
 }
 

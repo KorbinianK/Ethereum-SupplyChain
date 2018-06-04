@@ -129,8 +129,6 @@ window.App = {
    */
   openHarvest: function(event){
     var selectedHarvest = $(event).closest('#harvestSelector').find("#harvestSelect option:selected").val();
-    console.log(selectedHarvest);
-    
     Router.modules.HarvestModule().then(module => module.openHarvest(selectedHarvest));
   },
   loadHarvestSection: function(){
