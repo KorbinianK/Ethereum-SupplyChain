@@ -123,10 +123,19 @@ window.App = {
       .FieldModule()
       .then(module => module.updateName(address, newName));
   },
-
+  
   /***
    *  HARVESTS
    */
+  openHarvest: function(event){
+    var selectedHarvest = $(event).closest('#harvestSelector').find("#harvestSelect option:selected").val();
+    console.log(selectedHarvest);
+    
+    Router.modules.HarvestModule().then(module => module.openHarvest(selectedHarvest));
+  },
+  loadHarvestSection: function(){
+    
+  },
 
   loadHarvests: function() {
     Router.modules.HarvestModule().then(module => module.loadAll());
@@ -137,13 +146,16 @@ window.App = {
   },
 
   harvest: function() {
+    let selectedHarvest = $('#harvestSelect').val();
+    console.log("harvest selected",selectedHarvest);
+    
     $(".field-selected").each(function() {
       if ($(this).is(":checked")) {
         let address = $(this)
           .closest(".card")
           .find(".fieldaddress")
           .text();
-        Router.modules.HarvestModule().then(module => module.addField(address));
+        Router.modules.HarvestModule().then(module => module.addField(selectedHarvest,address));
       }
     });
     //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();

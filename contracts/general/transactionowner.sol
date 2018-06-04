@@ -68,5 +68,6 @@ contract TransactionOwner {
 
     constructor() public{
         sender.push(0x0);
+        addTransaction(0x0, "");
     }
 }

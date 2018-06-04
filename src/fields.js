@@ -9,7 +9,7 @@ export function updateName(address,newName) {
         }
         var account = accounts[0];
         var fieldInstance;
-        //   Field.at("0x5677db552d5fd9911a5560cb0bd40be90a70eff2").then(function (instance) { fieldInstance = instance });
+        //   Field.at("0x6a2c6b4b58d15f099321457ffdd33c5c2ba0d9cf").then(function (instance) { fieldInstance = instance });
 
         App.contracts.Field.at(address).then(function (instance) {
             fieldInstance = instance;
@@ -28,7 +28,19 @@ export function updateName(address,newName) {
         });
     });
 }
-
+export function getName(address){
+    return new Promise((resolve, reject) => {
+        var fieldInstance;
+        App.contracts.Field.at(address).then(function (instance) {
+            fieldInstance = instance;
+            return fieldInstance.getName();
+        }).then(function (result) { 
+            console.log("name",result);
+            return result
+        });
+    });
+    
+}
 export function fieldAsJson (address) {
     return new Promise((resolve, reject) => {
     var json;
@@ -43,13 +55,7 @@ export function fieldAsJson (address) {
     let longitude;
     let transactionCount;
     let txSender = [];
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        var fieldInstance;
-       
+    var fieldInstance;
         App.contracts.Field.at(address).then(function (instance) {
             fieldInstance = instance;
             return fieldInstance.getAllDetails();
@@ -91,10 +97,9 @@ export function fieldAsJson (address) {
                 json["txSender"].push(sender);
             }
              resolve(json);
-            })
-        });
+            });
        
-    })
+    });
 }
 
 export function load(address) {
@@ -108,11 +113,6 @@ export function load(address) {
          .then(fields_template => {
              fields_loaded = fields_template;
              Mustache.parse(fields_loaded);
-              web3.eth.getAccounts(function (error, accounts) {
-                  if (error) {
-                      console.error(error);
-                  }
-                  var account = accounts[0];
                   var fieldInstance;
                   App.contracts.Field.at(address).then(function (instance) {
                       fieldInstance = instance;
@@ -129,42 +129,92 @@ export function load(address) {
                       );
                       return document.getElementById('fields').innerHTML += output;
                   });
-              });
          })
          .catch(error => console.log('Unable to get the template: ', error.message));
    
 }
 
-export function getAll() {
-    var fieldHandlerInstance;
-    document.getElementById("fields").innerHTML = "";
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        console.log("selected account", account);
 
-        App.contracts.FieldHandler.deployed().then(function (instance) {
-            fieldHandlerInstance = instance;
-            return fieldHandlerInstance.getFieldCount();
-        }).then(function (result) {
-
-            let count = result.toString();
-            var output = [];
-            for (let i = 0; i < count; i++) {
-                output.push(fieldHandlerInstance.getFieldAddressAtIndex(i));
-            }
-            Promise.all(output)
-                .then(function (data) {
-                    for (let i = data.length - 1; i >= 0; i--) {
-                        let address = data[i]
-                        App.loadField(address);
+export function getAll(){
+  
+    
+        var fieldHandlerInstance;
+        const template_fields = "src/templates/cultivation/fieldcard.html"
+        var fields_loaded;
+    
+         fetch(template_fields)
+             .then(response => response.text())
+             .then(fields_template => {
+                 fields_loaded = fields_template;
+                 Mustache.parse(fields_loaded);
+            web3.eth.getAccounts(function (error, accounts) {
+                if (error) {
+                    console.error(error);
+                }
+                var account = accounts[0];
+                
+                console.log("selected account", account);
+        
+                App.contracts.FieldHandler.deployed().then(function (instance) {
+                    fieldHandlerInstance = instance;
+                    return fieldHandlerInstance.getFieldCount();
+                }).then(function (result) {
+        
+                    let count = result.toString();
+                    var output = [];
+                    for (let i = 0; i < count; i++) {
+                        output.push(fieldHandlerInstance.getFieldAddressAtIndex(i));
                     }
-                })
+                    Promise.all(output)
+                        .then(function (data) {
+                            for (let i = data.length - 1; i >= 0; i--) {
+                                let address = data[i]
+                                fieldAsJson(address).then(
+                                    function(json){
+                                        Mustache.parse(fields_loaded);
+                                        var output = Mustache.render(
+                                            fields_loaded, json
+                                        );
+                                        return document.getElementById('fields').innerHTML += output;
+                                    }
+                                );
+                            }
+                        })
+                });
+            });
         });
-    });
+        
 }
+// export function getAll() {
+//     var fieldHandlerInstance;
+//     document.getElementById("fields").innerHTML = "";
+//     web3.eth.getAccounts(function (error, accounts) {
+//         if (error) {
+//             console.error(error);
+//         }
+//         var account = accounts[0];
+//         console.log("selected account", account);
+
+//         App.contracts.FieldHandler.deployed().then(function (instance) {
+//             fieldHandlerInstance = instance;
+//             return fieldHandlerInstance.getFieldCount();
+//         }).then(function (result) {
+
+//             let count = result.toString();
+//             var output = [];
+//             for (let i = 0; i < count; i++) {
+//                 output.push(fieldHandlerInstance.getFieldAddressAtIndex(i));
+//             }
+//             Promise.all(output)
+//                 .then(function (data) {
+//                     for (let i = data.length - 1; i >= 0; i--) {
+//                         let address = data[i]
+//                         App.loadField(address);
+//                     }
+//                 })
+//         });
+//     });
+// }
 
 export function newField() {
     var fieldHandlerInstance;
@@ -197,20 +247,22 @@ export function newField() {
                                 console.log("new field created", log);
                                 var fieldAddr = log.args.field;
                                 console.log("addr:", fieldAddr);
-                                var output = Mustache.render(fields_loaded, {
-                                    field_address: fieldAddr,
-                                    timestamp: ""
-                                });
-                                return document.getElementById('fields').innerHTML += output;
-                                break;
+                                fieldAsJson(fieldAddr).then(
+                                    function(json){
+                                        Mustache.parse(fields_loaded);
+                                        var output = Mustache.render(
+                                            fields_loaded, json
+                                        );
+                                        return document.getElementById('fields').innerHTML += output;
+                                    }
+                                );
                             }
                         }
                     }).catch(function (err) {
                         console.error(err.message);
                     });
                 });
-                
-                });
+            });
     
 }
 
@@ -225,8 +277,6 @@ export function newField() {
             
             fieldAsJson(address).then(
                 function(json){
-                    console.log("!!!",json);
-                    Mustache.parse(fields_loaded);
                     Mustache.parse(fields_loaded);
                     var output = Mustache.render(
                         fields_loaded, json

@@ -9,13 +9,21 @@ contract Harvest is TransactionOwner {
     mapping(address => uint) fieldIndex;
     address[] fieldArray;
     uint year;
-    uint required;
-    uint daylimit;
     address[] owner;
-    
+    event FieldAdded(address field); 
+
     
     constructor(uint _year) public{
         year = _year;
+    }
+
+    function getAllDetails() public view returns (address[],uint,address[],uint,address[]){
+        return (
+            fieldArray,
+            year,
+            owner,
+            totalTransactions,
+            sender);
     }
    
     function addField(address _fieldAddress) public returns (bool success){
@@ -25,6 +33,7 @@ contract Harvest is TransactionOwner {
             fields[_fieldAddress] = _txcount;
             fieldIndex[_fieldAddress] =
             fieldArray.push(_fieldAddress);
+            emit FieldAdded(_fieldAddress);
             return true;
         }
         return false;

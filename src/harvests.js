@@ -1,7 +1,12 @@
 var _ = require("lodash");
+"use strict";
+
+import Mustache from "mustache";
+import * as FieldModule from "./fields.js";
+import Router from "./router.js";
 
 export function addField(harvest,field) {
-    console.log(address,"added");
+    console.log(field,"added to",harvest);
     web3.eth.getAccounts(function (error, accounts) {
         if (error) {
             console.error(error);
@@ -16,11 +21,12 @@ export function addField(harvest,field) {
               field,
               {
                 from: account
-              }
+              } 
             );
           })
           .then(function(result) {
-          
+              console.log(result);
+              
             return result;
           });
     });
@@ -33,14 +39,13 @@ export function loadHarvestFields(harvestAddress){
         }
         var account = accounts[0];
         var harvestInstance;
-
+        // Harvest.at('0xca8b5569febbc5e1a5bd6d4b98cf6690d0ba84ab').then(function (instance) { harvestInstance = instance });
         App.contracts.Harvest.at(harvestAddress)
             .then(function (instance) {
                 harvestInstance = instance;
                 return harvestInstance.getFields();
             })
             .then(function (result) {
-                // loadField
                 var output = [];
                 for (let i = 0; i < result.length; i++) {
                     output.push(App.loadField(result[i]));
@@ -138,5 +143,110 @@ export function newHarvest() {
                 return loadAll();
             });
     });
+}
+
+export function openHarvest(address){
+    
+    const template_harvestdetails = "src/templates/harvest/harvestdetails.html"
+    let harvest_loaded;
+     fetch(template_harvestdetails)
+         .then(response => response.text())
+         .then(harvest_template => {
+            harvest_loaded = harvest_template;
+            harvestAsJson(address).then(
+                function(json){
+                    console.log("open with",json);
+                    
+                    // Mustache.parse(harvest_loaded);
+                    // var output = Mustache.render(
+                    //     harvest_loaded, json
+                    // );
+                    // return document.getElementById('content').innerHTML = output;
+                }
+            );
+            
+            
+         })
+         .catch(error => console.log('Unable to get the template: ', error.message));
+}
+
+export function harvestAsJson (address) {
+     
+    return new Promise((resolve, reject) => {
+        var json;
+
+        let owners = [];
+        let year;
+        let picture;
+        
+        let transactionCount;
+        let txSender = [];
+        var harvestInstance;
+        App.contracts.Harvest.at(address).then(function (instance) {
+            harvestInstance = instance;
+            return harvestInstance.getAllDetails();
+        }).then( function (result) {
+                
+            fields              = result[0];
+            year                = result[1];
+            owners              = result[2];
+            transactionCount    = result[3];
+            txSender            = result[4];
+
+            json = {
+                "address": address,
+                    "fields": [],
+                    "owners" : [],
+                    "year": year.toString(),
+                    "transactionCount": transactionCount.toString(),
+                    "txSender": [],
+                }
+                for (let i = 0; i < owners.length; i++) {
+                    let owner = {
+                        "address":owners[i]
+                    };
+                    json["owners"].push(owner);
+                }
+                for (let i = 0; i < txSender.length; i++) {
+                    let sender = {
+                        "address": txSender[i]
+                    };
+                    json["txSender"].push(sender);
+                }
+                var output = [];
+               
+                    for (let i = 0; i < fields.length; i++) {
+                        var fieldInstance;
+                        App.contracts.Field.at(fields[i]).then(function (instance) {
+                            fieldInstance = instance;
+                            output.push(fieldInstance.getName()) 
+                        })
+                        
+                    }
+                    console.log("o",output);
+                    
+                    return output;
+                }).then(function(ouput){
+                    Promise.all(output)
+                    .then(function (names) {
+                        console.log("d",names);
+                        for (let i = names.length - 1; i >= 0; i--) {
+                            var name = names[i];
+                            console.log(name);
+                        }
+                        return yearPromises;
+                    }) 
+                })
+    })
+}
+
+export function getFieldName(address){
+    return new Promise((resolve, reject) => {
+        var fieldInstance;
+        App.contracts.Field.at(address).then(function (instance) {
+            fieldInstance = instance;
+            return fieldInstance.getName();
+        })
+    })
 }
 

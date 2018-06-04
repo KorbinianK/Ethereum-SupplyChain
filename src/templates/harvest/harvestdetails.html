@@ -1,0 +1,19 @@
+<div class="card ">
+    <div class="card-body">
+        <h5 class="card-title">{{name}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted"><small>{{address}}</small></h6>
+        <p class="card-text">
+           
+            <div class="form-group">
+                <label for="exampleFormControlSelect1"> Fields: <span id="txCount">{{fieldCount}}</span></label>
+                <select class="form-control" id="exampleFormControlSelect1">
+                    {{#fields}}
+                  <option value="{{address}}">{{fieldName}}</option>
+                    {{/fields}}
+                </select>
+              </div>
+        </p>
+        <!-- <button onclick="App.addFieldTransaction('{{address}}')" class="btn btn-link btn-sm card-link">Add Transaction</button> -->
+        <!-- <a href="#" class="card-link">Another link</a> -->
+    </div>
+</div>
