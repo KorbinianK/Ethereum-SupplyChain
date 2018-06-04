@@ -9,7 +9,7 @@ export function updateName(address,newName) {
         }
         var account = accounts[0];
         var fieldInstance;
-        //   Field.at("0x686cc7a4fa0724ab47c0b0fb766e3b4cb92327cd").then(function (instance) { fieldInstance = instance });
+        //   Field.at("0x5677db552d5fd9911a5560cb0bd40be90a70eff2").then(function (instance) { fieldInstance = instance });
 
         App.contracts.Field.at(address).then(function (instance) {
             fieldInstance = instance;
@@ -67,10 +67,11 @@ export function fieldAsJson (address) {
             txSender            = result[8];
 
            json = {
+               "address": address,
                 "status": status,
                 "creator": creator,
                 "owners": [],
-                "name": name,
+                "name": web3.utils.hexToString(name),
                 "picture": picture,
                 "latitude": latitude,
                 "longitude": longitude,
@@ -225,17 +226,38 @@ export function newField() {
             fieldAsJson(address).then(
                 function(json){
                     console.log("!!!",json);
-
+                    Mustache.parse(fields_loaded);
+                    Mustache.parse(fields_loaded);
+                    var output = Mustache.render(
+                        fields_loaded, json
+                    );
+                    return document.getElementById('content').innerHTML = output;
                 }
             );
-            //  Mustache.parse(fields_loaded);
-            //  Mustache.parse(fields_loaded);
-            //  var output = Mustache.render(
-            //      fields_loaded, json
-            //  );
-            //  return document.getElementById('content').innerHTML = output;
+            
             
          })
          .catch(error => console.log('Unable to get the template: ', error.message));
     
+}
+
+
+export function addFieldTransaction(address){
+    
+    web3.eth.getAccounts(function (error, accounts) {
+        if (error) {
+            console.error(error);
+        }
+        var account = accounts[0];
+        var fieldInstance;
+        App.contracts.Field.at(address).then(function (instance) {
+            fieldInstance = instance;
+            var dummyData = web3.utils.stringToHex("foo");
+            return fieldInstance.addTransaction(account, dummyData, { from: account});
+        }).then(function (result) {
+           console.log(result);
+           let tx = document.getElementById("txCount").innerHTML;
+            return document.getElementById("txCount").innerHTML = parseInt(tx)+1 ;
+        });
+    });
 }

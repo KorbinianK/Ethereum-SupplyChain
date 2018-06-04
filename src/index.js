@@ -15,148 +15,140 @@ import {
 } from 'truffle-contract'
 
 window.App = {
-    web3Provider: null,
-    contracts: {},
-    fields: {},
-    fieldsTemplate : null,
+  web3Provider: null,
+  contracts: {},
+  fields: {},
+  fieldsTemplate: null,
 
-    init: function () {
-        return App.initWeb3();
-    },
+  init: function() {
+    return App.initWeb3();
+  },
 
-    initWeb3: function () {
-        // Initialize web3 and set the provider to the testRPC.
+  initWeb3: function() {
+    // Initialize web3 and set the provider to the testRPC.
 
-        if (typeof web3 !== 'undefined') {
-            App.web3Provider = web3.currentProvider;
-            web3 = new Web3(web3.currentProvider);
-        } else {
-            // set the provider you want from Web3.providers
-            App.web3Provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
-            Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
-            web3 = new Web3(App.web3Provider);
-        }
-        return App.initContracts();
-    },
+    if (typeof web3 !== "undefined") {
+      App.web3Provider = web3.currentProvider;
+      web3 = new Web3(web3.currentProvider);
+    } else {
+      // set the provider you want from Web3.providers
+      App.web3Provider = new Web3.providers.HttpProvider(
+        "http://127.0.0.1:9545"
+      );
+      Web3.providers.HttpProvider.prototype.sendAsync =
+        Web3.providers.HttpProvider.prototype.send;
+      web3 = new Web3(App.web3Provider);
+    }
+    return App.initContracts();
+  },
 
-    initTemplates: function () {
-        const template_fields = "src/templates/cultivation/fieldcard.html"
-        var fields_loaded;
-       
-        fetch(template_fields)
-            .then(response => response.text())
-            .then(fields_template => {
-                fields_loaded = fields_template;
-                Mustache.parse(fields_loaded);
-                App.fieldsTemplate = fields_loaded;
-            })
-            .catch(error => console.log('Unable to get the template: ', error.message));
-    },
+  initTemplates: function() {
+    const template_fields = "src/templates/cultivation/fieldcard.html";
+    var fields_loaded;
 
+    fetch(template_fields)
+      .then(response => response.text())
+      .then(fields_template => {
+        fields_loaded = fields_template;
+        Mustache.parse(fields_loaded);
+        App.fieldsTemplate = fields_loaded;
+      })
+      .catch(error =>
+        console.log("Unable to get the template: ", error.message)
+      );
+  },
 
-  
-   
+  initContracts: function() {
+    $.getJSON("../build/contracts/Field.json", function(data) {
+      let FieldArtifact = data;
+      App.contracts.Field = TruffleContract(FieldArtifact);
+      App.contracts.Field.setProvider(App.web3Provider);
+    });
 
-    initContracts: function () {
-       
-        $.getJSON('../build/contracts/Field.json', function (data) {
-            let FieldArtifact = data;
-            App.contracts.Field = TruffleContract(FieldArtifact);
-            App.contracts.Field.setProvider(App.web3Provider);
-        });
+    $.getJSON("../build/contracts/HarvestHandler.json", function(data) {
+      let HarvestHandlerArtifact = data;
+      App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
+      App.contracts.HarvestHandler.setProvider(App.web3Provider);
+      return App.loadHarvests();
+    });
 
-        $.getJSON('../build/contracts/HarvestHandler.json', function (data) {
-            let HarvestHandlerArtifact = data;
-            App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
-            App.contracts.HarvestHandler.setProvider(App.web3Provider);
-            return App.loadHarvests();
-        });
+    $.getJSON("../build/contracts/Harvest.json", function(data) {
+      let HarvestArtifact = data;
+      App.contracts.Harvest = TruffleContract(HarvestArtifact);
+      App.contracts.Harvest.setProvider(App.web3Provider);
+    });
 
-         $.getJSON('../build/contracts/Harvest.json', function (data) {
-             let HarvestArtifact = data;
-             App.contracts.Harvest = TruffleContract(HarvestArtifact);
-             App.contracts.Harvest.setProvider(App.web3Provider);
-            
-         });
+    $.getJSON("../build/contracts/FieldHandler.json", function(data) {
+      let FieldHandlerArtifact = data;
+      App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
+      App.contracts.FieldHandler.setProvider(App.web3Provider);
+      return App.getFields();
+    });
 
-        $.getJSON('../build/contracts/FieldHandler.json', function (data) {
-            let FieldHandlerArtifact = data;
-            App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
-            App.contracts.FieldHandler.setProvider(App.web3Provider);
-            return App.getFields();
-        });
+    // App.initTemplates();
 
+    return App.bindEvents();
+  },
+  /***
+   *  FIELDS
+   */
+  addFieldTransaction: function(address) {
+      Router.modules.FieldModule().then(module => module.addFieldTransaction(address));
+  },
+  getFields: function() {
+    Router.modules.FieldModule().then(module => module.getAll());
+  },
 
-        // App.initTemplates();
-       
+  loadField: function(address) {
+    Router.modules.FieldModule().then(module => module.load(address));
+  },
 
-        return App.bindEvents();
-    },
-   /***
-    *  FIELDS
-    */
+  newField: function() {
+    Router.modules.FieldModule().then(module => module.newField());
+  },
 
-    getFields: function () {
-        Router.modules.FieldModule().then(module => module.getAll());
-    },
+  openField: function(address) {
+    Router.modules.FieldModule().then(module => module.openField(address));
+  },
 
-    loadField: function(address){
-         Router.modules.FieldModule().then(module => module.load(address));
-    },
+  bindEvents: function() {
+    $(document).on("click", ".changeFieldName", App.changeFieldName);
+  },
 
-    newField: function () {
-        Router.modules.FieldModule().then(module => module.newField());
-    },
+  changeFieldName: function(event) {
+    event.preventDefault();
+    let address = $(event.currentTarget).data("address");
+    let newName = document.getElementById(address + "-nameInput").value;
+    Router.modules
+      .FieldModule()
+      .then(module => module.updateName(address, newName));
+  },
 
-    openField: function (address) {
-        Router.modules.FieldModule().then(module => module.openField(address));
-    },
+  /***
+   *  HARVESTS
+   */
 
+  loadHarvests: function() {
+    Router.modules.HarvestModule().then(module => module.loadAll());
+  },
 
-    bindEvents: function () {
-        $(document).on("click", ".changeFieldName", App.changeFieldName);
-    },
+  newHarvest: function() {
+    Router.modules.HarvestModule().then(module => module.newHarvest());
+  },
 
-    changeFieldName: function(event){
-        event.preventDefault();        
-        let address = $(event.currentTarget).data("address");
-        let newName = document.getElementById(address + "-nameInput").value;
-        Router.modules.FieldModule().then(module => module.updateName(address,newName));
-    },
-
-    /***
-     *  HARVESTS
-     */
-
-     loadHarvests: function (){
-        Router.modules
-            .HarvestModule()
-            .then(module => module.loadAll());
-     },
-
-     newHarvest: function () {
-         Router.modules
-             .HarvestModule()
-             .then(module => module.newHarvest());
-     },
-
-     harvest: function () {
-         
-          $('.field-selected').each(function () {
-              if ($(this).is(":checked")) {
-                  let address = $(this)
-                    .closest(".card")
-                    .find(".fieldaddress")
-                    .text();
-                  Router.modules
-                    .HarvestModule()
-                    .then(module => module.addField(address));
-              }
-          })
-        //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();
-        //  console.log(yourArray);
-         
-     }
+  harvest: function() {
+    $(".field-selected").each(function() {
+      if ($(this).is(":checked")) {
+        let address = $(this)
+          .closest(".card")
+          .find(".fieldaddress")
+          .text();
+        Router.modules.HarvestModule().then(module => module.addField(address));
+      }
+    });
+    //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();
+    //  console.log(yourArray);
+  }
 };
 
 window.addEventListener('load', function () {
