@@ -96,8 +96,6 @@ export function loadAll() {
                         }).then(function (params) {
                             Promise.all(params)
                                 .then(function (years) {
-                                    console.log("leng",years.length);
-                                    
                                     for (let i = years.length - 1; i >= 0; i--) {
                                         let obj = new Object();
                                         obj.year = years[i].toString();
@@ -157,11 +155,11 @@ export function openHarvest(address){
                 function(json){
                     console.log("open with",json);
                     
-                    // Mustache.parse(harvest_loaded);
-                    // var output = Mustache.render(
-                    //     harvest_loaded, json
-                    // );
-                    // return document.getElementById('content').innerHTML = output;
+                    Mustache.parse(harvest_loaded);
+                    var output = Mustache.render(
+                        harvest_loaded, json
+                    );
+                    return document.getElementById('content').innerHTML = output;
                 }
             );
             
@@ -172,23 +170,38 @@ export function openHarvest(address){
 
 
 export function harvestAsJson(address) { 
+    var json;
      return new Promise((resolve, reject) => {
-        var json;
+        console.log("harvest",address);
+        
         loadDetails(address).then(function(result){
-            json = result;
+        json = result;
+        var output =[];
         for (var key in result.fields){
             let field = result.fields[key];
             console.log("field:", field.address);
-            getFieldName(field.address).then(function (name) {
-                    field.name = web3.utils.hexToString(name);
-                    return field.name;
-                })
+            
+            output.push( getFieldName(field.address))
+            // .then(function (name) {
+            //     field.name = web3.utils.hexToString(name);
+            // })
             }
-         }).then(function (params) {
-           console.log("par",params);
-             
+            Promise.all(output)
+            .then(function (data) {
+                for (let i = data.length - 1; i >= 0; i--) { 
+                    console.log(data);
+                    // for (var key in result.fields){
+                        // let field = result.fields[key];
+                        result.fields[i].fieldName = web3.utils.hexToString(data[i]);
+                        console.log(result.fields[key].fieldName);
+                         
+                    // }
+                }
+                resolve(result);
+            });
+            
          });
-         resolve(json);
+         
     });
 };
 
@@ -196,6 +209,7 @@ export function loadDetails(address){
     return new Promise((resolve,reject) => {
         var harvestInstance;
         var json;
+        var fields = [];
         let owners = [];
         let year;
         let picture;
@@ -233,9 +247,11 @@ export function loadDetails(address){
                 json["txSender"].push(sender);
             }
              for (let i = 0; i < fields.length; i++) {
+                 console.log("field in details:",fields[i]);
+                 
                  let field = {
                      "address": fields[i],
-                     "name":""
+                     "fieldName":""
                  };
                  json["fields"].push(field);
              }
@@ -247,13 +263,10 @@ export function loadDetails(address){
 export function getFieldName(address){
     return new Promise((resolve, reject) => {
         var fieldInstance;
-        
         App.contracts.Field.at(address).then(function (instance) {
             fieldInstance = instance;
             return fieldInstance.getName();
         }).then(function (result) {
-            console.log("name",result);
-            
             resolve(result);
         })
     })
