@@ -92,10 +92,24 @@ contract Field is TransactionOwner {
 
    /** @dev Constructor of the object.
     */
-    constructor(address _creator) public  {  
+    // constructor(address _creator) public  {  
+    //     creator = _creator;
+    //     owners.push(creator);
+    //     isOwner[creator] = true;
+    // }
+
+    constructor(
+        address _creator,
+        bytes _name,
+        bytes _longitude,
+        bytes _latitude      
+      ) public  {  
         creator = _creator;
         owners.push(creator);
         isOwner[creator] = true;
+        name = _name;
+        location.longitude = _longitude;
+        location.latitude = _latitude;
     }
 
     function setName(bytes _name) public onlyCreator returns(bool) {

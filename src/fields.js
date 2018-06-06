@@ -184,36 +184,6 @@ export function getAll(){
         });
         
 }
-// export function getAll() {
-//     var fieldHandlerInstance;
-//     document.getElementById("fields").innerHTML = "";
-//     web3.eth.getAccounts(function (error, accounts) {
-//         if (error) {
-//             console.error(error);
-//         }
-//         var account = accounts[0];
-//         console.log("selected account", account);
-
-//         App.contracts.FieldHandler.deployed().then(function (instance) {
-//             fieldHandlerInstance = instance;
-//             return fieldHandlerInstance.getFieldCount();
-//         }).then(function (result) {
-
-//             let count = result.toString();
-//             var output = [];
-//             for (let i = 0; i < count; i++) {
-//                 output.push(fieldHandlerInstance.getFieldAddressAtIndex(i));
-//             }
-//             Promise.all(output)
-//                 .then(function (data) {
-//                     for (let i = data.length - 1; i >= 0; i--) {
-//                         let address = data[i]
-//                         App.loadField(address);
-//                     }
-//                 })
-//         });
-//     });
-// }
 
 export function newField() {
     var fieldHandlerInstance;
@@ -234,16 +204,21 @@ export function newField() {
 
                     App.contracts.FieldHandler.deployed().then(function (instance) {
                         fieldHandlerInstance = instance;
-                        return fieldHandlerInstance.newField({
+                        return fieldHandlerInstance.newField(
+                            "Name",
+                            "49.020609", 
+                            "12.310252",
+                            {
                             from: account
-                        });
+                            }
+                    );
                     }).then(function (result) {
                         console.log(result);
                         for (var i = 0; i < result.logs.length; i++) {
                             var log = result.logs[i];
 
                             if (log.event == "NewField") {
-                                console.log("new field created", log);
+                                console.log("New field created", log);
                                 var fieldAddr = log.args.field;
                                 console.log("addr:", fieldAddr);
                                 fieldAsJson(fieldAddr).then(

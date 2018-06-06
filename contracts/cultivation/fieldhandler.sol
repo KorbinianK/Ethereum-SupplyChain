@@ -71,8 +71,12 @@ contract FieldHandler {
         return allFields[index];
     }
         
-    function newField() public returns(address) {
-        Field f = new Field(msg.sender);
+    function newField( 
+        bytes _name,
+        bytes _longitude,
+        bytes _latitude  
+        ) public returns(address) {
+        Field f = new Field(msg.sender,_name,_longitude,_latitude);
         allFields.push(f);
         emit NewField(f, msg.sender);
         return f;
