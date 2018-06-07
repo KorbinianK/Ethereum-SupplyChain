@@ -106,7 +106,8 @@ window.App = {
   },
 
   newField: function() {
-    Router.modules.FieldModule().then(module => module.newField());
+    var info = $("#newFieldForm").serializeArray()
+    Router.modules.FieldModule().then(module => module.newField(info));
   },
 
   openField: function(address) {
@@ -115,6 +116,7 @@ window.App = {
 
   bindEvents: function() {
     $(document).on("click", ".changeFieldName", App.changeFieldName);
+    
   },
 
   changeFieldName: function(event) {
@@ -148,16 +150,20 @@ window.App = {
   harvest: function() {
     let selectedHarvest = $('#harvestSelect').val();
     console.log("harvest selected",selectedHarvest);
-    
+    let addresses = [];
     $(".field-selected").each(function() {
       if ($(this).is(":checked")) {
         let address = $(this)
           .closest(".card")
           .find(".fieldaddress")
           .text();
-        Router.modules.HarvestModule().then(module => module.addField(selectedHarvest,address));
+        addresses.push(address);
       }
     });
+    Router.modules
+      .HarvestModule()
+      .then(module => module.addField(selectedHarvest, addresses));
+    
     //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();
     //  console.log(yourArray);
   }

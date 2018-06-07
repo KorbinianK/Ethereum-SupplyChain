@@ -107,12 +107,25 @@ export async function fieldAsJson(address) {
    return res;
 }
 
-export async function newField() {
+export async function newField(details) {
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-    let name = web3.utils.stringToHex("Name");
-    let long = web3.utils.stringToHex("49.020609");
-    let lat = web3.utils.stringToHex("12.310252");
+    var name,lat,long;
+    $.each(details, function(i, item) {
+        switch (item.name) {
+            case "name":
+                 name = web3.utils.stringToHex(item.value);
+            break;
+            case "latitude":
+                 lat = web3.utils.stringToHex(item.value);
+            break;
+            case "longitude":
+                 long = web3.utils.stringToHex(item.value);
+            break;
+          default:
+              break;
+      }  
+    });
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
  
@@ -135,6 +148,7 @@ export async function newField() {
                 var output = Mustache.render(
                     template_fields, json
                 );
+                document.getElementById("newFieldForm").reset();
                 return document.getElementById('fields').innerHTML += output;
             }
         }

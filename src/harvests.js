@@ -10,15 +10,15 @@ import field_contract from "./utils/contracts/field_contract";
 import * as helper from "./utils/helper_scripts";
 
 
-export async function addField(harvest, field) {
+export async function addField(harvest, fields) {
     const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
     const account = await helper.getAccount();
-    const res = await harvest_instance.addField(
-        field, 
+    const res = await harvest_instance.addMultipleFields(
+        fields, 
         { from: account })
         .then( result => { 
             console.log(result);
-            console.log(field, "added to", harvest);
+            console.log(fields, "added to", harvest);
     });
 }
 

@@ -38,6 +38,14 @@ contract Harvest is TransactionOwner {
         }
         return false;
     }
+
+     function addMultipleFields(address[] _fieldAddresses) public {
+        for (uint i; i < _fieldAddresses.length; i++) {
+            address fieldAddress = _fieldAddresses[i];
+            require(Field(fieldAddress).isField());       
+            addField(fieldAddress);
+        }
+    }
     
     function getFields() public view returns (address[]){
        return fieldArray; 

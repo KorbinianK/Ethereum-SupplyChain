@@ -89,6 +89,8 @@ contract FieldHandler {
     function addField(address _fieldAddress) public isfield(_fieldAddress) {
         allFields.push(Field(_fieldAddress));
     }
+
+   
     
     //TODO removeField?
     function getFieldOwner(address _fieldAddress, uint _index) public view isfield(_fieldAddress) returns(address) {
