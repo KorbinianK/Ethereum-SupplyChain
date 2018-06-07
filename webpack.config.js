@@ -13,7 +13,10 @@ module.exports = {
     filename: '[name].[chunkhash].js'
   },
   module: {
-    rules: [
+    rules: [{
+          test: /\.mustache\.html$/,
+          loader: 'mustache-loader'
+        },
       {
         test: /\.js$/,
         exclude: /node_modules/,

@@ -10,9 +10,10 @@ import Router from "./router.js";
 import {
     default as Web3
 } from 'web3';
-import {
-    default as contract
-} from 'truffle-contract'
+// import {
+//     default as contract
+// } from 'truffle-contract'
+
 
 window.App = {
   web3Provider: null,
@@ -59,34 +60,34 @@ window.App = {
   },
 
   initContracts: function() {
-    $.getJSON("../build/contracts/Field.json", function(data) {
-      let FieldArtifact = data;
-      App.contracts.Field = TruffleContract(FieldArtifact);
-      App.contracts.Field.setProvider(App.web3Provider);
-    });
+    // $.getJSON("../build/contracts/Field.json", function(data) {
+    //   let FieldArtifact = data;
+    //   App.contracts.Field = TruffleContract(FieldArtifact);
+    //   App.contracts.Field.setProvider(App.web3Provider);
+    // });
 
-    $.getJSON("../build/contracts/HarvestHandler.json", function(data) {
-      let HarvestHandlerArtifact = data;
-      App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
-      App.contracts.HarvestHandler.setProvider(App.web3Provider);
-      return App.loadHarvests();
-    });
+    // $.getJSON("../build/contracts/HarvestHandler.json", function(data) {
+    //   let HarvestHandlerArtifact = data;
+    //   App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
+    //   App.contracts.HarvestHandler.setProvider(App.web3Provider);
+    //   return App.loadHarvests();
+    // });
 
-    $.getJSON("../build/contracts/Harvest.json", function(data) {
-      let HarvestArtifact = data;
-      App.contracts.Harvest = TruffleContract(HarvestArtifact);
-      App.contracts.Harvest.setProvider(App.web3Provider);
-    });
+    // $.getJSON("../build/contracts/Harvest.json", function(data) {
+    //   let HarvestArtifact = data;
+    //   App.contracts.Harvest = TruffleContract(HarvestArtifact);
+    //   App.contracts.Harvest.setProvider(App.web3Provider);
+    // });
 
-    $.getJSON("../build/contracts/FieldHandler.json", function(data) {
-      let FieldHandlerArtifact = data;
-      App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
-      App.contracts.FieldHandler.setProvider(App.web3Provider);
-      return App.getFields();
-    });
+    // $.getJSON("../build/contracts/FieldHandler.json", function(data) {
+    //   let FieldHandlerArtifact = data;
+    //   App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
+    //   App.contracts.FieldHandler.setProvider(App.web3Provider);
+    //   return App.getFields();
+    // });
 
     // App.initTemplates();
-
+    App.getFields();
     return App.bindEvents();
   },
   /***

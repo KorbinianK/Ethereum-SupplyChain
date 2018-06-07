@@ -1,4 +1,4 @@
-pragma solidity 0.4.24; 
+pragma solidity 0.4.23; 
 
 import "../general/transactionowner.sol"; 
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
