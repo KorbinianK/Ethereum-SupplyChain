@@ -1,4 +1,4 @@
-import fieldArtifacts from '../../build/contracts/Field.json';
+import fieldArtifacts from '../../../build/contracts/Field.json';
 import contract from 'truffle-contract';
 
 export default function buildField(currentProvider) {

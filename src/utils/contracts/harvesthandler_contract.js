@@ -1,10 +1,10 @@
-import fieldArtifacts from '../../build/contracts/FieldHandler.json';
-import contract from 'truffle-contract';
+import harvestHandlerArtifacts from "../../../build/contracts/HarvestHandler.json";
+import contract from "truffle-contract";
 
-export default function buildFieldHandler(currentProvider) {
-    const fieldHandler = contract(fieldArtifacts);
-    fieldHandler.setProvider(currentProvider);
-    return fixTruffleContractCompatibilityIssue(fieldHandler);
+export default function buildHarvest(currentProvider) {
+    const harvestHandler = contract(harvestHandlerArtifacts);
+    harvestHandler.setProvider(currentProvider);
+    return fixTruffleContractCompatibilityIssue(harvestHandler);
 }
 
 // Workaround for a compatibility issue between web3@1.0.0-beta.29 and truffle-contract@3.0.3
@@ -13,7 +13,8 @@ function fixTruffleContractCompatibilityIssue(contract) {
     if (typeof contract.currentProvider.sendAsync !== "function") {
         contract.currentProvider.sendAsync = function () {
             return contract.currentProvider.send.apply(
-                contract.currentProvider, arguments
+                contract.currentProvider,
+                arguments
             );
         };
     }

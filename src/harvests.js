@@ -4,6 +4,8 @@ var _ = require("lodash");
 import Mustache from "mustache";
 import * as FieldModule from "./fields.js";
 import Router from "./router.js";
+import harvest_contract from "./utils/contracts/harvest_contract";
+import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 
 export function addField(harvest,field) {
     console.log(field,"added to",harvest);
@@ -119,27 +121,21 @@ export function loadAll() {
     
 }
 
-export function newHarvest() {
+export async function newHarvest() {
     let harvestYear = $("#newHarvest").val();
     console.log(harvestYear);
-    
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        var harvestHandlerInstance;
 
-        App.contracts.HarvestHandler.deployed()
-            .then(function (instance) {
-                harvestHandlerInstance = instance;
-                return harvestHandlerInstance.newHarvest(harvestYear,{from:account});
-            })
-            .then(function (result) {
-                console.log(result);
-                
-                return loadAll();
-            });
+    const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
+    const account = await getAccount();
+
+    const res = await harvestHandler_instance.newHarvest(
+        harvestYear,
+         {
+            from: account
+        }
+    ).then(result => {
+        console.log(result);
+        return loadAll();
     });
 }
 

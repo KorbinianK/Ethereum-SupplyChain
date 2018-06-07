@@ -1,13 +1,14 @@
 "use strict";
 
 import Mustache from "mustache";
-import field_contract from "./utils/field_contract";
-import fieldHandler_contract from "./utils/fieldhandler_contract";
+import field_contract from "./utils/contracts/field_contract";
+import fieldHandler_contract from "./utils/contracts/fieldhandler_contract";
+import * as helper from "./utils/helper_scripts";
 
 export async function updateName(address,newName) {
 
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await getAccount();
+    const account = await helper.getAccount();
     var dummyData = web3.utils.stringToHex("foo");
 
     const res = await field_instance.setName(
@@ -24,7 +25,7 @@ export async function updateName(address,newName) {
 
 export async function getAll(){
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
-    const account = await this.getAccount();
+    const account = await helper.getAccount();
     fieldhandler_instance
       .getAllFields({ from: account })
       .then(async receipt => {
@@ -40,7 +41,7 @@ export async function getAll(){
 }
 
 export async function loadFieldCard(json){
-    const template_fields = await fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
+    const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
     var output = Mustache.render(
         template_fields, json
@@ -49,14 +50,7 @@ export async function loadFieldCard(json){
 }
 
 
- async function fetchTemplate(url) {
-    var template =
-    $.get(url, function (r) {
-        template = r;
-    });
-     return await template;
-       
-}
+
 
 export async function fieldAsJson(address) {
     let status;
@@ -70,7 +64,7 @@ export async function fieldAsJson(address) {
     let txSender = [];
     var json;
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await getAccount();
+    const account = await helper.getAccount();
     
     const res = await field_instance.getAllDetails({from:account}).then(result =>{
         status = result[0];
@@ -115,11 +109,11 @@ export async function fieldAsJson(address) {
 
 export async function newField() {
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
-    const account = await this.getAccount();
+    const account = await helper.getAccount();
     let name = web3.utils.stringToHex("Name");
     let long = web3.utils.stringToHex("49.020609");
     let lat = web3.utils.stringToHex("12.310252");
-    const template_fields = await fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
+    const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
  
     fieldhandler_instance.newField(
@@ -147,17 +141,12 @@ export async function newField() {
     })
 }
 
-export async function getAccount() {
-    console.log("getAccounts()");
-    let accounts = await web3.eth.getAccounts();
-    return accounts[0];
-}
 
 
 export async function openField(address) {
 
     console.log("open",address);
-    const template_fielddetails = await fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
+    const template_fielddetails = await helper.fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
     Mustache.parse(template_fielddetails);
     const json = await fieldAsJson(address);
     Mustache.parse(template_fielddetails);
@@ -172,7 +161,7 @@ export async function openField(address) {
 
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await getAccount();
+    const account = await helper.getAccount();
     var dummyData = web3.utils.stringToHex("foo");
     const res = await field_instance.addTransaction(
         account,
