@@ -4,46 +4,23 @@ import Mustache from "mustache";
 import field_contract from "./utils/field_contract";
 import fieldHandler_contract from "./utils/fieldhandler_contract";
 
-export function updateName(address,newName) {
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        var fieldInstance;
-        //   Field.at("0x6a2c6b4b58d15f099321457ffdd33c5c2ba0d9cf").then(function (instance) { fieldInstance = instance });
+export async function updateName(address,newName) {
 
-        App.contracts.Field.at(address).then(function (instance) {
-            fieldInstance = instance;
-            return fieldInstance.setName(
-                web3.utils.stringToHex(newName), {
-                    from: account
-                }
-            );
-        }).then(function (result) {
-            $("#" + address + "-card")
-                .find(".card-title")
-                .text(newName);
-            return result;
-            
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await getAccount();
+    var dummyData = web3.utils.stringToHex("foo");
 
-        });
+    const res = await field_instance.setName(
+        web3.utils.stringToHex(newName),
+        { from: account }
+    ).then(result => {
+        console.log(result);
+        $("#" + address + "-card")
+            .find(".card-title")
+            .text(newName);
+        return result;
     });
 }
-export function getName(address){
-    return new Promise((resolve, reject) => {
-        var fieldInstance;
-        App.contracts.Field.at(address).then(function (instance) {
-            fieldInstance = instance;
-            return fieldInstance.getName();
-        }).then(function (result) { 
-            console.log("name",result);
-            return result
-        });
-    });
-    
-}
-
 
 export async function getAll(){
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
@@ -207,20 +184,4 @@ export async function addFieldTransaction(address){
         return document.getElementById("txCount").innerHTML = parseInt(tx) + 1;
      });
     
-    // web3.eth.getAccounts(function (error, accounts) {
-    //     if (error) {
-    //         console.error(error);
-    //     }
-    //     var account = accounts[0];
-    //     var fieldInstance;
-    //     App.contracts.Field.at(address).then(function (instance) {
-    //         fieldInstance = instance;
-    //         var dummyData = web3.utils.stringToHex("foo");
-    //         return fieldInstance.addTransaction(account, dummyData, { from: account});
-    //     }).then(function (result) {
-    //        console.log(result);
-    //        let tx = document.getElementById("txCount").innerHTML;
-    //         return document.getElementById("txCount").innerHTML = parseInt(tx)+1 ;
-    //     });
-    // });
 }
