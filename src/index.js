@@ -88,6 +88,7 @@ window.App = {
 
     // App.initTemplates();
     App.getFields();
+    App.loadHarvests();
     return App.bindEvents();
   },
   /***

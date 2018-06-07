@@ -6,31 +6,19 @@ import * as FieldModule from "./fields.js";
 import Router from "./router.js";
 import harvest_contract from "./utils/contracts/harvest_contract";
 import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
+import field_contract from "./utils/contracts/field_contract";
+import * as helper from "./utils/helper_scripts";
 
-export function addField(harvest,field) {
-    console.log(field,"added to",harvest);
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        var harvestInstance;
 
-        App.contracts.Harvest.at(harvest)
-          .then(function(instance) {
-              harvestInstance = instance;
-              return harvestInstance.addField(
-              field,
-              {
-                from: account
-              } 
-            );
-          })
-          .then(function(result) {
-              console.log(result);
-              
-            return result;
-          });
+export async function addField(harvest, field) {
+    const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
+    const account = await helper.getAccount();
+    const res = await harvest_instance.addField(
+        field, 
+        { from: account })
+        .then( result => { 
+            console.log(result);
+            console.log(field, "added to", harvest);
     });
 }
 
@@ -63,62 +51,32 @@ export function loadHarvestFields(harvestAddress){
     });
 }
 
-export function loadAll() {
+export async function loadAll() {
     document.getElementById("harvestSelect").innerHTML = '';
-    web3.eth.getAccounts(function (error, accounts) {
-        if (error) {
-            console.error(error);
-        }
-        var account = accounts[0];
-        var harvestHandlerInstance;
-        var harvestInstance;
-        App.contracts.HarvestHandler.deployed()
-            .then(function (instance) {
-                harvestHandlerInstance = instance;
-                return harvestHandlerInstance.getHarvests();
-            })
-            .then(function (result) {
-                if(result.length > 0){
-                    console.log(result);
-                    
-                    var entries = [];
-                    var output = [];
-                    for (let i = 0; i < result.length; i++) {
-                        output.push(App.contracts.Harvest.at(result[i]));
-                    }
-                    Promise.all(output)
-                        .then(function (instances) {
-                            
-                            var yearPromises = [];
-                            for (let i = instances.length - 1; i >= 0; i--) {
-                                harvestInstance = instances[i];
-                                yearPromises.push(harvestInstance.getYear());
-                            }
-                            return yearPromises;
-                        }).then(function (params) {
-                            Promise.all(params)
-                                .then(function (years) {
-                                    for (let i = years.length - 1; i >= 0; i--) {
-                                        let obj = new Object();
-                                        obj.year = years[i].toString();
-                                        console.log("year",years[i].toString());
-                                        obj.address = result[i];
-                                        entries.push(obj);
-                                    }
-                                    return entries;
-                                }).then(function (array) {
-                                    
-                                    let arr = _.sortBy(array, "year").reverse();
-                                    arr.forEach(element => {
-                                        document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
-                                    });
-                                });
-                        });
-                }
-            });
-    });
 
-    
+    const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
+    const account = await helper.getAccount();
+    const res = await harvestHandler_instance.getHarvests(
+        {
+        from: account
+        }
+    ).then(async result => {
+        console.log(result);
+        var years = [];
+        for (let i = 0; i < result.length; i++) {
+            let harvest_instance = await harvest_contract(web3.currentProvider).at(result[i]);
+            let year = {};
+            year.address = result[i];
+            year.year = await harvest_instance.getYear({from:account});
+            years.push(year);
+        }
+        console.log("y",years);
+        let arr = _.sortBy(years, "year").reverse();
+        arr.forEach(element => {
+            document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
+        });
+        
+    });
 }
 
 export async function newHarvest() {
@@ -126,7 +84,7 @@ export async function newHarvest() {
     console.log(harvestYear);
 
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
-    const account = await getAccount();
+    const account = await helper.getAccount();
 
     const res = await harvestHandler_instance.newHarvest(
         harvestYear,
@@ -139,132 +97,86 @@ export async function newHarvest() {
     });
 }
 
-export function openHarvest(address){
+export async function openHarvest(address){
     
-    const template_harvestdetails = "src/templates/harvest/harvestdetails.html"
-    let harvest_loaded;
-     fetch(template_harvestdetails)
-         .then(response => response.text())
-         .then(harvest_template => {
-            harvest_loaded = harvest_template;
-            harvestAsJson(address).then(
-                function(json){
-                    console.log("open with",json);
-                    
-                    Mustache.parse(harvest_loaded);
-                    var output = Mustache.render(
-                        harvest_loaded, json
-                    );
-                    return document.getElementById('content').innerHTML = output;
-                }
-            );
-            
-            
-         })
-         .catch(error => console.log('Unable to get the template: ', error.message));
+    const template_harvestdetails = await helper.fetchTemplate("src/templates/harvest/mustache.harvestdetails.html");
+    Mustache.parse(template_harvestdetails);
+    const json = await harvestAsJson(address);
+    Mustache.parse(template_harvestdetails);
+    var output = Mustache.render(
+        template_harvestdetails, json
+    );
+    return document.getElementById('content').innerHTML = output;
 }
 
 
-export function harvestAsJson(address) { 
+export async function harvestAsJson(address) { 
     var json;
-     return new Promise((resolve, reject) => {
-        console.log("harvest",address);
+    const harvest_instance = await harvest_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    var fields = [];
+    let owners = [];
+    let year;
+    let picture;
+    let transactionCount;
+    let txSender = [];
+
+    const res = await harvest_instance.getAllDetails(
+        {
+            from: account
+        }
+    ).then(async result => {
         
-        loadDetails(address).then(function(result){
-        json = result;
-        var output =[];
-        for (var key in result.fields){
-            let field = result.fields[key];
-            console.log("field:", field.address);
-            
-            output.push( getFieldName(field.address))
-            // .then(function (name) {
-            //     field.name = web3.utils.hexToString(name);
-            // })
+        fields              = result[0];
+        year                = result[1];
+        owners              = result[2];
+        transactionCount    = result[3];
+        txSender            = result[4];
+
+        json = {
+            "address": address,
+            "fields": [],
+            "owners" : [],
+            "year": year.toString(),
+            "transactionCount": transactionCount.toString(),
+            "txSender": [],
             }
-            Promise.all(output)
-            .then(function (data) {
-                for (let i = data.length - 1; i >= 0; i--) { 
-                    console.log(data);
-                    // for (var key in result.fields){
-                        // let field = result.fields[key];
-                        result.fields[i].fieldName = web3.utils.hexToString(data[i]);
-                        console.log(result.fields[key].fieldName);
-                         
-                    // }
-                }
-                resolve(result);
-            });
-            
-         });
-         
+        for (let i = 0; i < owners.length; i++) {
+            let owner = {
+                "address":owners[i]
+            };
+            json["owners"].push(owner);
+        }
+        for (let i = 0; i < txSender.length; i++) {
+            let sender = {
+                "address": txSender[i]
+            };
+            json["txSender"].push(sender);
+        }
+        if(fields.length > 0){
+            for (let i = 0; i < fields.length; i++) {
+                console.log("field in details:", fields[i]);
+                let field = {
+                    "address": fields[i],
+                    "fieldName": await getFieldName(fields[i])
+                };
+                json["fields"].push(field);
+            }
+        }
+       return  json;
     });
+    console.log(res);
+    return res;
 };
 
-export function loadDetails(address){
-    return new Promise((resolve,reject) => {
-        var harvestInstance;
-        var json;
-        var fields = [];
-        let owners = [];
-        let year;
-        let picture;
-        let transactionCount;
-        let txSender = [];
-        App.contracts.Harvest.at(address).then(function (instance) {
-            harvestInstance = instance;
-            return harvestInstance.getAllDetails();
-        }).then( function (result) {
 
-            fields              = result[0];
-            year                = result[1];
-            owners              = result[2];
-            transactionCount    = result[3];
-            txSender            = result[4];
-
-            json = {
-                "address": address,
-                    "fields": [],
-                    "owners" : [],
-                    "year": year.toString(),
-                    "transactionCount": transactionCount.toString(),
-                    "txSender": [],
-                }
-            for (let i = 0; i < owners.length; i++) {
-                let owner = {
-                    "address":owners[i]
-                };
-                json["owners"].push(owner);
-            }
-            for (let i = 0; i < txSender.length; i++) {
-                let sender = {
-                    "address": txSender[i]
-                };
-                json["txSender"].push(sender);
-            }
-             for (let i = 0; i < fields.length; i++) {
-                 console.log("field in details:",fields[i]);
-                 
-                 let field = {
-                     "address": fields[i],
-                     "fieldName":""
-                 };
-                 json["fields"].push(field);
-             }
-            resolve(json);
-        })
+export async function getFieldName(address){
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    const name = await field_instance.getName({from:account}).then( result =>  { 
+        return web3.utils.hexToString(result);
     });
+    return name;
 }
 
-export function getFieldName(address){
-    return new Promise((resolve, reject) => {
-        var fieldInstance;
-        App.contracts.Field.at(address).then(function (instance) {
-            fieldInstance = instance;
-            return fieldInstance.getName();
-        }).then(function (result) {
-            resolve(result);
-        })
-    })
-}
 
