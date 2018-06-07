@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity 0.4.23;
 pragma experimental ABIEncoderV2;
 
 import "./field.sol";
@@ -58,7 +58,11 @@ contract FieldHandler {
         activeFieldsArray.length--;
         emit StatusChanged(f, msg.sender); 
     }
-    
+
+    function getAllFields() public view returns (address []){
+        return allFields;
+    }
+
     function getActiveFields() public view returns(address[]) {
         return activeFieldsArray;
     }
