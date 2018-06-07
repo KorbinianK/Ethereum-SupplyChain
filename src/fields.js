@@ -186,7 +186,6 @@ export function getAll(){
 }
 
 export function newField() {
-    var fieldHandlerInstance;
       const template_fields = "src/templates/cultivation/fieldcard.html"
       var fields_loaded;
 
@@ -201,15 +200,22 @@ export function newField() {
                     }
                     var account = accounts[0];
                     console.log("selected", account);
+                    var fieldHandlerInstance;
+                    let name = web3.utils.stringToHex("Name");
+                    let long = web3.utils.stringToHex("49.020609");
+                    let lat = web3.utils.stringToHex("12.310252");
 
+                    // web3.eth.getAccounts(function (error, accounts) { if (error) { console.error(error); } account = accounts[0]; });
+// FieldHandler.deployed().then(function (instance) { fieldHandlerInstance = instance; return fieldHandlerInstance.newField(name,lat,long, { from: account }); });
                     App.contracts.FieldHandler.deployed().then(function (instance) {
                         fieldHandlerInstance = instance;
                         return fieldHandlerInstance.newField(
-                            "Name",
-                            "49.020609", 
-                            "12.310252",
+                            name,
+                            long,
+                            lat,
                             {
-                            from: account
+                            from: account,
+                            gas: '470000'
                             }
                     );
                     }).then(function (result) {

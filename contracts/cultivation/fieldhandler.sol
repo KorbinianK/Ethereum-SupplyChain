@@ -76,7 +76,7 @@ contract FieldHandler {
         bytes _longitude,
         bytes _latitude  
         ) public returns(address) {
-        Field f = new Field(msg.sender,_name,_longitude,_latitude);
+        Field f = new Field(msg.sender, _name, _longitude, _latitude);
         allFields.push(f);
         emit NewField(f, msg.sender);
         return f;
