@@ -2,36 +2,55 @@ pragma solidity ^0.4.23;
 
 import "../cultivation/field.sol";
 import "../general/transactionowner.sol";
+import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Harvest is TransactionOwner {
-   
-    mapping(address => uint) fields;
-    mapping(address => uint) fieldIndex;
-    address[] fieldArray;
-    uint year;
-    address[] owner;
+
+contract Harvest is TransactionOwner, Ownable {
+
+    mapping(address => bool) private fields;
+    // mapping(address => uint) private fieldIndex;
+    address[] private fieldArray;
+    uint private year;
+    address[] private owners;
     event FieldAdded(address field); 
-
     
-    constructor(uint _year) public{
-        year = _year;
+    address public grapeToken;
+
+    modifier harvestable(address _fieldAddress) {
+        require(Field(_fieldAddress).isHarvestable());
+        _;
     }
 
-    function getAllDetails() public view returns (address[],uint,address[],uint,address[]){
+    function setTokenAddress(address _tokenAddress) public onlyOwner {
+        grapeToken = _tokenAddress;
+    }
+
+    function mintToken(uint256 _value) public returns (bool) {
+        require(grapeToken.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
+        return true;
+    }
+
+    function transferTo(address _to, uint256 _value) public onlyOwner returns(bool) {
+        require(grapeToken.call(bytes4(keccak256("transfer(address,uint256)")), _to, _value));
+        return true;
+    }
+
+    function getAllDetails() public view returns (address[], uint, address[], uint, address[]) {
         return (
             fieldArray,
             year,
-            owner,
+            owners,
             totalTransactions,
             sender);
     }
    
-    function addField(address _fieldAddress) public returns (bool success){
-        if(fields[_fieldAddress] == 0){
+    function addField(address _fieldAddress) public harvestable(_fieldAddress) returns (bool success) {
+        if (fields[_fieldAddress] == false) {
             Field f = Field(_fieldAddress);
-            uint _txcount = f.getTotalTransactionCount();
-            fields[_fieldAddress] = _txcount;
-            fieldIndex[_fieldAddress] =
+            f.harvest(this);
+            // uint _txcount = f.getTotalTransactionCount();
+            fields[_fieldAddress] = true;
+            // fieldIndex[_fieldAddress] =
             fieldArray.push(_fieldAddress);
             emit FieldAdded(_fieldAddress);
             return true;
@@ -39,28 +58,29 @@ contract Harvest is TransactionOwner {
         return false;
     }
 
-     function addMultipleFields(address[] _fieldAddresses) public {
+    function addMultipleFields(address[] _fieldAddresses) public {
         for (uint i; i < _fieldAddresses.length; i++) {
-            address fieldAddress = _fieldAddresses[i];
-            require(Field(fieldAddress).isField());       
-            addField(fieldAddress);
+            address _fieldAddress = _fieldAddresses[i];
+            require(Field(_fieldAddress).isField());       
+            require(Field(_fieldAddress).isHarvestable());
+            addField(_fieldAddress);
         }
     }
     
-    function getFields() public view returns (address[]){
-       return fieldArray; 
+    function getFields() public view returns (address[]) {
+        return fieldArray; 
     }
     
-    function getTransactionPointer(address _fieldAddress) public view returns (uint transactions){
-       return fields[_fieldAddress];
+    function getTransactionPointer(address _fieldAddress) public view returns (uint) {
+        return Field(_fieldAddress).getHarvestPointer(this);
     }
     
-    function getFieldIndex(address _fieldAddress) public view returns(uint) {
-        return fieldIndex[_fieldAddress];
-    }
-
-    function getYear() public view returns(uint){
+    function getYear() public view returns(uint) {
         return year;
     }
-    
+
+    constructor(uint _year) public {
+        year = _year;
+        owners.push(msg.sender);
+    }
 }

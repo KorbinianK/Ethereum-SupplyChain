@@ -1,12 +1,7 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 import "../general/transactionowner.sol"; 
-// import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-/**
- * @title Field
- * @dev Field object that can recieve transactions
- */
 /**
  * @title Field
  * @dev Field object that can recieve transactions
@@ -63,6 +58,10 @@ contract Field is TransactionOwner {
     function harvest(address _harvest) public isActive atStage(Stages.Cultivated) transitionNext {
         harvestPointer[_harvest] = totalTransactions;
     }
+
+    function getHarvestPointer(address _harvest) public view returns(uint) {
+        return harvestPointer[_harvest];
+    } 
 
     function addTransaction(address _sender, bytes _data) public {
         if (stage == Stages.Cultivated)
@@ -134,6 +133,11 @@ contract Field is TransactionOwner {
     }
 
     function isField() public pure returns(bool) {
+        return true;
+    }
+
+    function isHarvestable() public view returns(bool) {
+        require(stage == Stages.Uncultivated);
         return true;
     }
 
