@@ -3,9 +3,10 @@ pragma solidity ^0.4.23;
 import "../cultivation/field.sol";
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
 
 
-contract Harvest is TransactionOwner, Ownable {
+contract Harvest is TransactionOwner, Ownable, ERC20Basic {
 
     mapping(address => bool) private fields;
     // mapping(address => uint) private fieldIndex;
@@ -79,8 +80,27 @@ contract Harvest is TransactionOwner, Ownable {
         return year;
     }
 
+// TOKEN FUNCTIONS
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
+    function totalSupply() public view returns (uint256) {
+        return ERC20Basic(grapeToken).totalSupply(); 
+    }
+    
+    function balanceOf(address who) public view returns (uint256){
+        require(who == address(this));
+        return ERC20Basic(grapeToken).balanceOf(this);
+    }
+  
+    function transfer(address to, uint256 value) public returns (bool) {
+        ERC20Basic(grapeToken).transfer(to, value);
+        emit Transfer(address(this), to, value);
+        return false;
+    }
+
     constructor(uint _year) public {
         year = _year;
         owners.push(msg.sender);
     }
+    
 }
