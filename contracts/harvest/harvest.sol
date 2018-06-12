@@ -3,7 +3,6 @@ pragma solidity ^0.4.23;
 import "../cultivation/field.sol";
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
-// import "../../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20Basic.sol";
 import "../general/erc20handler.sol";
 
 
@@ -11,28 +10,23 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
 
     mapping(address => bool) private fields;
     mapping(address => uint) private fieldBalance;
-    // mapping(address => uint) private fieldIndex;
     address[] private fieldArray;
     uint private year;
     address[] private owners;
     event FieldAdded(address field); 
-    // address grapeToken = erc20;
 
     modifier harvestable(address _fieldAddress) {
         require(Field(_fieldAddress).isHarvestable(),"Field is currently not harvestable");
         _;
     }
-
-    // function setTokenAddress(address _tokenAddress) public onlyOwner {
-    //     grapeToken = _tokenAddress;
-    // }
+ 
 
     function weightInput(address _fieldAddress, uint _amount) public harvestable(_fieldAddress) {
         mintToken(_amount);
         fieldBalance[_fieldAddress] += _amount;
     }
 
-    function balanceFromField(address _fieldAddress) public returns(uint) {
+    function balanceFromField(address _fieldAddress) public view returns(uint) {
         return fieldBalance[_fieldAddress];
     }
 
@@ -41,9 +35,13 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         return true;
     }
 
-    function transferTo(address _to, uint256 _value) public onlyOwner returns(bool) {
+    function transferTo(address _to, uint256 _value) public returns(bool) {
         require(erc20.call(bytes4(keccak256("transfer(address,uint256)")), _to, _value));
         return true;
+    }
+    
+    function getBalance() public view returns (uint256) {
+        return balanceOf(address(this));
     }
 
     function getAllDetails() public view returns (address[], uint, address[], uint, address[]) {
@@ -90,28 +88,8 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         return year;
     }
 
-// // TOKEN FUNCTIONS
-//     event Transfer(address indexed from, address indexed to, uint256 value);
-
-//     function totalSupply() public view returns (uint256) {
-//         return ERC20Basic(grapeToken).totalSupply(); 
-//     }
-    
-//     function balanceOf(address who) public view returns (uint256){
-//         require(who == address(this));
-//         return ERC20Basic(grapeToken).balanceOf(this);
-//     }
-  
-//     function transfer(address to, uint256 value) public returns (bool) {
-//         ERC20Basic(grapeToken).transfer(to, value);
-//         emit Transfer(address(this), to, value);
-//         return false;
-//     }
-
     constructor(uint _year, address _token) public {
         year = _year;
         erc20 = _token;
         owners.push(msg.sender);
     }
-    
-}

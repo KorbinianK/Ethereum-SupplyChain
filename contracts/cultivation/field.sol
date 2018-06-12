@@ -13,7 +13,7 @@ contract Field is TransactionOwner {
     address internal creator;
     bytes internal name;
     bytes internal picture;
-    bool internal status;
+    // bool internal status;
     Location internal location;
     address[] public owners;
     Stages public stage;
@@ -44,18 +44,13 @@ contract Field is TransactionOwner {
         require(msg.sender == creator, "Only the creator can call this function");
         _;
     }
-
-    modifier isActive {
-        require(status == true);
-        _;
-    }
     
     struct Location {
         bytes latitude;
         bytes longitude;
     }
 
-    function harvest(address _harvest) public isActive atStage(Stages.Cultivated) transitionNext {
+    function harvest(address _harvest) public atStage(Stages.Cultivated) transitionNext {
         harvestPointer[_harvest] = totalTransactions;
     }
 
@@ -76,23 +71,6 @@ contract Field is TransactionOwner {
     function getOwner(uint _index) public view returns(address){
         return owners[_index];
     }
-    
-    function changeStatus(bool _status) public onlyCreator returns(bool) {
-        emit StatusChanged(status, _status); 
-        if (!status) {
-            stage = Stages.Uncultivated;
-        }else {
-            stage = Stages.Cultivated;
-        }
-        status = _status;
-        return status;
-    }
-    
-    function getStatus() public view returns(bool) {
-        return status;
-    }
-
-    
 
     function getName() public view returns(bytes) {
         return name;
@@ -112,7 +90,6 @@ contract Field is TransactionOwner {
 
     function getAllDetails() public view 
     returns(
-        bool,
         address,
         address[],
         bytes,
@@ -122,7 +99,6 @@ contract Field is TransactionOwner {
         uint,
         address[]) {
         return (
-            status,
             creator,
             owners,
             name,
@@ -138,12 +114,8 @@ contract Field is TransactionOwner {
         return true;
     }
 
-    function getStage() public view returns(Stages){
-        return stage;
-    }
-
     function isHarvestable() public view returns(bool) {
-        require(stage == Stages.Cultivated);
+        require(stage == Stages.Uncultivated);
         return true;
     }
 

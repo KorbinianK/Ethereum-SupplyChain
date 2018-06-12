@@ -1,8 +1,31 @@
 pragma solidity 0.4.24; 
 
+
 contract TransactionOwner {
     uint public totalTransactions;
     address[] internal sender;
+    Status public status;
+
+    enum Status {
+        active,
+        deactivated
+    }
+
+    event NewStatus(Status status);
+
+    modifier isActive {
+        require(status == Status.active);
+        _;
+    }
+
+    function switchStatus() public {
+        if (status == Status.active){
+            status = Status.deactivated; 
+        }else {
+            status = Status.active; 
+        }
+        emit NewStatus(status);
+    }
     
     struct TransactionSender {
         address sender;
@@ -19,7 +42,7 @@ contract TransactionOwner {
     mapping (uint => TransactionStruct) public transactions;
     mapping (address => bool) internal isSender;
   
-    function addTransaction(address _sender, bytes _data) public{
+    function addTransaction(address _sender, bytes _data) public isActive {
         if (!inArray(_sender)) {
             isSender[_sender] = true;
             sender.push(_sender);
@@ -30,7 +53,7 @@ contract TransactionOwner {
         tsender.transactionCount++;
         totalTransactions++;
     }
-    
+
     function getTransactionDataAtIndex(uint _index) public view returns(bytes) {
         return transactions[_index].data;
     }
@@ -58,7 +81,7 @@ contract TransactionOwner {
     }
     
     function inArray(address _addr) internal view returns (bool) {
-        if (_addr != 0x0 && isSender[_addr] == false) {
+        if (_addr != 0x0 && isSender[_addr]) {
             return true;
         }
         return false;
