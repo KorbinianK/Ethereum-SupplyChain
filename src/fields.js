@@ -23,6 +23,15 @@ export async function updateName(address,newName) {
     });
 }
 
+export async function changeStatus(address){
+    
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    field_instance.changeStatus(true,{from:account}).then(result => {
+        console.log(result);
+    })
+}
+
 export async function getAll(){
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
@@ -31,7 +40,7 @@ export async function getAll(){
       .then(async receipt => {
         // let count = result.toString();
         var fields = [];
-        console.log("rec",receipt);
+        console.log("fields",receipt);
           for (let i = 0; i < receipt.length; i++) {
               const field = await fieldAsJson(receipt[i]);
               fields.push(field);
@@ -50,7 +59,17 @@ export async function loadFieldCard(json){
 }
 
 
-
+export async function checkHarvestable(address){
+    console.log("harvestcheck",address);
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    const res = await field_instance.getStage({from:account}).then(result =>{ // TODO!!!!
+        console.log("check",result);
+        
+        return result;
+    }).catch(err => console.error(err));
+    return res;
+}
 
 export async function fieldAsJson(address) {
     let status;
@@ -62,11 +81,12 @@ export async function fieldAsJson(address) {
     let longitude;
     let transactionCount;
     let txSender = [];
+    var harvestable = await checkHarvestable(address);
     var json;
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
     
-    const res = await field_instance.getAllDetails({from:account}).then(result =>{
+    const res = await field_instance.getAllDetails({from:account}).then(async result =>{
         status = result[0];
         creator = result[1] ;
         owners = result[2] ;
@@ -76,9 +96,10 @@ export async function fieldAsJson(address) {
         longitude = result[6] ;
         transactionCount = result[7] ;
         txSender = result[8];
-
+       
         json = {
             "address": address,
+            "harvestable": await harvestable,
             "status": status,
             "creator": creator,
             "owners": [],

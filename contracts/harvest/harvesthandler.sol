@@ -16,10 +16,13 @@ contract HarvestHandler is Ownable {
         grapeToken = _tokenAddress;
     }
 
+    function currentHarvest() public view returns(address){
+        //TODO
+    }
+
     function newHarvest(uint _year) public returns(bool success) {
         if (harvests[_year] == 0x0) {
-            Harvest h = new Harvest(_year);
-            h.setTokenAddress(grapeToken);
+            Harvest h = new Harvest(_year,grapeToken);
             harvests[_year] = h;
             harvestAddresses.push(h);
             return true;

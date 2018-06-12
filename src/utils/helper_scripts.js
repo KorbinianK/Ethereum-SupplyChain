@@ -2,9 +2,10 @@
 
 
 export async function getAccount() {
-    console.log("getAccounts()");
     let accounts = await web3.eth.getAccounts();
-    return accounts[0];
+    console.log("account:",accounts[0]);
+    
+    return web3.utils.toChecksumAddress(accounts[0]);
 }
 
 export async function fetchTemplate(url){

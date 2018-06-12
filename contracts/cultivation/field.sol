@@ -92,6 +92,8 @@ contract Field is TransactionOwner {
         return status;
     }
 
+    
+
     function getName() public view returns(bytes) {
         return name;
     }
@@ -136,8 +138,12 @@ contract Field is TransactionOwner {
         return true;
     }
 
+    function getStage() public view returns(Stages){
+        return stage;
+    }
+
     function isHarvestable() public view returns(bool) {
-        require(stage == Stages.Uncultivated);
+        require(stage == Stages.Cultivated);
         return true;
     }
 

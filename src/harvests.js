@@ -8,6 +8,7 @@ import harvest_contract from "./utils/contracts/harvest_contract";
 import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 import field_contract from "./utils/contracts/field_contract";
 import * as helper from "./utils/helper_scripts";
+import { load } from "babel-register/lib/cache";
 
 
 export async function addField(harvest, fields) {
@@ -56,6 +57,8 @@ export async function loadAll() {
 
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
+   console.log("hinst",harvestHandler_instance.address);
+   
     const res = await harvestHandler_instance.getHarvests(
         {
         from: account
@@ -76,7 +79,7 @@ export async function loadAll() {
             document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
         });
         
-    });
+    }) .catch(err => console.error(err));
 }
 
 export async function newHarvest() {
@@ -85,14 +88,15 @@ export async function newHarvest() {
 
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-
+   
     const res = await harvestHandler_instance.newHarvest(
         harvestYear,
          {
             from: account
         }
-    ).then(result => {
+    ).then(async result => {
         console.log(result);
+        // const x = await result.then(r => {return loadAll()});
         return loadAll();
     });
 }

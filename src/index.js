@@ -10,9 +10,6 @@ import Router from "./router.js";
 import {
     default as Web3
 } from 'web3';
-// import {
-//     default as contract
-// } from 'truffle-contract'
 
 
 window.App = {
@@ -44,7 +41,7 @@ window.App = {
   },
 
   initTemplates: function() {
-    const template_fields = "src/templates/cultivation/fieldcard.html";
+    const template_fields = "src/templates/cultivation/mustache.fieldcard.html";
     var fields_loaded;
 
     fetch(template_fields)
@@ -94,6 +91,10 @@ window.App = {
   /***
    *  FIELDS
    */
+
+  changeFieldStatus: function(address){
+    Router.modules.FieldModule().then(module => module.changeStatus(address));
+  },
   addFieldTransaction: function(address) {
       Router.modules.FieldModule().then(module => module.addFieldTransaction(address));
   },
