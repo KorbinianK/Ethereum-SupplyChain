@@ -4,8 +4,12 @@ const WebpackMd5Hash = require('webpack-md5-hash');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
+  target: "web",
+  node: {
+    fs: 'empty'
+  },
   entry: { 
-    main: './src/index.js'
+    main: ['babel-polyfill','./src/index.js']
      
   },
   output: {
@@ -13,7 +17,10 @@ module.exports = {
     filename: '[name].[chunkhash].js'
   },
   module: {
-    rules: [
+    rules: [{
+          test: /\.mustache\.html$/,
+          loader: 'mustache-loader'
+        },
       {
         test: /\.js$/,
         exclude: /node_modules/,

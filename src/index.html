@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Wine Supply Chain</title>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -9,23 +10,99 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-dark bg-primary navbar-expand-lg ">
+        <a class="navbar-brand font-weight-bold " href="http://localhost:8080">KRONETH</a>
+        <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavId">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Cultivation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="App.loadHarvestSection();" href="#">Harvests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Transport</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Manufacturing</a>
+                </li>
+            </ul>
 
+        </div>
+    </nav>
     <div class="container">
         <div class="row">
             <div class="col">
-                <h1 class="text-center">Supply Chain Interaction</h1>
+                <h1 class="my-2 font-weight-bold text-dark">
+                    Supply Chain Interaction
+                </h1>
                 <hr/>
-                <br/>
             </div>
         </div>
-        <div id="fields" class="row card-columns flex-nowrap">
+    </div>
+    <div id="content" class="container">
+        <!-- HARVEST -->
+        <div class="row my-5">
+            <div class="col">
+                <h2>Harvests:</h2>
+            </div>
+            <div class="col">
+                <div id="harvestSelector" class="input-group row">
+                    <label for="harvestSelect">Select Harvest</label>
+                    <div class="input-group-prepend">
+                        <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Button</button>
+                    </div>
+                    <select class="form-control" id="harvestSelect">
+
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row my-5">
+            <div class="input-group mb-3">
+
+                <input type="number" id="newHarvest" class="form-control" placeholder="New Harvest " aria-label="newHarvest">
+                <div class="input-group-append">
+                    <button class="text-white btn btn-secondary " onclick="App.newHarvest()" type="button">New</button>
+                </div>
+            </div>
         </div>
         <div class="row">
-            <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary btn-lg btn-block">New Field</button>
+            <button type="button" name="harvest" id="harvestBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
         </div>
-        <div class="row">
-            <button type="button" name="newField" id="newFieldBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
+        <!-- END HARVEST -->
+        <!-- FIELDS -->
+        <div id="fields" class=" card-columns">
         </div>
+        <div class="row my-5">
+            <div class="col">
+                <form id="newFieldForm">
+                    <div class="form-group">
+                        <label for="fieldName">Field Name</label>
+<input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
+                    </div>
+                    <div class="form-row">
+<div class="form-group col">
+    <label for="fieldLat">Latitude</label>
+<input name="latitude"  type="text" class="form-control" id="fieldLat" placeholder="Latitude">
+</div>
+<div class="form-group col">
+    <label for="fieldLong">Longitude</label>
+    <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
+</div>
+                    </div>
+                    
+<button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary text-white btn-lg btn-block">New Field</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- END FIELDS -->
     </div>
 </body>
 
