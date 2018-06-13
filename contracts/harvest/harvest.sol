@@ -20,28 +20,18 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         _;
     }
  
-
-    function weightInput(address _fieldAddress, uint _amount) public harvestable(_fieldAddress) {
-        mintToken(_amount);
-        fieldBalance[_fieldAddress] += _amount;
+     function weightInput(address _fieldAddress, uint _value) public harvestable(_fieldAddress) {
+        require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
+        fieldBalance[_fieldAddress] += _value;
     }
 
     function balanceFromField(address _fieldAddress) public view returns(uint) {
         return fieldBalance[_fieldAddress];
     }
 
-    function mintToken(uint256 _value) public returns (bool) {
+    function mintToken(uint256 _value) public isActive returns (bool) {
         require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
         return true;
-    }
-
-    function transferTo(address _to, uint256 _value) public returns(bool) {
-        require(erc20.call(bytes4(keccak256("transfer(address,uint256)")), _to, _value));
-        return true;
-    }
-    
-    function getBalance() public view returns (uint256) {
-        return balanceOf(address(this));
     }
 
     function getAllDetails() public view returns (address[], uint, address[], uint, address[]) {
@@ -53,7 +43,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
             sender);
     }
    
-    function addField(address _fieldAddress) public harvestable(_fieldAddress) returns (bool success) {
+    function addField(address _fieldAddress) public harvestable(_fieldAddress) isActive returns (bool success) {
         if (fields[_fieldAddress] == false) {
             Field f = Field(_fieldAddress);
             f.harvest(this);
@@ -67,7 +57,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         return false;
     }
 
-    function addMultipleFields(address[] _fieldAddresses) public {
+    function addMultipleFields(address[] _fieldAddresses) public isActive {
         for (uint i; i < _fieldAddresses.length; i++) {
             address _fieldAddress = _fieldAddresses[i];
             require(Field(_fieldAddress).isField());       
@@ -93,3 +83,4 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         erc20 = _token;
         owners.push(msg.sender);
     }
+}

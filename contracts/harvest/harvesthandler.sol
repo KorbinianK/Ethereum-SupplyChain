@@ -17,7 +17,7 @@ contract HarvestHandler is Ownable {
     }
 
     function currentHarvest() public view returns(address){
-       return harvestAddresses[harvestAddresses.length-1];
+        return harvestAddresses[harvestAddresses.length-1];
     }
 
     function newHarvest(uint _year) public returns(bool success) {

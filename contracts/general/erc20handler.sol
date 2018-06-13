@@ -7,6 +7,13 @@ contract ERC20Handler is ERC20Basic{
     function tokenAddress() public view returns(address){
         return erc20;
     }
+    function getBalance() public view returns (uint256) {
+        return balanceOf(address(this));
+    }
+    function transferTo(address _to, uint256 _value) public isActive returns(bool) {
+        require(erc20.call(bytes4(keccak256("transfer(address,uint256)")), _to, _value));
+        return true;
+    }
 
 // TOKEN FUNCTIONS
     event Transfer(address indexed from, address indexed to, uint256 value);

@@ -1,39 +1,31 @@
 pragma solidity ^0.4.23;
 
-import "./transport.sol";
-// transfer
+import "./production.sol";
 
-/*
-    new Manufacturing
-    alle trauben von currenttransport 
-
-*/
-
-
-contract TransportHandler is Ownable {
+contract ProcessHandler is Ownable {
     
-    uint private totalTransports;
-    address[] private transportAddresses;
-    mapping(uint => address) private transports;
-    address private currHarv;
+    uint private totalProductions;
+    address[] private productionAddresses;
+    mapping(uint => address) private productions;
+    address private currTrans;
     address public grapeToken;
-    address public harvestHandler;
+    address public transportHandler;
 
     function setTokenAddress(address _tokenAddress) public onlyOwner {
         grapeToken = _tokenAddress;
     }
     
-    function setHarvestHandler(address _harvestHandler) public onlyOwner {
-        harvestHandler = _harvestHandler;
+    function setTransportHandler(address _transportHandler) public onlyOwner {
+        transportHandler = _transportHandler;
     }
 
-    function currentTransport() public view returns(address){
-        return transportAddresses[transportAddresses.length-1];
+    function currentProduction() public view returns(address){
+        return productionAddresses[productionAddresses.length-1];
     }
     
     
-    function currentHarvest() public view returns (address current){
-        bytes4 sig = bytes4(keccak256("currentHarvest()"));
+    function currentTransport() public view returns (address current){
+        bytes4 sig = bytes4(keccak256("currentTransport()"));
         assembly {
             // move pointer to free memory spot
             let ptr := mload(0x40)
@@ -44,7 +36,7 @@ contract TransportHandler is Ownable {
 
             let result := call(
               15000, // gas limit
-              sload(harvestHandler_slot),  // to addr. append var to _slot to access storage variable
+              sload(transportHandler_slot),  // to addr. append var to _slot to access storage variable
               0, // not transfer any ether
               ptr, // Inputs are stored at location ptr
               0x24, // Inputs are 36 bytes long
@@ -60,9 +52,9 @@ contract TransportHandler is Ownable {
         }
     }
     
-    function harvestBalance(address harvestAddress) public view returns (uint256 _balance) {
+    function transportBalance(address transportAddress) public view returns (uint256 _balance) {
         
-        currHarv = harvestAddress;
+        currTrans = transportAddress;
         
         bytes4 sig = bytes4(keccak256("getBalance()"));
         assembly {
@@ -75,7 +67,7 @@ contract TransportHandler is Ownable {
 
             let result := call(
               15000, // gas limit
-              sload(currHarv_slot),  // to addr. append var to _slot to access storage variable
+              sload(currTrans_slot),  // to addr. append var to _slot to access storage variable
               0, // not transfer any ether
               ptr, // Inputs are stored at location ptr
               0x24, // Inputs are 36 bytes long
@@ -91,33 +83,32 @@ contract TransportHandler is Ownable {
         }
     }
     
-    function newTransport() public returns(bool success) {
-        uint id = totalTransports;
-        address harvest = currentHarvest();
-        string memory latitude = "49.02091";
-        string memory longitude = "12.3047";
-        uint256 totalBalance = harvestBalance(harvest);
-        if (transports[id] == 0x0 && totalBalance > 0) {
-            Transport t = new Transport(id,grapeToken,latitude,longitude);
-            require(harvest.call(bytes4(keccak256("transferTo(address,uint256)")), t, totalBalance));
-            transports[id] = t;
-            transportAddresses.push(t);
-            totalTransports++;
+ 
+    function newProduction() public returns(bool success) {
+        uint id = totalProductions;
+        address transport = currentTransport();
+        uint256 totalBalance = transportBalance(transport);
+        if (productions[id] == 0x0 && totalBalance > 0) {
+            Production p = new Production(id,grapeToken);
+            require(transport.call(bytes4(keccak256("transferTo(address,uint256)")), p, totalBalance));
+            productions[id] = p;
+            productionAddresses.push(p);
+            totalProductions++;
             return true;
         }
         return false;
     }
 
-    function getTransports() public view returns(address[]) {
-        return transportAddresses;
+    function getProductions() public view returns(address[]) {
+        return productionAddresses;
     }
     
-    function getTransport(uint _year) public view returns(address) {
-        return transports[_year];
+    function getProduction(uint _year) public view returns(address) {
+        return productions[_year];
     }
     
-    constructor(address _tokenAddress, address _harvestHandler) public {
+    constructor(address _tokenAddress, address _transportHandler) public {
         setTokenAddress(_tokenAddress);
-        setHarvestHandler(_harvestHandler);
+        setTransportHandler(_transportHandler);
     }
 }
