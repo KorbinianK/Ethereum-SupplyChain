@@ -111,10 +111,10 @@ contract HarvestHandler is Ownable {
     /** 
      * @dev The constructor function
      * @param _fieldHandler address of the handler
-     * @param _grapeToken address of the token
+     * @param _token address of the token
     */
-    constructor(address _fieldHandler,address _grapeToken) public {
+    constructor(address _token, address _fieldHandler) public {
         setFieldHandler(_fieldHandler);
-        setTokenAddress(_grapeToken);
+        setTokenAddress(_token);
     }
 }

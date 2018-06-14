@@ -63,10 +63,12 @@ export async function checkHarvestable(address){
     console.log("harvestcheck",address);
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    const res = await field_instance.getStage({from:account}).then(result =>{ // TODO!!!!
+    const res = await field_instance.stage({from:account}).then(result =>{ // TODO!!!!
         console.log("check",result);
-        
-        return result;
+        if (result.toString() == "1"){
+            return true;
+        }
+        return false;
     }).catch(err => console.error(err));
     return res;
 }
@@ -129,6 +131,8 @@ export async function fieldAsJson(address) {
 }
 
 export async function newField(details) {
+    console.log("new field");
+    
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
     var name,lat,long;
@@ -173,7 +177,7 @@ export async function newField(details) {
                 return document.getElementById('fields').innerHTML += output;
             }
         }
-    })
+    }).catch(err => console.error("woopsie",err));
 }
 
 
@@ -197,15 +201,19 @@ export async function openField(address) {
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    var dummyData = web3.utils.stringToHex("foo");
-    const res = await field_instance.addTransaction(
-        account,
-        dummyData,
-        { from: account }
-    ).then(result => {
+    const dummy = await helper.doDummyTransaction(account,field_instance).then( (result) => {
         console.log(result);
         let tx = document.getElementById("txCount").innerHTML;
         return document.getElementById("txCount").innerHTML = parseInt(tx) + 1;
-     });
-    
+    });
+    // var dummyData = web3.utils.stringToHex("foo");
+    // const res = await field_instance.addTransaction(
+    //     account,
+    //     dummyData,
+    //     { from: account }
+    // ).then(result => {
+    //     console.log(result);
+    //     let tx = document.getElementById("txCount").innerHTML;
+    //     return document.getElementById("txCount").innerHTML = parseInt(tx) + 1;
+    //  });
 }

@@ -1,6 +1,6 @@
-<div id="{{address}}-card" class="card text-white bg-primary mx-1">
+<div id="{{address}}-card" class="card text-white {{#harvestable}}bg-primary {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1">
     <div class="card-header">
-     <h5 class="card-title"><span class="field-name">{{name}}</span>
+     <h5 class="card-title"><span class="field-name">{{name}}</span> - <small>{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</small>
         <input class="float-right field-selected" type="checkbox" aria-label="Checkbox for selecting field">
      </h5>
     </div>

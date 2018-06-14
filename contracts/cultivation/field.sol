@@ -97,9 +97,10 @@ contract Field is TransactionOwner {
     * @param _sender Address of the sender
     * @param _data data attached to the transaction
     */
-    function addTransaction(address _sender, bytes _data) public {
-        require(stage == Stages.Cultivated);
-        super.addTransaction(_sender, _data); 
+    function addTransaction(address _sender, bytes _data) public isActive {
+        if(stage == Stages.Cultivated){
+            super.addTransaction(_sender, _data); 
+        }
     }
     
     /**
@@ -123,7 +124,7 @@ contract Field is TransactionOwner {
     
     /**
     * @dev Gets the name of the vineyard
-    * @return string of the name
+    * @return bytes of the name
     */
     function getName() public view returns(string) {
         return name;
@@ -131,7 +132,7 @@ contract Field is TransactionOwner {
     
     /**
     * @dev Gets the latitude of the vineyard
-    * @return string of the latitude
+    * @return bytes of the latitude
     */
     function getLatitude() public view returns(string) {
         return location.latitude;
@@ -139,7 +140,7 @@ contract Field is TransactionOwner {
 
     /**
     * @dev Gets the longitude of the vineyard
-    * @return string of the longitude
+    * @return bytes of the longitude
     */
     function getLongitude() public view returns(string) {
         return location.longitude;
@@ -147,7 +148,7 @@ contract Field is TransactionOwner {
 
     /**
     * @dev Gets the location of the vineyard
-    * @return string, string of the longitude and latitude
+    * @return bytes, string of the longitude and latitude
     */
     function getLocation() public view returns(string, string) {
         return (location.longitude, location.latitude);
@@ -156,7 +157,7 @@ contract Field is TransactionOwner {
     /**
     * @dev Gets all information from the contract
     * @return Stages stage of the vineyard, address of the creator, address[] of permissioned accounts
-    * string name of the vineyard, bytes picture, string latitude, string longitude, 
+    * bytes name of the vineyard, bytes picture, bytes latitude, bytes longitude, 
     * uint transaction counter since last harvest, address[] of all transaction sender
     */ 
     function getAllDetails() public view 

@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 import "./MintableToken.sol";
 
 /**
- * @Title The Grape Token contract
+ * @title The Grape Token contract
 */
 contract GrapeToken is MintableToken {
     string public name = "Grapes";

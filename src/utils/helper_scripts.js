@@ -15,3 +15,14 @@ export async function fetchTemplate(url){
         });
     return await template;
 }
+
+export async function doDummyTransaction(account, instance){
+    var dummyData = web3.utils.stringToHex("foo");
+    const res = await instance.addTransaction(
+        account,
+        dummyData,
+        { from: account }
+    ).then(result => {
+       return result;
+     });
+}

@@ -75,7 +75,7 @@ contract ProcessHandler is Ownable {
     
     /** 
      * @dev Low level call function to retrieve the balance of a harvest from the transport handler
-     * @param harvestAddress address of the transport
+     * @param transportAddress address of the transport
      * @return uint256 balance of the transport
      * Based on code from https://medium.com/[at]blockchain101/calling-the-function-of-another-contract-in-solidity-f9edfa921f4c
     */
