@@ -100,9 +100,9 @@ contract TransactionOwner {
     */
     function getStatus() public view returns(bool) {
         if(uint(status) == 1){
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
     
     /**

@@ -232,8 +232,6 @@ contract Field is TransactionOwner {
         location.longitude = _longitude;
         location.latitude = _latitude;
         stage = Stages.Cultivated;
-        
-        
     }
 
     /**

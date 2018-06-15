@@ -57,8 +57,6 @@ export async function loadAll() {
 
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-   console.log("hinst",harvestHandler_instance.address);
-   
     const res = await harvestHandler_instance.getHarvests(
         {
         from: account
@@ -73,7 +71,6 @@ export async function loadAll() {
             year.year = await harvest_instance.getYear({from:account});
             years.push(year);
         }
-        console.log("y",years);
         let arr = _.sortBy(years, "year").reverse();
         arr.forEach(element => {
             document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
@@ -96,7 +93,6 @@ export async function newHarvest() {
         }
     ).then(async result => {
         console.log(result);
-        // const x = await result.then(r => {return loadAll()});
         return loadAll();
     });
 }

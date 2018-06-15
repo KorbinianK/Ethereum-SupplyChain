@@ -4,47 +4,137 @@ import Mustache from "mustache";
 import field_contract from "./utils/contracts/field_contract";
 import fieldHandler_contract from "./utils/contracts/fieldhandler_contract";
 import * as helper from "./utils/helper_scripts";
+import * as tx from "./utils/transactions";
 
 export async function updateName(address,newName) {
 
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    var dummyData = web3.utils.stringToHex("foo");
+    // var dummyData = web3.utils.stringToHex("foo");
 
     const res = await field_instance.setName(
-        web3.utils.stringToHex(newName),
+        newName,
         { from: account }
     ).then(result => {
         console.log(result);
         $("#" + address + "-card")
-            .find(".card-title")
+            .find(".card-title").find(".field-name")
             .text(newName);
         return result;
     });
 }
 
 export async function changeStatus(address){
-    
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    field_instance.changeStatus(true,{from:account}).then(result => {
-        console.log(result);
+    const res = await field_instance.nextStage({
+        from: account,
+        gas: 300000
+    })
+    .then(async (result) => {
+                openField(address);
+    //     // const res = await result.then( () => {
+    //         const x = await result;
+    //         return result;
+            
+    //     // });
+        
+    // }).then( () =>{
+    //     if ($('#' + address + "-card")) {
+    //         $('#' + address + "-card").remove();
+    //         return loadSingleField(address);
+    //     }
     })
 }
 
+export async function getStatus(address){
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    const status = await field_instance.getStatus({
+        from: account
+    }).then(
+        (res) => {
+            console.log("status", res)
+            return res;
+        }
+    )
+    return await status;
+}
+
+export async function switchStatus(address) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    const txCount = await field_instance.switchStatus({
+        from: account
+    }).then(
+        (res) => {
+            console.log("status", res)
+            return res;
+        }
+    )
+}
+
+// ############### START TRANSACTION FUNCTIONS ###############
+
+export async function getTotalTransactionCount(address) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const txCount = await tx.getTotalTransactionCount(field_instance);
+    console.log("TotalTX:", await txCount);
+    return await txCount;
+}
+
+export async function getTransactionSenderAtIndex(address,index) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const sender = await tx.getTransactionSenderAtIndex(field_instance, index);
+    return await sender;
+}
+
+export async function getTransactionDataAtIndex(address, index) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const data = await tx.getTransactionDataAtIndex(field_instance, index);
+    return await data;
+}
+
+export async function getAllTransactions(address) {
+    const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).at(address);
+    const account = await helper.getAccount();
+    const txCount = await getTotalTransactionCount(address);
+    console.log("?",await txCount);
+    var json = 
+       []
+    ;
+    for (let i = 0; i < txCount; i++) {
+        let tx = {};
+        tx.sender = await getTransactionSenderAtIndex(address, i);
+        tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+        json.push(tx);
+    }    
+    return json;
+}
+
+
+
+// ############### END TRANSACTION FUNCTIONS ###############
+
+
+export async function loadSingleField(address){
+    const json = await fieldAsJson(address);
+   return loadFieldCard(json);
+}
+
 export async function getAll(){
+    
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
     fieldhandler_instance
       .getAllFields({ from: account })
       .then(async receipt => {
-        // let count = result.toString();
         var fields = [];
-        console.log("fields",receipt);
-          for (let i = 0; i < receipt.length; i++) {
-              const field = await fieldAsJson(receipt[i]);
-              fields.push(field);
-              loadFieldCard(field);
+        for (let i = 0; i < receipt.length; i++) {
+            const field = await fieldAsJson(receipt[i]);
+            console.log("field:",field);
+            fields.push(field);
+            loadFieldCard(field);
         }   
       });
 }
@@ -74,42 +164,43 @@ export async function checkHarvestable(address){
 }
 
 export async function fieldAsJson(address) {
-    let status;
+    let stage;
     let creator;
     let owners = [];
     let name;
     let picture;
     let latitude;
     let longitude;
-    let transactionCount;
     let txSender = [];
+    let txHarvest;
     var harvestable = await checkHarvestable(address);
+    var totalTransactionCount = await getTotalTransactionCount(address);
     var json;
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
     
     const res = await field_instance.getAllDetails({from:account}).then(async result =>{
-        status = result[0];
+        stage = result[0];
         creator = result[1] ;
         owners = result[2] ;
         name = result[3] ;
         picture = result[4] ;
         latitude = result[5] ;
         longitude = result[6] ;
-        transactionCount = result[7] ;
+        txHarvest = result[7];
         txSender = result[8];
-       
         json = {
             "address": address,
             "harvestable": await harvestable,
-            "status": status,
+            "stage": stage.toString(),
             "creator": creator,
             "owners": [],
-            "name": web3.utils.hexToString(name),
+            "name": name,
             "picture": picture,
             "latitude": latitude,
             "longitude": longitude,
-            "transactionCount": transactionCount.toString(),
+            "transactionCountHarvest": txHarvest.toString(),
+            "totalTransactions" : totalTransactionCount,
             "txSender": [],
         }
         for (let i = 0; i < owners.length; i++) {
@@ -124,6 +215,7 @@ export async function fieldAsJson(address) {
                 };
             json["txSender"].push(sender);
         }
+        
         return json;
     })
    console.log("json result",res);
@@ -139,13 +231,13 @@ export async function newField(details) {
     $.each(details, function(i, item) {
         switch (item.name) {
             case "name":
-                 name = web3.utils.stringToHex(item.value);
+                 name = item.value;
             break;
             case "latitude":
-                 lat = web3.utils.stringToHex(item.value);
+                 lat = item.value;
             break;
             case "longitude":
-                 long = web3.utils.stringToHex(item.value);
+                 long = item.value;
             break;
           default:
               break;
@@ -187,33 +279,23 @@ export async function openField(address) {
     console.log("open",address);
     const template_fielddetails = await helper.fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
     Mustache.parse(template_fielddetails);
-    const json = await fieldAsJson(address);
-    Mustache.parse(template_fielddetails);
-    var output = Mustache.render(
-        template_fielddetails, json
-    );
-    return document.getElementById('content').innerHTML = output;
-            
-         
+    const field = await fieldAsJson(address).then(async(json)=>{
+        json["transactions"] = await getAllTransactions(address);
+        Mustache.parse(template_fielddetails);
+        var output = Mustache.render(
+            template_fielddetails, json
+        );
+        return output;
+    });
+    document.getElementById('content').innerHTML = field;
 }
-
 
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    const dummy = await helper.doDummyTransaction(account,field_instance).then( (result) => {
-        console.log(result);
-        let tx = document.getElementById("txCount").innerHTML;
-        return document.getElementById("txCount").innerHTML = parseInt(tx) + 1;
+    const dummy = await tx.doDummyTransaction(account,field_instance).then((result) => {
+       console.log(result);
+       return result;
     });
-    // var dummyData = web3.utils.stringToHex("foo");
-    // const res = await field_instance.addTransaction(
-    //     account,
-    //     dummyData,
-    //     { from: account }
-    // ).then(result => {
-    //     console.log(result);
-    //     let tx = document.getElementById("txCount").innerHTML;
-    //     return document.getElementById("txCount").innerHTML = parseInt(tx) + 1;
-    //  });
+    return await dummy;
 }

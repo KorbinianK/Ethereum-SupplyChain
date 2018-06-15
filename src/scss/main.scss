@@ -5,3 +5,11 @@
     transition: all $seconds linear;
 }
 
+.custom-control-label::before,
+.custom-control-label::after {
+    background-color:black;
+    top: -1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+

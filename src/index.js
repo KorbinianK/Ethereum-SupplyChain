@@ -57,6 +57,10 @@ window.App = {
   },
 
   initContracts: function() {
+    web3.eth.subscribe('pendingTransactions', function (error, result) {})
+      .on("data", function (trxData) {
+        web3.eth.getTransaction(trxData).then(console.log);
+      });
     // $.getJSON("../build/contracts/Field.json", function(data) {
     //   let FieldArtifact = data;
     //   App.contracts.Field = TruffleContract(FieldArtifact);
@@ -95,8 +99,11 @@ window.App = {
   changeFieldStatus: function(address){
     Router.modules.FieldModule().then(module => module.changeStatus(address));
   },
-  addFieldTransaction: function(address) {
-      Router.modules.FieldModule().then(module => module.addFieldTransaction(address));
+  addFieldTransaction: async function(address) {
+     Router.modules.FieldModule().then(module => module.addFieldTransaction(address)).then(()=>{
+       Router.modules.FieldModule().then(module => module.openField(address));
+     });
+       
   },
   getFields: function() {
     Router.modules.FieldModule().then(module => module.getAll());

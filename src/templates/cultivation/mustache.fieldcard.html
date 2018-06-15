@@ -1,10 +1,16 @@
-<div id="{{address}}-card" class="card text-white {{#harvestable}}bg-primary {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1">
+<div id="{{address}}-card" class="card text-white {{#harvestable}}bg-success {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1">
     <div class="card-header">
      <h5 class="card-title"><span class="field-name">{{name}}</span> - <small>{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</small>
-        <input class="float-right field-selected" type="checkbox" aria-label="Checkbox for selecting field">
+         {{#harvestable}}
+            <div class="custom-control custom-checkbox  float-right ">
+            <input class="custom-control-input field-selected" id="{{address}}-checkbox" type="checkbox" aria-label="Checkbox for selecting field">
+            <label class="custom-control-label" for="{{address}}-checkbox"></label>
+
+            </div>
+         {{/harvestable}}
      </h5>
     </div>
-    <button class="text-white btn btn-secondary btn-block" onclick="App.changeFieldStatus('{{address}}')" data-address="{{address}}" type="button">Change Status</button>
+    
     
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">
     <div class="card-body">

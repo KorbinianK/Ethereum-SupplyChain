@@ -29,7 +29,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @param _fieldAddress the address to check
     */
     modifier harvestable(address _fieldAddress) {
-        require(Field(_fieldAddress).isHarvestable(),"Field is currently not harvestable");
+        require(Field(_fieldAddress).isHarvestable(), "Field is currently not harvestable");
         _;
     }
     
@@ -37,7 +37,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @dev Harvests all fields added to this contract
     */
     function harvestFields() public {
-        for(uint i = 0; i < fieldArray.length; i++){
+        for(uint i = 0; i < fieldArray.length; i++) {
             Field(fieldArray[i]).harvest(address(this));
         }
     }
@@ -69,7 +69,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     */
     function getAllDetails() 
     public view 
-    returns (address[], uint, address[], uint, address[] , uint256) {
+    returns (address[], uint, address[], uint, address[], uint256) {
         uint256 grapes = getBalance();
         return (
             fieldArray,
