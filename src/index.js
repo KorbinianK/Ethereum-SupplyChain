@@ -61,34 +61,8 @@ window.App = {
       .on("data", function (trxData) {
         web3.eth.getTransaction(trxData).then(console.log);
       });
-    // $.getJSON("../build/contracts/Field.json", function(data) {
-    //   let FieldArtifact = data;
-    //   App.contracts.Field = TruffleContract(FieldArtifact);
-    //   App.contracts.Field.setProvider(App.web3Provider);
-    // });
-
-    // $.getJSON("../build/contracts/HarvestHandler.json", function(data) {
-    //   let HarvestHandlerArtifact = data;
-    //   App.contracts.HarvestHandler = TruffleContract(HarvestHandlerArtifact);
-    //   App.contracts.HarvestHandler.setProvider(App.web3Provider);
-    //   return App.loadHarvests();
-    // });
-
-    // $.getJSON("../build/contracts/Harvest.json", function(data) {
-    //   let HarvestArtifact = data;
-    //   App.contracts.Harvest = TruffleContract(HarvestArtifact);
-    //   App.contracts.Harvest.setProvider(App.web3Provider);
-    // });
-
-    // $.getJSON("../build/contracts/FieldHandler.json", function(data) {
-    //   let FieldHandlerArtifact = data;
-    //   App.contracts.FieldHandler = TruffleContract(FieldHandlerArtifact);
-    //   App.contracts.FieldHandler.setProvider(App.web3Provider);
-    //   return App.getFields();
-    // });
-
     // App.initTemplates();
-    App.getFields();
+    App.getFieldCards();
     App.loadHarvests();
     return App.bindEvents();
   },
@@ -96,8 +70,11 @@ window.App = {
    *  FIELDS
    */
 
-  changeFieldStatus: function(address){
-    Router.modules.FieldModule().then(module => module.changeStatus(address));
+  changeFieldStatus: async function(address){
+    await Router.modules.FieldModule().then(module => module.changeStatus(address)).then( () =>{
+      Router.modules.FieldModule().then(module => module.openField(address));
+    });
+  
   },
   addFieldTransaction: async function(address) {
      Router.modules.FieldModule().then(module => module.addFieldTransaction(address)).then(()=>{
@@ -105,8 +82,8 @@ window.App = {
      });
        
   },
-  getFields: function() {
-    Router.modules.FieldModule().then(module => module.getAll());
+  getFieldCards: function () {
+    Router.modules.FieldModule().then(module => module.getFieldCards());
   },
 
   loadField: function(address) {
@@ -124,7 +101,33 @@ window.App = {
 
   bindEvents: function() {
     $(document).on("click", ".changeFieldName", App.changeFieldName);
-    
+    // Navbar
+    $(".navbar-nav .nav-link").on("click", function () {
+      $(".navbar-nav").find(".active").removeClass("active");
+      $(this).addClass("active");
+      console.log(this.text);
+      switch (this.text) {
+        case "Cultivation":
+          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("#cultivationSection").addClass("d-block");
+          App.getFieldCards();
+          break;
+        case "Harvests":
+         $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+         $("#content").find("#harvestSection").addClass("d-block");
+          break;
+
+        case "Transport":
+          break;
+
+        case "Processing":
+
+          break;
+        default:
+          break;
+      }
+  
+    });
   },
 
   changeFieldName: function(event) {
@@ -143,37 +146,47 @@ window.App = {
     var selectedHarvest = $(event).closest('#harvestSelector').find("#harvestSelect option:selected").val();
     Router.modules.HarvestModule().then(module => module.openHarvest(selectedHarvest));
   },
-  loadHarvestSection: function(){
-    
-  },
 
-  loadHarvests: function() {
+  loadHarvestSection: function(){
     Router.modules.HarvestModule().then(module => module.loadAll());
   },
 
-  newHarvest: function() {
-    Router.modules.HarvestModule().then(module => module.newHarvest());
+  loadHarvests: function() {
+    Router.modules.HarvestModule().then(module => module.loadDropdown());
+  },
+
+  newHarvest: async function () {
+    Router.modules.HarvestModule().then(module => module.newHarvest()).then( async(result)=> {
+      
+      return await result;
+    }).then(()=>{
+      return App.loadHarvests();
+    });
   },
 
   harvest: function() {
     let selectedHarvest = $('#harvestSelect').val();
-    console.log("harvest selected",selectedHarvest);
-    let addresses = [];
-    $(".field-selected").each(function() {
-      if ($(this).is(":checked")) {
-        let address = $(this)
-          .closest(".card")
-          .find(".fieldaddress")
-          .text();
-        addresses.push(address);
-      }
-    });
+    let amount = $('#harvest-amount').val();
+    let address = $("#harvestableFields-select").val();
+    // let addresses = [];
+    // $("#harvestableFields-select > option").each(function () {
+    //   addresses.push(this.value);
+    // });
+    // console.log(addresses);
     Router.modules
       .HarvestModule()
-      .then(module => module.addField(selectedHarvest, addresses));
-    
-    //  var yourArray = $("input:checkbox[name=type]:checked").map(function () { return $(this).val() }).get();
-    //  console.log(yourArray);
+      .then(module => module.weightInput(selectedHarvest, address, amount));
+    // $("#harvestableFields-select").each(function () {
+
+    //   if ($(this).is(":checked")) {
+    //     let address = $(this)
+    //       .closest(".card")
+    //       .find(".fieldaddress")
+    //       .text();
+    //     addresses.push(address);
+    //   }
+    // });
+    // 
   }
 };
 

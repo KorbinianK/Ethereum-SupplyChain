@@ -1,29 +1,37 @@
 <div id="{{address}}-card" class="card text-white {{#harvestable}}bg-success {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1">
     <div class="card-header">
-     <h5 class="card-title"><span class="field-name">{{name}}</span> - <small>{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</small>
-         {{#harvestable}}
-            <div class="custom-control custom-checkbox  float-right ">
-            <input class="custom-control-input field-selected" id="{{address}}-checkbox" type="checkbox" aria-label="Checkbox for selecting field">
-            <label class="custom-control-label" for="{{address}}-checkbox"></label>
-
-            </div>
-         {{/harvestable}}
-     </h5>
+        <h5 class="card-title text-white">
+            <span class="field-name float-left">{{name}}</span>
+        </h5>
+        <span class="ml-1 float-right badge badge-light">{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</span>
+        <small class="float-right">Stage: {{stage}}</small>
+        <h6 class="card-subtitle mb-2 text-white">
+            <small>Address: {{address}}</small>
+        </h6>
     </div>
-    
-    
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">
-    <div class="card-body">
-       
-        <p class="card-text">{{field_details}}</p>
-        <p class="card-text"><small class="text-white fieldaddress">{{address}}</small></p>
-        
-        <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <button class="text-white btn btn-secondary btn-block changeFieldName" data-address="{{address}}" type="button">Change Name</button>
-                </div>
-                <input type="text" id="{{address}}-nameInput" class="form-control" placeholder="New name " aria-label="Name" aria-describedby="nameLabel">
-            </div>
+    
+        <button class="btn btn-outline-light btn-block" type="button" data-toggle="collapse" data-target="#{{address}}-collapse" aria-expanded="false"
+            aria-controls="{{address}}-collapse">
+            Details
+        </button>
+        </p>
+        <div class="collapse" id="{{address}}-collapse">
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Latitude:</strong> {{latitude}}
+                    <strong>Longitude:</strong> {{longitude}}</p>
+                <p class="card-text"></p>
+                <p class="card-text">
+                    <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
+                <p class="card-text">
+                    <strong>Total TX:</strong> {{totalTransactions}}</p>
+                <p class="card-text">
+                    <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
+
+        </div>
+
     </div>
-    <button class="text-white btn btn-secondary btn-block" onclick="App.openField('{{address}}')" data-address="{{address}}" type="button">Open</button>
+    <button class="text-white btn btn-secondary btn-block" onclick="App.openField('{{address}}')" data-address="{{address}}"
+        type="button">Open</button>
 </div>

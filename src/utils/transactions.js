@@ -16,7 +16,8 @@ export async function getTotalTransactionCount(instance){
 }
 
 export async function getTransactionSenderAtIndex(instance, index) {
-    const sender = await instance.getTransactionSenderAtIndex(index)
+    const account = await helper.getAccount();
+    const sender = await instance.getTransactionSenderAtIndex(index, {from:account})
     .then( async(res) =>{
         return res;
     });
@@ -24,14 +25,16 @@ export async function getTransactionSenderAtIndex(instance, index) {
 }
 
 export async function getTransactionDataAtIndex(instance, index) {
-    const data = await instance.getTransactionDataAtIndex(index)
+    const account = await helper.getAccount();
+    const data = await instance.getTransactionDataAtIndex(index, {from:account})
         .then(async (res) => {
             return res;
         });
     return await data;
 }
 
-export async function doDummyTransaction(account, instance) {
+export async function doDummyTransaction(instance) {
+    const account = await helper.getAccount();
     var dummyData = web3.utils.stringToHex("foo");
     const res = await instance.addTransaction(
         account,
@@ -42,4 +45,13 @@ export async function doDummyTransaction(account, instance) {
         return result;
     });
     return res;
+}
+
+export async function getBalance(instance) {
+    const account = await helper.getAccount();
+    const balance = await instance.getBalance({from:account}).then(result =>{
+        console.log("token balance",result.toString());
+        return result.toString();
+    });
+    return await balance;
 }

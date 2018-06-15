@@ -1,26 +1,52 @@
-<div id="{{address}}-card" class="card {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
-    <div class="card-body">
-         <h5 class="card-title"><span class="field-name">{{name}}</span> - 
-            <small>{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</small>
+
+    <div id="{{address}}-card" class="card col {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="field-name float-left">{{name}}</span> -
+<small >{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</small>
+                <small class="float-right">Stage: {{stage}}</small>
+                <h6 class="card-subtitle mb-2 text-muted">
+                    <small>Address: {{address}}</small>
+                </h6>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <button class="text-white btn btn-secondary btn-block changeFieldName" data-address="{{address}}" type="button">Change Name</button>
+                    </div>
+                    <input type="text" id="{{address}}-nameInput" class="form-control" placeholder="New name " aria-label="Name" aria-describedby="nameLabel">
+                </div>
+
+                <button class="text-white btn btn-secondary btn-block" onclick="App.changeFieldStatus('{{address}}')" data-address="{{address}}"
+                    type="button">Change Status</button>
+                <p class="card-text">
+                    <div class="form-group">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="transactionList"> Transactions:&nbsp;
+                                    <span id="txCount">{{totalTransactions}}</span>
+                                </label>
+                            </div>
+                            <select class="form-control" id="transactionList">
+                                {{#transactions}}
+                                <option value="{{address}}">{{sender}}-{{data}}</option>
+                                {{/transactions}}
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button">Open Transaction</button>
+                            </div>
        
-        <h6 class="card-subtitle mb-2 text-muted"><small>Address: {{address}}</small></h6>
-<button class="text-white btn btn-secondary btn-block" onclick="App.changeFieldStatus('{{address}}')" data-address="{{address}}"
-    type="button">Change Status</button>
-        <p class="card-text">
-            
-            <div class="form-group">
-<label for="transactionList"> Transactions:
-<span id="txCount">{{totalTransactions}}</span>
-                </label>
-                <select class="form-control" id="transactionList">
-                    {{#transactions}}
-                        <option value="{{address}}">{{sender}}-{{data}}</option>
-                    {{/transactions}}
-                </select>
-            </div>
-        </p>
-        
-        <button onclick="App.addFieldTransaction('{{address}}')" class="btn btn-link btn-sm card-link">Add Transaction</button>
-        <a href="#" class="card-link">Another link</a>
+                        </div>
+                    </div>
+                </p>
+         <p class="card-text">
+                    <strong>Latitude:</strong> {{latitude}}
+                    <strong>Longitude:</strong> {{longitude}}</p>
+                <p class="card-text"></p>
+                <p class="card-text">
+                    <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
+                <p class="card-text">
+                    <strong>Total TX:</strong> {{totalTransactions}}</p>
+                <p class="card-text">
+                    <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
+                <button onclick="App.addFieldTransaction('{{address}}')" class="text-white btn-lg btn btn-primary btn-sm card-link">Add Transaction</button>
+        </div>
     </div>
-</div>

@@ -1,18 +1,48 @@
-<div class="card ">
-    <div class="card-body">
-        <h5 class="card-title">{{name}}</h5>
-        <h6 class="card-subtitle mb-2 text-muted"><small>{{address}}</small></h6>
+<div class="card col">
+    <div class="card-body ">
+        <h5 class="card-title float-left">Year: {{year}}</h5>
+        <h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
+        <h6 class=" card-subtitle mb-2 text-muted">
+            <small>{{address}}</small>
+        </h6>
         <p class="card-text">
-           
+
             <div class="form-group">
-                <label for="fieldList"> Fields: <span id="txCount">{{fieldCount}}</span></label>
+                <label for="fieldList"> Fields:
+                    <span id="txCount">{{fieldCount}}</span>
+                </label>
                 <select class="form-control" id="fieldList">
                     {{#fields}}
-                  <option value="{{address}}">{{fieldName}}</option>
+                    <option value="{{address}}">{{fieldName}}</option>
                     {{/fields}}
                 </select>
-              </div>
+            </div>
         </p>
+        <div class="form-row">
+            <div class="col">
+                <div class="input-group mb-3 ">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="harvestableFields-select">Field</label>
+                    </div>
+                    <select class="form-control" id="harvestableFields-select">
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3 ">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="harvest-amount">Amout</label>
+                    </div>
+                    <input type="number" class="form-control" name="" id="harvest-amount" placeholder="">
+                    <div class="input-group-append">
+                        <label class="input-group-text" for="harvest-amount">kg</label>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <button type="button" name="harvest" id="harvestBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
         <!-- <button onclick="App.addFieldTransaction('{{address}}')" class="btn btn-link btn-sm card-link">Add Transaction</button> -->
         <!-- <a href="#" class="card-link">Another link</a> -->
     </div>

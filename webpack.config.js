@@ -20,6 +20,15 @@ module.exports = {
     rules: [{
           test: /\.mustache\.html$/,
           loader: 'mustache-loader'
+        }, {
+          test: /\.(png|jpg|gif|svg)$/,
+            use: [{
+              loader: 'file-loader',
+              options: {
+                outputPath: 'assets/',
+                name: '[name][hash].[ext]',
+              },
+            }, ],
         },
       {
         test: /\.js$/,
