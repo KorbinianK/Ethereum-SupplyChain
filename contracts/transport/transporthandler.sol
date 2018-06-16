@@ -15,7 +15,10 @@ contract TransportHandler is Ownable {
 
     // Mapping of an index to a transport contract
     mapping(uint => address) private transports;
-    
+
+    // Mapping of a transport address to a harvest
+    mapping(address => address) private transportToHarvest;
+
     /** 
      * @dev Updates the token address
      * @param _tokenAddress the address of the token
@@ -116,20 +119,30 @@ contract TransportHandler is Ownable {
     function newTransport() public returns(bool success) {
         uint id = totalTransports;
         address harvest = currentHarvest();
+       
         string memory latitude = "49.02091";
         string memory longitude = "12.3047";
         uint256 totalBalance = harvestBalance(harvest);
         if (transports[id] == 0x0 && totalBalance > 0) {
             Transport t = new Transport(id,grapeToken,latitude,longitude);
+            transportToHarvest[t] = harvest;
+            require(harvest.call(bytes4(keccak256("switchStatus()"))));
             require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), t, totalBalance));
             require(harvest.call(bytes4(keccak256("harvestFields()"))));
-            
             transports[id] = t;
             transportAddresses.push(t);
             totalTransports++;
             return true;
         }
         return false;
+    }
+
+    /** 
+     * @dev Returns the harvest added to a transport
+     * @return address of the harvest
+    */
+    function getHarvestFromTransport(address _transportAddress) public view returns (address){
+        return transportToHarvest[_transportAddress];
     }
 
     /** 

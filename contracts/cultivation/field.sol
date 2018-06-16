@@ -79,7 +79,7 @@ contract Field is TransactionOwner {
         harvestPointer[_harvest] = totalTransactions;
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
-        switchStatus();
+        // switchStatus();
     }
     
     /**

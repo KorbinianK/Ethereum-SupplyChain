@@ -3,12 +3,12 @@ window.$ = window.jQuery = jQuery;
 import "./scss/styles.scss";
 import bootstrap from "bootstrap";
 import Mustache from "mustache";
+import Router from "./router.js";
 import * as FieldModule from "./fields.js";
 import * as HarvestModule from "./harvests.js";
-import Router from "./router.js";
-// Import libraries we need.
-import {
-    default as Web3
+import * as TransportModule from "./transports.js";
+import { 
+  default as Web3
 } from 'web3';
 
 
@@ -18,11 +18,11 @@ window.App = {
   fields: {},
   fieldsTemplate: null,
 
-  init: function() {
+  init: function () {
     return App.initWeb3();
   },
 
-  initWeb3: function() {
+  initWeb3: function () {
     // Initialize web3 and set the provider to the testRPC.
 
     if (typeof web3 !== "undefined") {
@@ -40,7 +40,7 @@ window.App = {
     return App.initContracts();
   },
 
-  initTemplates: function() {
+  initTemplates: function () {
     const template_fields = "src/templates/cultivation/mustache.fieldcard.html";
     var fields_loaded;
 
@@ -56,12 +56,11 @@ window.App = {
       );
   },
 
-  initContracts: function() {
+  initContracts: function () {
     web3.eth.subscribe('pendingTransactions', function (error, result) {})
       .on("data", function (trxData) {
         web3.eth.getTransaction(trxData).then(console.log);
       });
-    // App.initTemplates();
     App.getFieldCards();
     App.loadHarvests();
     return App.bindEvents();
@@ -70,36 +69,44 @@ window.App = {
    *  FIELDS
    */
 
-  changeFieldStatus: async function(address){
-    await Router.modules.FieldModule().then(module => module.changeStatus(address)).then( () =>{
-      Router.modules.FieldModule().then(module => module.openField(address));
-    });
-  
+  changeFieldStatus: async function (address) {
+    await Router.modules.FieldModule()
+      .then(module => module.changeStatus(address)).then(() => {
+        Router.modules.FieldModule()
+          .then(module => module.openField(address));
+      });
+
   },
-  addFieldTransaction: async function(address) {
-     Router.modules.FieldModule().then(module => module.addFieldTransaction(address)).then(()=>{
-       Router.modules.FieldModule().then(module => module.openField(address));
-     });
-       
+  addFieldTransaction: async function (address) {
+    Router.modules.FieldModule()
+      .then(module => module.addFieldTransaction(address)).then(() => {
+        Router.modules.FieldModule()
+          .then(module => module.openField(address));
+      });
+
   },
   getFieldCards: function () {
-    Router.modules.FieldModule().then(module => module.getFieldCards());
+    Router.modules.FieldModule()
+      .then(module => module.getFieldCards());
   },
 
-  loadField: function(address) {
-    Router.modules.FieldModule().then(module => module.load(address));
+  loadField: function (address) {
+    Router.modules.FieldModule()
+      .then(module => module.load(address));
   },
 
-  newField: function() {
+  newField: function () {
     var info = $("#newFieldForm").serializeArray()
-    Router.modules.FieldModule().then(module => module.newField(info));
+    Router.modules.FieldModule()
+      .then(module => module.newField(info));
   },
 
-  openField: function(address) {
-    Router.modules.FieldModule().then(module => module.openField(address));
+  openField: function (address) {
+    Router.modules.FieldModule()
+      .then(module => module.openField(address));
   },
 
-  bindEvents: function() {
+  bindEvents: function () {
     $(document).on("click", ".changeFieldName", App.changeFieldName);
     // Navbar
     $(".navbar-nav .nav-link").on("click", function () {
@@ -113,11 +120,14 @@ window.App = {
           App.getFieldCards();
           break;
         case "Harvests":
-         $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
-         $("#content").find("#harvestSection").addClass("d-block");
+          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("#harvestSection").addClass("d-block");
           break;
 
         case "Transport":
+          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("#transportSection").addClass("d-block");
+          App.loadTransports();
           break;
 
         case "Processing":
@@ -126,11 +136,11 @@ window.App = {
         default:
           break;
       }
-  
+
     });
   },
 
-  changeFieldName: function(event) {
+  changeFieldName: function (event) {
     event.preventDefault();
     let address = $(event.currentTarget).data("address");
     let newName = document.getElementById(address + "-nameInput").value;
@@ -138,60 +148,68 @@ window.App = {
       .FieldModule()
       .then(module => module.updateName(address, newName));
   },
-  
+
   /***
    *  HARVESTS
    */
-  openHarvest: function(event){
+  openHarvest: function (event) {
     var selectedHarvest = $(event).closest('#harvestSelector').find("#harvestSelect option:selected").val();
-    Router.modules.HarvestModule().then(module => module.openHarvest(selectedHarvest));
+    Router.modules.HarvestModule()
+      .then(module => module.openHarvest(selectedHarvest));
   },
 
-  loadHarvestSection: function(){
-    Router.modules.HarvestModule().then(module => module.loadAll());
+  loadHarvestSection: function () {
+    Router.modules.HarvestModule()
+      .then(module => module.loadAll());
   },
 
-  loadHarvests: function() {
-    Router.modules.HarvestModule().then(module => module.loadDropdown());
+  loadHarvests: function () {
+    Router.modules.HarvestModule()
+      .then(module => module.loadDropdown());
   },
 
   newHarvest: async function () {
-    Router.modules.HarvestModule().then(module => module.newHarvest()).then( async(result)=> {
-      
-      return await result;
-    }).then(()=>{
-      return App.loadHarvests();
-    });
+    Router.modules.HarvestModule()
+      .then(module => module.newHarvest())
+      .then((result) => {
+        return result;
+      }).then(() => {
+        return App.loadHarvests();
+      });
   },
 
-  harvest: function() {
+  harvest: function () {
     let selectedHarvest = $('#harvestSelect').val();
     let amount = $('#harvest-amount').val();
     let address = $("#harvestableFields-select").val();
-    // let addresses = [];
-    // $("#harvestableFields-select > option").each(function () {
-    //   addresses.push(this.value);
-    // });
-    // console.log(addresses);
     Router.modules
       .HarvestModule()
       .then(module => module.weightInput(selectedHarvest, address, amount));
-    // $("#harvestableFields-select").each(function () {
+  },
+  /***
+   *  Tranports
+   */
 
-    //   if ($(this).is(":checked")) {
-    //     let address = $(this)
-    //       .closest(".card")
-    //       .find(".fieldaddress")
-    //       .text();
-    //     addresses.push(address);
-    //   }
-    // });
-    // 
+  newTransport: function () {
+    Router.modules
+      .TransportModule()
+      .then(module => module.newTransport());
+  },
+
+  loadTransports: function () {
+    Router.modules
+      .TransportModule()
+      .then(module => module.loadTransport());
+  },
+
+  addData: function (address) {
+     Router.modules
+       .TransportModule()
+       .then(module => module.addData(address));
   }
+
+
 };
-
 window.addEventListener('load', function () {
- 
-
-    window.App.init();
+  window.App.init();
 });

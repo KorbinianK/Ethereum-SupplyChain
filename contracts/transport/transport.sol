@@ -14,6 +14,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     string start_longitude;
     string end_latitude;
     string end_longitude;
+    address[] harvests;
     
     
     /** 
@@ -28,6 +29,14 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
         setStartCoordinates(_longitude, _latitude);
+    }
+
+    /** 
+     * @dev Adds a harvest to a transport
+     * @param _harvest address of a harvest
+    */
+    function addHarvest(address _harvest) public {
+        harvests.push(_harvest);
     }
 
     /** 
@@ -48,6 +57,14 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     function setEndCoordinates(string _latitude, string _longitude) public {
         end_latitude = _latitude;
         end_longitude = _longitude;
+    }
+
+    /** 
+     * @dev Gets the ID of the transport
+     * @return uint the ID
+    */
+    function getID() public view returns (uint) {
+        return id;
     }
     
 }

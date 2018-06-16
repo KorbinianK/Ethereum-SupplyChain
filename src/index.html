@@ -45,55 +45,14 @@
         </div>
     </div>
     <div id="content" class="container">
-        <!-- HARVEST -->
         
-        <section id="harvestSection" class="d-none">
-<h2>Harvest:</h2>
-<div class="row my-5">
-    <div class="col">
-
-        <div class="loader d-none row"></div>
-        <div id="harvestDetails" class="row">
-            <!-- HARVEST CARD LOADING  -->
-
-        </div>
-    </div>
-</div>
-            <div class="row">
-                <div class="col">
-                    <div id="harvestSelector" class="input-group row">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="harvestSelect ">Select Harvest</label>
-                        </div>
-                        <select class="form-control" id="harvestSelect">
-                            <!-- HARVEST SELECT  -->
-                        </select>
-                        <div class="input-group-append">
-                            <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Open</button>
-                        </div>
-
-                    </div>
-                    <div class="row input-group my-5 ">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="harvestSelect ">New Harvest</label>
-                        </div>
-                        <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary " onclick="App.newHarvest()" type="button">New</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- END HARVEST -->
-
         <!-- FIELDS -->
-        <section id="cultivationSection" class="d-block">
+        <section id="cultivationSection" class="d-none">
             <div class="loader d-none"></div>
-            
+
             <div id="fields" class="row my-5 mx-0 card-columns">
                 <!-- FIELDS LOADING -->
-                
+
             </div>
             <div id="newFieldArea" class="row my-5">
                 <div class="col">
@@ -120,6 +79,59 @@
 
             <!-- END FIELDS -->
         </section>
+        <!-- HARVEST -->
+
+        <section id="harvestSection" class="d-none">
+            <h2>Harvest:</h2>
+            <div class="row my-5">
+                <div class="col">
+
+                    <div class="loader d-none row"></div>
+                    <div id="harvestDetails" class="row">
+                        <!-- HARVEST CARD LOADING  -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div id="harvestSelector" class="input-group row">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="harvestSelect ">Select Harvest</label>
+                        </div>
+                        <select class="form-control" id="harvestSelect">
+                            <!-- HARVEST SELECT  -->
+                        </select>
+                        <div class="input-group-append">
+                            <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Open</button>
+                        </div>
+
+                    </div>
+                    <div class="row input-group my-5 ">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="harvestSelect ">New Harvest</label>
+                        </div>
+                        <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary " onclick="App.newHarvest()" type="button">New</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- HARVEST END -->
+        <!-- TRANSPORT -->
+        <section id="transportSection">
+            <h2>Transports</h2>
+<div class="loader d-none row"></div>
+<div id="transportDetails" class="row">
+
+                </div>
+                <div class="row">
+<button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">New Transport</button>
+
+                </div>
+        </section>
+        <!-- TRANSPORT END -->
     </div>
 </body>
 

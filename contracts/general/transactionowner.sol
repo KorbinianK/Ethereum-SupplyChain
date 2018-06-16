@@ -56,6 +56,7 @@ contract TransactionOwner {
     struct TransactionStruct {
         address sender;
         bytes data;
+        uint256 time;
     }
     
     // Mapping of an address to a Sender struct
@@ -79,8 +80,8 @@ contract TransactionOwner {
             sender.push(_sender);
         }
         TransactionSender storage tsender = transactionSender[_sender];
-        tsender.transactions[tsender.transactionCount] = TransactionStruct(_sender,_data);
-        transactions[totalTransactions] = TransactionStruct(_sender, _data);
+        tsender.transactions[tsender.transactionCount] = TransactionStruct(_sender,_data, now);
+        transactions[totalTransactions] = TransactionStruct(_sender, _data, now);
         tsender.transactionCount++;
         totalTransactions++;
     }
@@ -93,6 +94,16 @@ contract TransactionOwner {
     function getTransactionDataAtIndex(uint _index) public view returns(bytes) {
         return transactions[_index].data;
     }
+
+    /**
+    * @dev Gets transaction timestamp at a index
+    * @param _index pointer to check
+    * @return uint256 the timestamp
+    */
+    function getTransactionTimeAtIndex(uint _index) public view returns(uint256) {
+        return transactions[_index].time;
+    }
+    
     
     /**
     * @dev Gets the status of the contract
@@ -121,6 +132,7 @@ contract TransactionOwner {
     function getTransactionSenderAtIndex(uint _index) public view returns (address){
         return transactions[_index].sender;
     }
+
     
     /**
     * @dev Gets the amount of transactions a sender has sent
@@ -141,6 +153,18 @@ contract TransactionOwner {
     function getTransactionDataFromSenderAtIndex(address _sender, uint _index) public view returns(bytes){
         TransactionSender storage s = transactionSender[_sender];
         return s.transactions[_index].data;
+    }
+
+
+    /**
+    * @dev Gets the timestamp of a transaction from a specific sender at a position
+    * @param _sender the sender to check
+    * @param _index poiner
+    * @return uint256 the timestamp
+    */
+    function getTransactionTimeFromSenderAtIndex(address _sender, uint _index) public view returns(uint256){
+        TransactionSender storage s = transactionSender[_sender];
+        return s.transactions[_index].time;
     }
     
     /**

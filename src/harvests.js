@@ -2,7 +2,6 @@ var _ = require("lodash");
 "use strict";
 
 import Mustache from "mustache";
-import * as FieldModule from "./fields.js";
 import Router from "./router.js";
 import harvest_contract from "./utils/contracts/harvest_contract";
 import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
@@ -31,7 +30,6 @@ export function loadHarvestFields(harvestAddress){
         }
         var account = accounts[0];
         var harvestInstance;
-        // Harvest.at('0xca8b5569febbc5e1a5bd6d4b98cf6690d0ba84ab').then(function (instance) { harvestInstance = instance });
         App.contracts.Harvest.at(harvestAddress)
             .then(function (instance) {
                 harvestInstance = instance;
@@ -97,14 +95,11 @@ export async function newHarvest() {
     const harvest = await harvestHandler_instance.newHarvest(
         harvestYear,
         {
-            from: account
+            from: account,
         }
-    ).then( async(result) => {
-        console.log(result);
+    ).then((result) => {
         return result;
     });
-    console.log("h",harvest);
-    
     return await harvest;
 }
 
@@ -116,7 +111,6 @@ export async function openHarvest(address){
     const template_harvestdetails = await helper.fetchTemplate("src/templates/harvest/mustache.harvestdetails.html");
     Mustache.parse(template_harvestdetails);
     const json = await harvestAsJson(address);
-    Mustache.parse(template_harvestdetails);
     var output = Mustache.render(
         template_harvestdetails, json
     );
@@ -158,6 +152,7 @@ export async function harvestAsJson(address) {
             "year": year.toString(),
             "transactionCount": transactionCount.toString(),
             "txSender": [],
+            "status": await tx.getStatus(harvest_instance)
             }
         for (let i = 0; i < owners.length; i++) {
             let owner = {

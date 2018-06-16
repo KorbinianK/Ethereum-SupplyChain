@@ -133,7 +133,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     function getYear() public view returns(uint) {
         return year;
     }
-    
+
     /**
     * @dev Constructor function
     * @param _year of the harvest
