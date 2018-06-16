@@ -19,8 +19,7 @@
         <div class="collapse navbar-collapse" id="collapsibleNavId">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Cultivation</span>
-                    </a>
+                    <a class="nav-link" href="#">Cultivation</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="App.loadHarvestSection();" href="#">Harvests</a>
@@ -47,62 +46,80 @@
     </div>
     <div id="content" class="container">
         <!-- HARVEST -->
-        <div class="row my-5">
-            <div class="col">
-                <h2>Harvests:</h2>
-            </div>
-            <div class="col">
-                <div id="harvestSelector" class="input-group row">
-                    <label for="harvestSelect">Select Harvest</label>
-                    <div class="input-group-prepend">
-                        <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Button</button>
+        
+        <section id="harvestSection" class="d-none">
+<h2>Harvest:</h2>
+<div class="row my-5">
+    <div class="col">
+
+        <div class="loader d-none row"></div>
+        <div id="harvestDetails" class="row">
+            <!-- HARVEST CARD LOADING  -->
+
+        </div>
+    </div>
+</div>
+            <div class="row">
+                <div class="col">
+                    <div id="harvestSelector" class="input-group row">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="harvestSelect ">Select Harvest</label>
+                        </div>
+                        <select class="form-control" id="harvestSelect">
+                            <!-- HARVEST SELECT  -->
+                        </select>
+                        <div class="input-group-append">
+                            <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Open</button>
+                        </div>
+
                     </div>
-                    <select class="form-control" id="harvestSelect">
-
-                    </select>
+                    <div class="row input-group my-5 ">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="harvestSelect ">New Harvest</label>
+                        </div>
+                        <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary " onclick="App.newHarvest()" type="button">New</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row my-5">
-            <div class="input-group mb-3">
-
-                <input type="number" id="newHarvest" class="form-control" placeholder="New Harvest " aria-label="newHarvest">
-                <div class="input-group-append">
-                    <button class="text-white btn btn-secondary " onclick="App.newHarvest()" type="button">New</button>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <button type="button" name="harvest" id="harvestBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
-        </div>
+        </section>
         <!-- END HARVEST -->
-        <!-- FIELDS -->
-        <div id="fields" class=" card-columns">
-        </div>
-        <div class="row my-5">
-            <div class="col">
-                <form id="newFieldForm">
-                    <div class="form-group">
-                        <label for="fieldName">Field Name</label>
-<input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
-                    </div>
-                    <div class="form-row">
-<div class="form-group col">
-    <label for="fieldLat">Latitude</label>
-<input name="latitude"  type="text" class="form-control" id="fieldLat" placeholder="Latitude">
-</div>
-<div class="form-group col">
-    <label for="fieldLong">Longitude</label>
-    <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
-</div>
-                    </div>
-                    
-<button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary text-white btn-lg btn-block">New Field</button>
-                </form>
-            </div>
-        </div>
 
-        <!-- END FIELDS -->
+        <!-- FIELDS -->
+        <section id="cultivationSection" class="d-block">
+            <div class="loader d-none"></div>
+            
+            <div id="fields" class="row my-5 mx-0 card-columns">
+                <!-- FIELDS LOADING -->
+                
+            </div>
+            <div id="newFieldArea" class="row my-5">
+                <div class="col">
+                    <form id="newFieldForm">
+                        <div class="form-group">
+                            <label for="fieldName">Field Name</label>
+                            <input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col">
+                                <label for="fieldLat">Latitude</label>
+                                <input name="latitude" type="text" class="form-control" id="fieldLat" placeholder="Latitude">
+                            </div>
+                            <div class="form-group col">
+                                <label for="fieldLong">Longitude</label>
+                                <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
+                            </div>
+                        </div>
+
+                        <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary text-white btn-lg btn-block">New Field</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- END FIELDS -->
+        </section>
     </div>
 </body>
 

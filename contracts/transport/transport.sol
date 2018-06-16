@@ -1,18 +1,53 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.23;
 
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../general/erc20handler.sol";
 
+/**
+ * @title The Transport contract
+ */
 contract Transport is TransactionOwner, Ownable, ERC20Handler{
     uint private id;
-    address[] private owners;
+    address[] private permissionedAccounts;
+    string start_latitude;
+    string start_longitude;
+    string end_latitude;
+    string end_longitude;
     
-    constructor(uint _id, address _token) public {
+    
+    /** 
+     * @dev The constructor function
+     * @param _id of the transport
+     * @param _token address of the token
+     * @param _longitude start Location longitude
+     * @param _latitude end Location latitude
+    */
+    constructor(uint _id, address _token, string _longitude, string _latitude) public {
         id = _id;
         erc20 = _token;
-        owners.push(msg.sender);
+        permissionedAccounts.push(msg.sender);
+        setStartCoordinates(_longitude, _latitude);
+    }
+
+    /** 
+     * @dev Sets the starting coordinates of the transport
+     * @param _longitude Location longitude
+     * @param _latitude Location latitude
+    */
+    function setStartCoordinates(string _latitude, string _longitude) public {
+        start_latitude = _latitude;
+        start_longitude = _longitude;
     }
     
+    /** 
+     * @dev Sets the end coordinates of the transport
+     * @param _longitude Location longitude
+     * @param _latitude Location latitude
+    */
+    function setEndCoordinates(string _latitude, string _longitude) public {
+        end_latitude = _latitude;
+        end_longitude = _longitude;
+    }
     
 }

@@ -8,18 +8,19 @@ import harvest_contract from "./utils/contracts/harvest_contract";
 import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 import field_contract from "./utils/contracts/field_contract";
 import * as helper from "./utils/helper_scripts";
-import { load } from "babel-register/lib/cache";
+import * as tx from "./utils/transactions";
 
-
-export async function addField(harvest, fields) {
+export async function weightInput(harvest, field, amount) {
     const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
     const account = await helper.getAccount();
-    const res = await harvest_instance.addMultipleFields(
-        fields, 
+    const res = await harvest_instance.weightInput(
+        field,
+        amount,
         { from: account })
         .then( result => { 
             console.log(result);
             console.log(fields, "added to", harvest);
+            return openHarvest(harvest);
     });
 }
 
@@ -52,13 +53,21 @@ export function loadHarvestFields(harvestAddress){
     });
 }
 
-export async function loadAll() {
+export async function loadAll() { 
+
+    // console.log($(".navbar-nav").find(".active"))
+    // .each(function (e) {
+    //     console.log(e);
+    //     this.removeClass("active");
+    // })
+
+};
+
+export async function loadDropdown() {
     document.getElementById("harvestSelect").innerHTML = '';
 
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-   console.log("hinst",harvestHandler_instance.address);
-   
     const res = await harvestHandler_instance.getHarvests(
         {
         from: account
@@ -73,7 +82,6 @@ export async function loadAll() {
             year.year = await harvest_instance.getYear({from:account});
             years.push(year);
         }
-        console.log("y",years);
         let arr = _.sortBy(years, "year").reverse();
         arr.forEach(element => {
             document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
@@ -84,25 +92,27 @@ export async function loadAll() {
 
 export async function newHarvest() {
     let harvestYear = $("#newHarvest").val();
-    console.log(harvestYear);
-
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-   
-    const res = await harvestHandler_instance.newHarvest(
+    const harvest = await harvestHandler_instance.newHarvest(
         harvestYear,
-         {
+        {
             from: account
         }
-    ).then(async result => {
+    ).then( async(result) => {
         console.log(result);
-        // const x = await result.then(r => {return loadAll()});
-        return loadAll();
+        return result;
     });
+    console.log("h",harvest);
+    
+    return await harvest;
 }
 
 export async function openHarvest(address){
-    
+    $("#harvestDetails").empty();
+    $("#harvestSection")
+      .find(".loader")
+      .toggleClass("d-none");
     const template_harvestdetails = await helper.fetchTemplate("src/templates/harvest/mustache.harvestdetails.html");
     Mustache.parse(template_harvestdetails);
     const json = await harvestAsJson(address);
@@ -110,7 +120,12 @@ export async function openHarvest(address){
     var output = Mustache.render(
         template_harvestdetails, json
     );
-    return document.getElementById('content').innerHTML = output;
+    var options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
+    $("#harvestSection")
+      .find(".loader")
+      .toggleClass("d-none");
+    document.getElementById('harvestDetails').innerHTML = output;
+    document.getElementById('harvestableFields-select').innerHTML = options;
 }
 
 
@@ -124,7 +139,6 @@ export async function harvestAsJson(address) {
     let picture;
     let transactionCount;
     let txSender = [];
-
     const res = await harvest_instance.getAllDetails(
         {
             from: account
@@ -136,8 +150,8 @@ export async function harvestAsJson(address) {
         owners              = result[2];
         transactionCount    = result[3];
         txSender            = result[4];
-
         json = {
+            "tokenBalance": await tx.getBalance(harvest_instance),
             "address": address,
             "fields": [],
             "owners" : [],
@@ -167,7 +181,7 @@ export async function harvestAsJson(address) {
                 json["fields"].push(field);
             }
         }
-       return  json;
+       return await json;
     });
     console.log(res);
     return res;
@@ -178,7 +192,7 @@ export async function getFieldName(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
     const name = await field_instance.getName({from:account}).then( result =>  { 
-        return web3.utils.hexToString(result);
+        return result;
     });
     return name;
 }
