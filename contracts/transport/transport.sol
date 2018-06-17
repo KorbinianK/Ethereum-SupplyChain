@@ -15,7 +15,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     string end_latitude;
     string end_longitude;
     address[] harvests;
-    
+    uint256 public createdAt;
     
     /** 
      * @dev The constructor function
@@ -29,6 +29,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
         setStartCoordinates(_longitude, _latitude);
+        createdAt = now;
     }
 
     /** 

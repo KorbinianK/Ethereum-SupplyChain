@@ -63,20 +63,27 @@ export async function switchStatus(address) {
 export async function getTotalTransactionCount(address) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const txCount = await tx.getTotalTransactionCount(field_instance);
-    return await txCount;
+    return txCount;
 }
 
 export async function getTransactionSenderAtIndex(address,index) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const sender = await tx.getTransactionSenderAtIndex(field_instance, index);
-    return await sender;
+    return sender;
 }
 
 export async function getTransactionDataAtIndex(address, index) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const data = await tx.getTransactionDataAtIndex(field_instance, index);
-    return await data;
+    return data;
 }
+
+export async function getTransactionTimeAtIndex(address, index) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const time = await tx.getTransactionTimeAtIndex(field_instance, index);
+    return helper.makeUnixReadable(time);;
+}
+
 
 export async function getAllTransactions(address) {
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).at(address);
@@ -89,6 +96,7 @@ export async function getAllTransactions(address) {
         let tx = {};
         tx.sender = await getTransactionSenderAtIndex(address, i);
         tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+        tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
     return json;
@@ -318,6 +326,8 @@ export async function openField(address) {
     Mustache.parse(template_fielddetails);
     const field = await fieldAsJson(address).then(async(json)=>{
         json["transactions"] = await getAllTransactions(address);
+        console.log(json);
+        
         Mustache.parse(template_fielddetails);
         var output = Mustache.render(
             template_fielddetails, json
@@ -332,6 +342,9 @@ export async function openField(address) {
 
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    await tx.doDummyTransaction(field_instance);
+    var reciept = await tx.doDummyTransaction(field_instance);
+    console.log(reciept);
+    let block = await web3.eth.getBlock("latest")
+    console.log(block)
     return openField(address);
 }

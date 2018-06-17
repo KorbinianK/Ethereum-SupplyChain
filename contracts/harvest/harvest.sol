@@ -14,6 +14,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     address[] private fieldArray;
     uint private year;
     address[] private permissionedAccounts;
+    uint256 public createdAt;
     
      // Mapping of a field address to a boolean value to track if it has been added already
     mapping(address => bool) private fields;
@@ -143,6 +144,6 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         year = _year;
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
-    
+        createdAt = now;
     }
 }

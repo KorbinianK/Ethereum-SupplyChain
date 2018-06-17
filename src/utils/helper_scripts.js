@@ -38,3 +38,21 @@ export function objDiff(array1, array2) {
 
     return resultArray
 }
+
+
+export function makeUnixReadable(timestamp){
+
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    var date = new Date(timestamp * 1000);
+    var year = date.getFullYear();
+    var month = months[date.getMonth()];
+    var day = date.getDate();
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+
+    var time = day + '-' + month + '-' + year + ' ' + hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+    return time;
+}

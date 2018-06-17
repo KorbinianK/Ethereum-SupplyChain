@@ -113,7 +113,7 @@ export async function getTransactionDataAtIndex(address, index) {
 export async function getTransactionTimeAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const time = await tx.getTransactionTimeAtIndex(transport_instance, index);
-    return time;
+    return helper.makeUnixReadable(time);
 }
 
 export async function getAllTransactions(address) {

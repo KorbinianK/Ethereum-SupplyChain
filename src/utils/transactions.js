@@ -19,7 +19,7 @@ export async function getTotalTransactionCount(instance){
 export async function getTransactionTimeAtIndex(instance, index) {
     const account = await helper.getAccount();
     const time = await instance.getTransactionTimeAtIndex(index, { from: account }).then(result => {return result});
-    return await time;
+    return await time.toString();
 }
 
 

@@ -15,7 +15,7 @@ contract Field is TransactionOwner {
     address[] public permissionedAccounts;
     Stages public stage;
     address public lastHarvest;
-    
+    uint256 public createdAt;
     /**
     * @dev Enum for the stages of the vineyard
     */
@@ -232,6 +232,7 @@ contract Field is TransactionOwner {
         location.longitude = _longitude;
         location.latitude = _latitude;
         stage = Stages.Cultivated;
+        createdAt = now;
     }
 
     /**
