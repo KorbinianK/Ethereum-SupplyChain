@@ -37,10 +37,7 @@ export async function changeStatus(address){
 
 export async function getStage(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
-    const status = await field_instance.stage({
-        from: account
-    }).then(
+    const status = await field_instance.stage.call().then(
         (res) => {
             console.log("status", res)
             return res;
@@ -109,8 +106,6 @@ export async function getAllTransactions(address) {
 
 export async function loadSingleField(address){
     const json = await fieldAsJson(address);
-
-
    return loadFieldCard(json);
 }
 
@@ -172,7 +167,7 @@ export async function getHarvestableFields(filter) {
 }
 
 export async function loadFieldCard(json){
-        console.log("Json", json);
+    console.log("Json", json);
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
     var output = Mustache.render(
@@ -184,8 +179,7 @@ export async function loadFieldCard(json){
 
 export async function checkHarvestable(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
-    const res = await field_instance.stage({from:account}).then(result =>{ // TODO!!!!
+    const res = await field_instance.stage.call().then(result =>{ // TODO!!!!
         if (result.toString() == "1"){
             return true;
         }
@@ -208,9 +202,8 @@ export async function fieldAsJson(address) {
     var totalTransactionCount = await getTotalTransactionCount(address);
     var json;
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
     
-    const res = await field_instance.getAllDetails({from:account}).then(async result =>{
+    const res = await field_instance.getAllDetails.call().then(async result =>{
         stage = result[0];
         if (stage == 0) {
             stage = "Uncultivated"

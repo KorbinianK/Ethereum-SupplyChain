@@ -71,7 +71,6 @@ export async function loadDropdown() {
         from: account
         }
     ).then(async result => {
-        console.log(result);
         var years = [];
         for (let i = 0; i < result.length; i++) {
             let harvest_instance = await harvest_contract(web3.currentProvider).at(result[i]);

@@ -7,7 +7,7 @@ import "./field.sol";
  * @title The Handler contract for the vineyards        
  */
 contract FieldHandler {
-    
+     
     address[] internal allFields;
     address[] internal activeFieldsArray;
     

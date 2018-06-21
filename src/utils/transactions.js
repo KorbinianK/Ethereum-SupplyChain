@@ -1,10 +1,7 @@
 import * as helper from "./helper_scripts";
 
 export async function getTotalTransactionCount(instance){
-    const account = await helper.getAccount();
-    const txCount = await instance.getTotalTransactionCount({
-        from: account
-    }).then((res) => {
+    const txCount = await instance.getTotalTransactionCount.call().then((res) => {
             return res;
         }
     );
@@ -17,22 +14,19 @@ export async function getTotalTransactionCount(instance){
 
 
 export async function getTransactionTimeAtIndex(instance, index) {
-    const account = await helper.getAccount();
-    const time = await instance.getTransactionTimeAtIndex(index, { from: account }).then(result => {return result});
+    const time = await instance.getTransactionTimeAtIndex.call(index).then(result => {return result});
     return await time.toString();
 }
 
 
 
 export async function getTransactionSenderAtIndex(instance, index) {
-    const account = await helper.getAccount();
-    const sender = await instance.getTransactionSenderAtIndex(index, {from:account}).then(result => {return result});
+    const sender = await instance.getTransactionSenderAtIndex.call(index).then(result => {return result});
     return await sender;
 }
 
 export async function getTransactionDataAtIndex(instance, index) {
-    const account = await helper.getAccount();
-    const data = await instance.getTransactionDataAtIndex(index, {from:account}).then(result => {return result});
+    const data = await instance.getTransactionDataAtIndex.call(index).then(result => {return result});
     return await data;
 }
 
@@ -68,8 +62,7 @@ export async function addTransaction(instance,sender,data) {
 
 
 export async function getBalance(instance) {
-    const account = await helper.getAccount();
-    const balance = await instance.getBalance({from:account}).then(result =>{
+    const balance = await instance.getBalance.call().then(result =>{
         console.log("token balance",result.toString());
         return result.toString();
     });
@@ -78,10 +71,7 @@ export async function getBalance(instance) {
 
 
 export async function getStatus(instance) {
-    const account = await helper.getAccount();
-    const status = await instance.getStatus({
-        from: account
-    }).then(result => {
+    const status = await instance.getStatus.call().then(result => {
         console.log("status", result.toString());
         return result.toString();
     });

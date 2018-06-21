@@ -4,3 +4,4 @@ dist/
 *.min.js
 truffle.js
 contracts/cultivation/requirements.txt
+local addresses.txt

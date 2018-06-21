@@ -28,7 +28,7 @@
                     <a class="nav-link" href="#">Transport</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manufacturing</a>
+                    <a class="nav-link" href="#">Processing</a>
                 </li>
             </ul>
 
@@ -45,7 +45,7 @@
         </div>
     </div>
     <div id="content" class="container">
-        
+
         <!-- FIELDS -->
         <section id="cultivationSection" class="d-none">
             <div class="loader d-none"></div>
@@ -122,16 +122,34 @@
         <!-- TRANSPORT -->
         <section id="transportSection">
             <h2>Transports</h2>
-<div class="loader d-none row"></div>
-<div id="transportDetails" class="row">
+            <div class="loader d-none row"></div>
+            
+            <div id="transportDetails" class="row">
 
-                </div>
-                <div class="row">
-<button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">New Transport</button>
+            </div>
+            <div id="transports">
+                
+            </div>
+            <div class="row">
+                <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">New Transport</button>
 
-                </div>
+            </div>
         </section>
         <!-- TRANSPORT END -->
+         <!-- PROCESSING -->
+         <section id="processingSection">
+            <h2>Productions</h2>
+            <div class="loader d-none row"></div>
+            
+            <div id="productionDetails" class="row">
+
+            </div>
+            <div class="row">
+                <button onclick="App.getBottle()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">Bottle</button>
+
+            </div>
+        </section>
+        <!-- PROCESSING END -->
     </div>
 </body>
 

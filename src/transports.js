@@ -36,21 +36,87 @@ async function getHarvest(address) {
     const harvest = await transportHandler_instance.getHarvestFromTransport(address,{from:account}).then(result => {
         return result;
     });
-
+    // RAUS
+    const all = await allTransports();
+    console.log("all transports",all);
     return harvest;
 }
 
+
+export async function transportAsJson(transport) {
+    let start_latitude;
+    let start_longitude;
+    let end_latitude;
+    let end_longitude;
+    let txSender = [];
+    let harvests = [];
+    var json = {};
+    json["address"] = transport;
+    json["harvestAddress"] = await getHarvest(transport);
+    const transport_instance = await transport_contract(web3.currentProvider).at(transport);
+
+    // json["start_latitude"] = await transport_instance.start_latitude.call().then(result => {return result;});
+    // json["start_longitude"] = await transport_instance.start_longitude.call().then(result => {return result;});
+    // json["end_latitude"] = await transport_instance.end_latitude.call().then(result => {return result;});
+    // json["end_longitude"] = await transport_instance.end_longitude.call().then(result => {return result;});
+    json["totalTransactions"] = await getTotalTransactionCount(transport);
+    txSender = await transport_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
+    // for (let i = 0; i < txSender.length; i++) {
+    //     let sender = {"address": txSender[i]};
+    //     json["txSender"].push(sender);
+    //     }
+    return json;
+}
+
+async function loadTransportCard(json){
+    const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
+    Mustache.parse(template_transports);
+    var output = Mustache.render(
+        template_transports, json
+    );
+    return document.getElementById('transports').innerHTML += output;
+}
+
+export async function getTransportCards(){
+    $('#transportSection').find(".loader").removeClass("d-none");
+    $('#newFieldArea').removeClass("d-none");
+    $('#fields').empty();
+    await allTransports().then(transports =>{
+        for (let i = 0; i < transports.length; i++) {
+            loadTransportCard(transports[i]);
+        }
+    });
+    $('#cultivationSection').find(".loader").addClass("d-none");
+}
+
+
+export async function allTransports() {
+    $("#transportSection")
+    .find(".loader")
+    .removeClass("d-none");
+    
+    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+    const transports = await transportHandler_instance.getTransports.call().then(async result => {
+        var t = [];
+        for (let i = 0; i < result.length; i++) {
+           t.push(await transportAsJson(result[i]));
+        }
+        return t;
+    });
+    console.log("alltr",transports)
+    return transports;
+    $("#transportSection")
+    .find(".loader")
+    .addClass("d-none");
+}
 
 export async function loadTransport(address) {
       $("#transportDetails").empty();
       $("#transportSection")
           .find(".loader")
-          .toggleClass("d-none");
-    const account = await helper.getAccount();
+          .removeClass("d-none");
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const transport = await transportHandler_instance.currentTransport({
-        from: account
-    }).then((res) => { 
+    const transport = await transportHandler_instance.currentTransport.call().then((res) => { 
         return res;
     });
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
@@ -73,7 +139,7 @@ export async function loadTransport(address) {
     console.log("balance",balance);
     $("#transportSection")
         .find(".loader")
-        .toggleClass("d-none");
+        .addClass("d-none");
 }
 
 export async function addData(address) {

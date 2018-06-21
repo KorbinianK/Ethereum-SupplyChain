@@ -5,8 +5,9 @@ const _modules = {
     HarvestModule: () =>
         import ('./harvests.js'),
     TransportModule: () =>
-        import ("./transports.js")
-    
+        import ("./transports.js"),
+    ProcessingModule: () =>
+        import ("./processing.js")
 };
 
 export default class Router {

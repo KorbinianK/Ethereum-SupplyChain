@@ -7,6 +7,7 @@ import Router from "./router.js";
 import * as FieldModule from "./fields.js";
 import * as HarvestModule from "./harvests.js";
 import * as TransportModule from "./transports.js";
+import * as ProcessingModule from "./processing.js";
 import { 
   default as Web3
 } from 'web3';
@@ -206,9 +207,16 @@ window.App = {
      Router.modules
        .TransportModule()
        .then(module => module.addData(address));
+  },
+
+  /**
+   * Processing
+   */
+  getBottle: function() {
+    Router.modules
+    .ProcessingModule()
+    .then(module => module.finalBottle());
   }
-
-
 };
 window.addEventListener('load', function () {
   window.App.init();
