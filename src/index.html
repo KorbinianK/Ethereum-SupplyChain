@@ -22,7 +22,7 @@
                     <a class="nav-link" href="#">Cultivation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="App.loadHarvestSection();" href="#">Harvests</a>
+                    <a class="nav-link" href="#">Harvests</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Transport</a>
@@ -50,9 +50,9 @@
         <section id="cultivationSection" class="d-none">
             <div class="loader d-none"></div>
 
-            <div id="fields" class="row my-5 mx-0 card-columns">
+            <div id="fields" class="row my-5 mx-0 card-deck">
                 <!-- FIELDS LOADING -->
-
+                
             </div>
             <div id="newFieldArea" class="row my-5">
                 <div class="col">
@@ -82,7 +82,7 @@
         <!-- HARVEST -->
 
         <section id="harvestSection" class="d-none">
-            <h2>Harvest:</h2>
+          
             <div class="row my-5">
                 <div class="col">
 
@@ -120,15 +120,15 @@
         </section>
         <!-- HARVEST END -->
         <!-- TRANSPORT -->
-        <section id="transportSection">
+        <section id="transportSection" class="d-none">
             <h2>Transports</h2>
             <div class="loader d-none row"></div>
             
             <div id="transportDetails" class="row">
 
             </div>
-            <div id="transports">
-                
+            <div id="transports" class="row my-5 mx-0 card-deck">>
+                 <h5 id="transports-loading" class="text-lowercase text-muted text-center">loading...</h5> 
             </div>
             <div class="row">
                 <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">New Transport</button>
@@ -137,7 +137,7 @@
         </section>
         <!-- TRANSPORT END -->
          <!-- PROCESSING -->
-         <section id="processingSection">
+         <section id="processingSection"  class="d-none">
             <h2>Productions</h2>
             <div class="loader d-none row"></div>
             

@@ -83,8 +83,6 @@ export async function getTransactionTimeAtIndex(address, index) {
 
 
 export async function getAllTransactions(address) {
-    const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
     const txCount = await getTotalTransactionCount(address);
     var json = 
        []
@@ -106,28 +104,37 @@ export async function getAllTransactions(address) {
 
 export async function loadSingleField(address){
     const json = await fieldAsJson(address);
-   return loadFieldCard(json);
+   return loadSingleFieldCard(json);
 }
 
 
+ function hexToBase64(hexstring){
+ return btoa(
+     hexstring
+     .match(/\w{2}/g)
+     .map(s => String.fromCharCode(parseInt(s, 16)))
+     .join("")
+ );
+} 
+    
 
 export async function getFieldCards(){
-    $('#cultivationSection').find(".loader").toggleClass("d-none");
-    $('#newFieldArea').removeClass("d-none");
+    $('#cultivationSection').find(".loader").removeClass("d-none");
+    $('#cultivationSection').removeClass("d-none");
     $('#fields').empty();
-    await getAll().then(fields =>{
+    await getAll().then(fields =>{ 
         for (let i = 0; i < fields.length; i++) {
-            loadFieldCard(fields[i]);
+            loadSingleFieldCard(fields[i]);
         }
     });
-    $('#cultivationSection').find(".loader").toggleClass("d-none");
+    $('#cultivationSection').find(".loader").addClass("d-none");
 }
 
 export async function getAll(){
+
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
-    const account = await helper.getAccount();
     const fields = await fieldhandler_instance
-      .getAllFields({ from: account })
+      .getAllFields.call()
       .then(async receipt => {
         var fields = [];
         for (let i = 0; i < receipt.length; i++) {
@@ -166,7 +173,7 @@ export async function getHarvestableFields(filter) {
     return dropdown;
 }
 
-export async function loadFieldCard(json){
+export async function loadSingleFieldCard(json) {
     console.log("Json", json);
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
@@ -215,7 +222,7 @@ export async function fieldAsJson(address) {
         creator = result[1] ;
         owners = result[2] ;
         name = result[3] ;
-        picture = result[4] ;
+        picture = hexToBase64(result[4]);
         latitude = result[5] ;
         longitude = result[6] ;
         txHarvest = result[7];
@@ -246,9 +253,8 @@ export async function fieldAsJson(address) {
                 };
             json["txSender"].push(sender);
         }
-        
         return json;
-    })
+    });
    return res;
 }
 
@@ -327,7 +333,6 @@ export async function openField(address) {
         );
         return output;
     });
-    $('#newFieldArea').addClass("d-none");
     toggleLoader("cultivated");
     $('#fields').toggleClass("d-none");
     return document.getElementById('fields').innerHTML = field;

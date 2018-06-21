@@ -116,19 +116,20 @@ window.App = {
       console.log(this.text);
       switch (this.text) {
         case "Cultivation":
-          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("section").removeClass("d-block").addClass("d-none");
           $("#content").find("#cultivationSection").addClass("d-block");
           App.getFieldCards();
           break;
         case "Harvests":
-          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("section").removeClass("d-block").addClass("d-none");
           $("#content").find("#harvestSection").addClass("d-block");
+          App.loadHarvestSection();
           break;
 
         case "Transport":
-          $("#content").find(".d-block").removeClass("d-block").addClass("d-none");
+          $("#content").find("section").removeClass("d-block").addClass("d-none");
           $("#content").find("#transportSection").addClass("d-block");
-          App.loadTransports();
+          App.loadTransportSection();
           break;
 
         case "Processing":
@@ -191,6 +192,10 @@ window.App = {
    *  Tranports
    */
 
+  loadTransportSection: function () {
+    Router.modules.TransportModule()
+      .then(module => module.getTransportCards());
+  },
   newTransport: function () {
     Router.modules
       .TransportModule()

@@ -106,7 +106,7 @@ export async function openHarvest(address){
     $("#harvestDetails").empty();
     $("#harvestSection")
       .find(".loader")
-      .toggleClass("d-none");
+      .removeClass("d-none");
     const template_harvestdetails = await helper.fetchTemplate("src/templates/harvest/mustache.harvestdetails.html");
     Mustache.parse(template_harvestdetails);
     const json = await harvestAsJson(address);
@@ -116,7 +116,7 @@ export async function openHarvest(address){
     var options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
     $("#harvestSection")
       .find(".loader")
-      .toggleClass("d-none");
+      .addClass("d-none");
     document.getElementById('harvestDetails').innerHTML = output;
     document.getElementById('harvestableFields-select').innerHTML = options;
 }

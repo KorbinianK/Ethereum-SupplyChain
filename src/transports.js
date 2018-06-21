@@ -7,16 +7,41 @@ import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 
 export async function newTransport() {
-    const current = await currentHarvest();
-    console.log("current Harvest", current);
+    const currentH = await currentHarvest();
+    const currentTransport = await getCurrentTransport();
+    if (currentH != undefined && currentTransport != undefined) {
+        var check = checkTransport(currentH, currentTransport);
+    }
+    if(!check || check == undefined){
+        const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+        const account = await helper.getAccount();
+        const result = await transportHandler_instance.newTransport({
+            from: account
+        }).then((res) => {
+            return res
+        });
+    }
+    else{
+        console.error("same harvest!");
+    }
+    
+}
 
+async function checkTransport(harvest,transport){
+    const current = harvest;
+    const newharvest = await getHarvest(transport);
+    if(current == newHarvest){
+        return false;
+    }return true;
+}
+
+export async function getCurrentTransport(){
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const account = await helper.getAccount();
-    const result = await transportHandler_instance.newTransport({
-        from: account
-    }).then((res) => {
-        return res
-    });
+    const transport = await transportHandler_instance.currentTransport.call().then((res) => {
+        return res;
+    }).catch(err => console.error(err));
+    
+    return transport;
 }
 
 export async function currentHarvest() {
@@ -36,12 +61,16 @@ async function getHarvest(address) {
     const harvest = await transportHandler_instance.getHarvestFromTransport(address,{from:account}).then(result => {
         return result;
     });
-    // RAUS
-    const all = await allTransports();
-    console.log("all transports",all);
     return harvest;
 }
 
+async function getID(transport){
+     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
+     const ID = transport_instance.getID.call().then(result => {
+         return result;
+     });
+     return ID;
+}
 
 export async function transportAsJson(transport) {
     let start_latitude;
@@ -53,6 +82,7 @@ export async function transportAsJson(transport) {
     var json = {};
     json["address"] = transport;
     json["harvestAddress"] = await getHarvest(transport);
+    json["ID"] = await getID(transport);
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
 
     // json["start_latitude"] = await transport_instance.start_latitude.call().then(result => {return result;});
@@ -77,10 +107,11 @@ async function loadTransportCard(json){
     return document.getElementById('transports').innerHTML += output;
 }
 
+
+
 export async function getTransportCards(){
     $('#transportSection').find(".loader").removeClass("d-none");
-    $('#newFieldArea').removeClass("d-none");
-    $('#fields').empty();
+    $('#transports').empty();
     await allTransports().then(transports =>{
         for (let i = 0; i < transports.length; i++) {
             loadTransportCard(transports[i]);
@@ -90,10 +121,11 @@ export async function getTransportCards(){
 }
 
 
-export async function allTransports() {
+async function allTransports() {
     $("#transportSection")
     .find(".loader")
     .removeClass("d-none");
+    console.log("allTransports");
     
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const transports = await transportHandler_instance.getTransports.call().then(async result => {
@@ -101,24 +133,24 @@ export async function allTransports() {
         for (let i = 0; i < result.length; i++) {
            t.push(await transportAsJson(result[i]));
         }
-        return t;
+        return t; 
     });
     console.log("alltr",transports)
+    if (transports.length == 0){
+        document.getElementById("transports-loading").innerHTML = "No Transports found";
+    }
+     $("#transportSection")
+         .find(".loader")
+         .addClass("d-none");
     return transports;
-    $("#transportSection")
-    .find(".loader")
-    .addClass("d-none");
 }
 
-export async function loadTransport(address) {
+export async function loadSingleTransport(address) {
       $("#transportDetails").empty();
       $("#transportSection")
           .find(".loader")
           .removeClass("d-none");
-    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const transport = await transportHandler_instance.currentTransport.call().then((res) => { 
-        return res;
-    });
+    const transport = await getCurrentTransport();
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
     const balance = await tx.getBalance(transport_instance);
 
