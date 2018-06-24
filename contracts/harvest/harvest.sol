@@ -87,7 +87,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @param _fieldAddress address of the field
     * @return bool 
     */
-    function addField(address _fieldAddress) public harvestable(_fieldAddress) returns (bool success) {
+    function addField(address _fieldAddress) internal returns (bool success) {
         if (fields[_fieldAddress] == false) {
             fields[_fieldAddress] = true;
             fieldArray.push(_fieldAddress);

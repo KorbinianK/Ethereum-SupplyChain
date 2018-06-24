@@ -108,16 +108,6 @@ export async function loadSingleField(address){
 }
 
 
- function hexToBase64(hexstring){
- return btoa(
-     hexstring
-     .match(/\w{2}/g)
-     .map(s => String.fromCharCode(parseInt(s, 16)))
-     .join("")
- );
-} 
-    
-
 export async function getFieldCards(){
     $('#cultivationSection').find(".loader").removeClass("d-none");
     $('#cultivationSection').removeClass("d-none");
