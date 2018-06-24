@@ -3,18 +3,18 @@ pragma solidity ^0.4.23;
 import "../cultivation/field.sol";
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../general/erc20handler.sol";
+import "../general/erc721handler.sol";
 
 
 /**
  * @title The Harvest contract
  */
-contract Harvest is TransactionOwner, Ownable, ERC20Handler {
+contract Harvest is TransactionOwner, Ownable, ERC721Handler {
     
     address[] private fieldArray;
     uint private year;
     address[] private permissionedAccounts;
-    uint256 public createdAt;
+  
     
      // Mapping of a field address to a boolean value to track if it has been added already
     mapping(address => bool) private fields;
@@ -49,7 +49,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @param _value the amount of grapes to mint
     */
     function weightInput(address _fieldAddress, uint _value) public harvestable(_fieldAddress) {
-        require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
+        require(erc721.call(bytes4(keccak256("mintMany(address,uint256)")), this, _value));
         addField(_fieldAddress);
         fieldBalance[_fieldAddress] += _value;
     }
@@ -70,15 +70,18 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     */
     function getAllDetails() 
     public view 
-    returns (address[], uint, address[], uint, address[], uint256) {
-        uint256 grapes = getBalance();
+    returns (address[], uint, address[], uint, address[]
+    // , uint256
+    ) {
+        // uint256 amountGrapes = getBalance();
         return (
             fieldArray,
             year,
             permissionedAccounts,
             totalTransactions,
-            sender,
-            grapes
+            sender
+            
+            // ,amountGrapes
             );
     }
    
@@ -87,7 +90,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @param _fieldAddress address of the field
     * @return bool 
     */
-    function addField(address _fieldAddress) internal returns (bool success) {
+    function addField(address _fieldAddress) public harvestable(_fieldAddress) returns (bool success) {
         if (fields[_fieldAddress] == false) {
             fields[_fieldAddress] = true;
             fieldArray.push(_fieldAddress);
@@ -142,8 +145,8 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     */
     constructor(uint  _year, address _token) public {
         year = _year;
-        erc20 = _token;
+        erc721 = _token;
         permissionedAccounts.push(msg.sender);
-        createdAt = now;
+    
     }
 }

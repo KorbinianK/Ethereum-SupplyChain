@@ -2,12 +2,12 @@ pragma solidity ^0.4.23;
 
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../general/erc20handler.sol";
+import "../general/erc721handler.sol";
 
 /**
  * @title The Transport contract
  */
-contract Transport is TransactionOwner, Ownable, ERC20Handler{
+contract Transport is TransactionOwner, Ownable, ERC721Handler{
     uint private id;
     address[] private permissionedAccounts;
     string start_latitude;
@@ -16,6 +16,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     string end_longitude;
     address[] harvests;
     uint256 public createdAt;
+    address erc721;
     
     /** 
      * @dev The constructor function
@@ -26,7 +27,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     */
     constructor(uint _id, address _token, string _longitude, string _latitude) public {
         id = _id;
-        erc20 = _token;
+        erc721 = _token;
         permissionedAccounts.push(msg.sender);
         setStartCoordinates(_longitude, _latitude);
         createdAt = now;
@@ -67,5 +68,6 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     function getID() public view returns (uint) {
         return id;
     }
+    
     
 }

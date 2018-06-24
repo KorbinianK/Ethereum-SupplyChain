@@ -112,29 +112,35 @@ contract TransportHandler is Ownable {
         }
     }
     
-  /** 
-     * @dev Creates a new transport contract and retieves the entire balance from the current harvest
+    /** 
+     * @dev Creates a new transport contract 
      * @return bool
     */
     function newTransport() public returns(bool success) {
         uint id = totalTransports;
-        address harvest = currentHarvest();
-       
         string memory latitude = "49.02091";
         string memory longitude = "12.3047";
-        uint256 totalBalance = harvestBalance(harvest);
-        if (transports[id] == 0x0 && totalBalance > 0) {
-            Transport t = new Transport(id,grapeToken,latitude,longitude);
-            transportToHarvest[t] = harvest;
-            require(harvest.call(bytes4(keccak256("switchStatus()"))));
-            require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), t, totalBalance));
-            require(harvest.call(bytes4(keccak256("harvestFields()"))));
-            transports[id] = t;
-            transportAddresses.push(t);
-            totalTransports++;
-            return true;
-        }
-        return false;
+        Transport t = new Transport(id,grapeToken,latitude,longitude);
+        transports[id] = t;
+        transportAddresses.push(t);
+        totalTransports++;
+        return true;
+      
+    }
+
+    /** 
+     * @dev Adds erc721 to a transport
+     * @param _harvest
+     * @param _token
+     * @param _transport 
+    */
+    function addToTransport(address _harvest, uint256 _token, address _transport) public {
+        uint256[] memory tokens = getTokens(_harvest);
+        address harvest = _harvest;
+        if (tokens.length > 0) {
+            transportToHarvest[_transport] = harvest;
+            require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _token));
+      }
     }
 
     /** 
@@ -171,4 +177,43 @@ contract TransportHandler is Ownable {
         setTokenAddress(_tokenAddress);
         setHarvestHandler(_harvestHandler);
     }
+    
+    
+    
+    
+    /** 
+     * 
+     * Based on: https://gist.github.com/wadeAlexC/2574ea97533a9eb7edf0e186ba715a4a 
+     */
+    
+    function getTokens(address _a) public view returns (uint256[] tokens) {
+        // Function selector for 'getAddrs()'
+        bytes4 addrs_selector = bytes4(keccak256("tokensOwned()"));
+        assembly {
+            // Get pointer to free memory - we'll construct calldata for getAddrs() here
+            let ptr := mload(0x40)
+            // Load getAddrs() selector into the pointer
+            mstore(ptr, addrs_selector)
+            
+            // staticcall ensures our call does not change state
+            // Specify forwarding all gas, to address _a, and pass in 4 bytes stored at the pointer
+            // Return size is dynamic, so we don't specify a return destination or size (hence 0, 0)
+            let ret := staticcall(gas, _a, ptr, 0x04, 0, 0)
+            // If the call failed, revert
+            if iszero(ret) { revert (0, 0) }
+            
+            // Set the location of our return array to be at the end of any accessed memory (msize returns the largest index of memory accessed so far)
+            tokens := msize
+            // Copies all of the returned data to addrs, excepting the first 32 (0x20) bytes
+            // The first 32 bytes in a dynamic return payload are a data read offset (returned data is ABI-encoded)
+            // You can read more about that here: https://solidity.readthedocs.io/en/v0.4.21/abi-spec.html
+            // The second 32 bytes will store the length of the returned array, which we want to be stored in addrs
+            // Directly after the length comes the actual data in the array
+            // [data offset][length][ind0][ind1][ind2]...
+            // Taking the above into consideration, we know:
+            // returndatasize = 64 + (32 * (array.length))
+            returndatacopy(tokens, 0x20, sub(returndatasize, 0x20))
+        }
 }
+    
+    
