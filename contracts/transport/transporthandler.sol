@@ -1,12 +1,14 @@
 pragma solidity ^0.4.23;
 
 import "./transport.sol";
+// import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**
  * @title The Handler contract for the transports
  */
 contract TransportHandler is Ownable {
-    
+    // using SafeMath for uint256;
+
     uint private totalTransports;
     address[] private transportAddresses;
     address private currHarv;
@@ -116,25 +118,42 @@ contract TransportHandler is Ownable {
      * @dev Creates a new transport contract and retieves the entire balance from the current harvest
      * @return bool
     */
-    function newTransport() public returns(bool success) {
+    function newTransport(string _lat, string _long) public returns(bool success) {
         uint id = totalTransports;
-        address harvest = currentHarvest();
-       
-        string memory latitude = "49.02091";
-        string memory longitude = "12.3047";
-        uint256 totalBalance = harvestBalance(harvest);
-        if (transports[id] == 0x0 && totalBalance > 0) {
+        string memory latitude = _lat;
+        string memory longitude = _long;
+        if (transports[id] == 0x0) {
             Transport t = new Transport(id,grapeToken,latitude,longitude);
-            transportToHarvest[t] = harvest;
-            require(harvest.call(bytes4(keccak256("switchStatus()"))));
-            require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), t, totalBalance));
-            require(harvest.call(bytes4(keccak256("harvestFields()"))));
             transports[id] = t;
             transportAddresses.push(t);
             totalTransports++;
             return true;
         }
         return false;
+    }
+
+    function addAllFromHarvest(address _transport) public {
+        address harvest = currentHarvest();
+        transportToHarvest[_transport] = harvest;
+        uint256 totalBalance = harvestBalance(harvest);
+        require(totalBalance > 0);
+        require(harvest.call(bytes4(keccak256("switchStatus()"))));
+        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
+        require(harvest.call(bytes4(keccak256("harvestFields()"))));
+    }
+
+
+    function addFromHarvest(address _harvest, address _transport, uint256 _value) public {
+        address harvest = currentHarvest();
+        if(transportToHarvest[_harvest] == address(0)){
+            transportToHarvest[_transport] = _harvest;
+        }   
+        uint256 totalBalance = harvestBalance(_harvest);
+        require(totalBalance > 0);
+        require(_value <= totalBalance);
+        require(harvest.call(bytes4(keccak256("switchStatus()"))));
+        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
+        require(harvest.call(bytes4(keccak256("harvestFields()"))));
     }
 
     /** 
