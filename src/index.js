@@ -213,6 +213,10 @@ window.App = {
        .TransportModule()
        .then(module => module.addData(address));
   },
+  openTransport: function (address) {
+    Router.modules.TransportModule()
+      .then(module => module.loadSingleTransport(address));
+  },
 
   /**
    * Processing

@@ -1,5 +1,5 @@
 
-    <div id="{{address}}-card" class="card col {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
+    <div id="{{address}}-card" class="card col field-details {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
         <div class="card-body">
             <h5 class="card-title">
                 <span class="field-name float-left">{{name}}</span> -
@@ -47,6 +47,6 @@
                     <strong>Total TX:</strong> {{totalTransactions}}</p>
                 <p class="card-text">
                     <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
-                <button onclick="App.addFieldTransaction('{{address}}')" class="text-white btn-lg btn btn-primary btn-sm card-link">Add Transaction</button>
+                <button onclick="App.addFieldTransaction('{{address}}')" class="text-white btn-lg btn btn-primary btn-block card-link">Add Transaction</button>
         </div>
     </div>

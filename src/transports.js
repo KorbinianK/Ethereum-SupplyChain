@@ -73,6 +73,8 @@ async function getID(transport){
 }
 
 export async function transportAsJson(transport) {
+    const transport_instance = await transport_contract(web3.currentProvider).at(transport);
+
     let start_latitude;
     let start_longitude;
     let end_latitude;
@@ -83,7 +85,8 @@ export async function transportAsJson(transport) {
     json["address"] = transport;
     json["harvestAddress"] = await getHarvest(transport);
     json["ID"] = await getID(transport);
-    const transport_instance = await transport_contract(web3.currentProvider).at(transport);
+    json['transactions'] = await getAllTransactions(transport);
+    json['tokenBalance'] = await tx.getBalance(transport_instance);
 
     // json["start_latitude"] = await transport_instance.start_latitude.call().then(result => {return result;});
     // json["start_longitude"] = await transport_instance.start_longitude.call().then(result => {return result;});
@@ -151,39 +154,25 @@ export async function loadSingleTransport(address) {
           .find(".loader")
           .removeClass("d-none");
     const transport = await getCurrentTransport();
-    const transport_instance = await transport_contract(web3.currentProvider).at(transport);
-    const balance = await tx.getBalance(transport_instance);
-
     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
     Mustache.parse(template_transportdetails);
-    // const json = await harvestAsJson(address);
-    var json = {
-        "tokenBalance": balance,
-        "address": transport,
-        "harvestAddress": await getHarvest(transport),
-        "transactions": await getAllTransactions(transport)
-    };
-    console.log("transport Json",json);
+    const json = await transportAsJson(address);
     var output = Mustache.render(
         template_transportdetails, json
     );
     document.getElementById('transportDetails').innerHTML = output;
-    console.log("balance",balance);
     $("#transportSection")
         .find(".loader")
         .addClass("d-none");
 }
 
 export async function addData(address) {
-    // console.log("a",address)
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     tx.addTransaction(transport_instance,sensor, data).then(result => {
         console.log("tx sent",result)
     });
-
-
 }
 
 
