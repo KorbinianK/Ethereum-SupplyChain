@@ -16,6 +16,8 @@ contract Field is TransactionOwner {
     Stages public stage;
     address public lastHarvest;
     uint256 public createdAt;
+    string grapeType;
+    
     /**
     * @dev Enum for the stages of the vineyard
     */
@@ -223,7 +225,8 @@ contract Field is TransactionOwner {
         address _creator,
         string _name,
         string _longitude,
-        string _latitude      
+        string _latitude,
+        string _grapeType      
       ) public  {  
         creator = _creator;
         permissionedAccounts.push(creator);
@@ -232,6 +235,7 @@ contract Field is TransactionOwner {
         location.longitude = _longitude;
         location.latitude = _latitude;
         stage = Stages.Cultivated;
+        grapeType = _grapeType;
         createdAt = now;
     }
 
@@ -244,6 +248,17 @@ contract Field is TransactionOwner {
         name = _name;
         return true;
     }
+
+     /**
+    * @dev Updates the grape type of the vineyard
+    * @param _type the new type of grapes 
+    * @return bool
+    */
+    function setType(string _type) public onlyCreator returns(bool) {
+        grapeType = _type;
+        return true;
+    }
+
 
     /**
     * @dev Updates the location of the vineyard

@@ -34,6 +34,16 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         _;
     }
     
+    function transfer(address to, uint256 value) public returns(bool){
+       
+        if(getBalance() - value == 0){
+            harvestFields();
+            switchStatus();
+        }
+        super.transfer(to, value);
+        return true;
+    }
+    
     /**
     * @dev Harvests all fields added to this contract
     */

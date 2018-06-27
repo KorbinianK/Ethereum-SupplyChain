@@ -9,6 +9,7 @@ import "../general/erc20handler.sol";
  */
 contract Transport is TransactionOwner, Ownable, ERC20Handler{
     uint private id;
+    string company;
     address[] private permissionedAccounts;
     string start_latitude;
     string start_longitude;
@@ -24,8 +25,9 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
      * @param _longitude start Location longitude
      * @param _latitude end Location latitude
     */
-    constructor(uint _id, address _token, string _longitude, string _latitude) public {
+    constructor(uint _id, string _company, address _token, string _longitude, string _latitude) public {
         id = _id;
+        company = _company;
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
         setStartCoordinates(_longitude, _latitude);

@@ -14,6 +14,7 @@ contract TransportHandler is Ownable {
     address private currHarv;
     address public grapeToken;
     address public harvestHandler;
+    string public company;
 
     // Mapping of an index to a transport contract
     mapping(uint => address) private transports;
@@ -123,7 +124,7 @@ contract TransportHandler is Ownable {
         string memory latitude = _lat;
         string memory longitude = _long;
         if (transports[id] == 0x0) {
-            Transport t = new Transport(id,grapeToken,latitude,longitude);
+            Transport t = new Transport(id,company,grapeToken,latitude,longitude);
             transports[id] = t;
             transportAddresses.push(t);
             totalTransports++;
@@ -151,10 +152,9 @@ contract TransportHandler is Ownable {
         uint256 totalBalance = harvestBalance(_harvest);
         require(totalBalance > 0);
         require(_value <= totalBalance);
-        require(harvest.call(bytes4(keccak256("switchStatus()"))));
-        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
-        require(harvest.call(bytes4(keccak256("harvestFields()"))));
+        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
     }
+    
 
     /** 
      * @dev Returns the harvest added to a transport
@@ -186,7 +186,8 @@ contract TransportHandler is Ownable {
      * @param _harvestHandler address of the handler
      * @param _tokenAddress address of the token
     */
-    constructor(address _tokenAddress, address _harvestHandler) public {
+    constructor(string _company, address _tokenAddress, address _harvestHandler) public {
+        company = _company;
         setTokenAddress(_tokenAddress);
         setHarvestHandler(_harvestHandler);
     }
