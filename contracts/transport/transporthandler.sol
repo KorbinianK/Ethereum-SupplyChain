@@ -20,7 +20,7 @@ contract TransportHandler is Ownable {
     mapping(uint => address) private transports;
 
     // Mapping of a transport address to a harvest
-    mapping(address => address) private transportToHarvest;
+    mapping(address => address[]) private transportToHarvest;
 
     /** 
      * @dev Updates the token address
@@ -133,9 +133,13 @@ contract TransportHandler is Ownable {
         return false;
     }
 
+    /** 
+     * @dev Adds the entire last harvest to a transport
+     * @param _transport address of the transport
+    */
     function addAllFromHarvest(address _transport) public {
         address harvest = currentHarvest();
-        transportToHarvest[_transport] = harvest;
+        transportToHarvest[_transport].push(harvest);
         uint256 totalBalance = harvestBalance(harvest);
         require(totalBalance > 0);
         require(harvest.call(bytes4(keccak256("switchStatus()"))));
@@ -143,11 +147,16 @@ contract TransportHandler is Ownable {
         require(harvest.call(bytes4(keccak256("harvestFields()"))));
     }
 
-
+    /** 
+     * @dev Adds part of a harvest to a transport
+     * @param _harvest address of the harvest
+     * @param _transport address of the transport
+     * @param _value unit256 the value to transfer
+    */
     function addFromHarvest(address _harvest, address _transport, uint256 _value) public {
         address harvest = currentHarvest();
-        if(transportToHarvest[_harvest] == address(0)){
-            transportToHarvest[_transport] = _harvest;
+        if(transportToHarvest[_harvest].length == 0){
+            transportToHarvest[_transport].push(_harvest);
         }   
         uint256 totalBalance = harvestBalance(_harvest);
         require(totalBalance > 0);
@@ -160,7 +169,7 @@ contract TransportHandler is Ownable {
      * @dev Returns the harvest added to a transport
      * @return address of the harvest
     */
-    function getHarvestFromTransport(address _transportAddress) public view returns (address){
+    function getHarvestsFromTransport(address _transportAddress) public view returns (address[]){
         return transportToHarvest[_transportAddress];
     }
 
@@ -186,8 +195,7 @@ contract TransportHandler is Ownable {
      * @param _harvestHandler address of the handler
      * @param _tokenAddress address of the token
     */
-    constructor(string _company, address _tokenAddress, address _harvestHandler) public {
-        company = _company;
+    constructor(address _tokenAddress, address _harvestHandler) public {
         setTokenAddress(_tokenAddress);
         setHarvestHandler(_harvestHandler);
     }

@@ -212,7 +212,7 @@ export async function fieldAsJson(address) {
         creator = result[1] ;
         owners = result[2] ;
         name = result[3] ;
-        picture = hexToBase64(result[4]);
+        picture = result[4];
         latitude = result[5] ;
         longitude = result[6] ;
         txHarvest = result[7];
@@ -248,17 +248,20 @@ export async function fieldAsJson(address) {
    return res;
 }
 
-export async function newField(details) {
-    console.log("new field");
-    
+export async function newField() {
+    var details = $("#newFieldForm").serializeArray()
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-    var name,lat,long;
+    var name,lat,long,grapeType;
+    console.log(details);
     $.each(details, function(i, item) {
         switch (item.name) {
             case "name":
                  name = item.value;
             break;
+            case "grapeType":
+                grapeType = item.value;
+                break;
             case "latitude":
                  lat = item.value;
             break;
@@ -276,6 +279,7 @@ export async function newField(details) {
         name,
         long,
         lat,
+        grapeType,
         {
          from: account
         }

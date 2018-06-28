@@ -16,6 +16,8 @@ contract ProcessHandler is Ownable {
     // Mapping of an index to a production contract
     mapping(uint => address) private productions;
 
+    // Mapping of a production address to a transport
+    mapping(address => address[]) private productionToTransport;
     /** 
      * @dev Updates the token address
      * @param _tokenAddress the address of the token
@@ -116,11 +118,8 @@ contract ProcessHandler is Ownable {
     */ 
     function newProduction() public returns(bool success) {
         uint id = totalProductions;
-        address transport = currentTransport();
-        uint256 totalBalance = transportBalance(transport);
-        if (productions[id] == 0x0 && totalBalance > 0) {
+        if (productions[id] == 0x0) {
             Production p = new Production(id,grapeToken);
-            require(transport.call(bytes4(keccak256("transferTo(address,uint256)")), p, totalBalance));
             productions[id] = p;
             productionAddresses.push(p);
             totalProductions++;
@@ -129,6 +128,35 @@ contract ProcessHandler is Ownable {
         return false;
     }
 
+    /** 
+     * @dev Adds the entire last transport to a production
+     * @param _production address of the transport
+    */
+    function addAllFromTransport(address _production) public returns(bool) {
+        address transport = currentTransport();
+        uint256 totalBalance = transportBalance(transport);
+        address p = currentProduction();
+        productionToTransport[p].push(transport);
+        require(totalBalance > 0);
+        require(transport.call(bytes4(keccak256("transferTo(address,uint256)")), p, totalBalance));
+    }
+
+    /** 
+     * @dev Adds part of a transport to a production
+     * @param _transport address of the transport
+     * @param _production address of the production
+     * @param _value unit256 the value to transfer
+    */
+    function addFromTransport(address _transport, address _production, uint256 _value) public {
+        // address transport = currentTransport();
+        if(productionToTransport[_production].length == 0){
+            productionToTransport[_production].push(_transport) ;
+        }   
+        uint256 totalBalance = transportBalance(_transport);
+        require(totalBalance > 0);
+        require(_value <= totalBalance);
+        require(_transport.call(bytes4(keccak256("transfer(address,uint256)")), _production, _value));
+    }
     /** 
      * @dev Gets all productions
      * @return address[] array of all productions

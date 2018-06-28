@@ -97,9 +97,9 @@ window.App = {
   },
 
   newField: function () {
-    var info = $("#newFieldForm").serializeArray()
+    
     Router.modules.FieldModule()
-      .then(module => module.newField(info));
+      .then(module => module.newField());
   },
 
   openField: function (address) {

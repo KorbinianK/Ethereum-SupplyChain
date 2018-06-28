@@ -157,7 +157,7 @@ contract FieldHandler {
         string _latitude,
         string _grapeType 
         ) public returns(address) {
-        Field f = new Field(msg.sender, _name, _longitude, _latitude,_grapeType);
+        Field f = new Field(msg.sender, _name, _longitude, _latitude, _grapeType);
         allFields.push(f);
         activeFieldsArray.push(f);
         emit NewField(f, msg.sender);

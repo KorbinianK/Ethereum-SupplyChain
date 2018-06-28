@@ -5,6 +5,18 @@
     transition: all $seconds linear;
 }
 
+section{
+    margin:5px !important;
+    position: relative;
+    h2{
+        text-transform: uppercase;
+        text-align: center;
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+    }
+}
+
 .custom-control-label::before,
 .custom-control-label::after {
     background-color:black;
@@ -28,6 +40,17 @@
 #cultivationSection{
     width: 100%;
     position: relative;
+}
+
+.card-body{
+    button{
+        &.close{
+            position: absolute;
+            right: 10px;
+            top: 0;
+            font-size: 40px;
+        }
+    }
 }
 
 .card-subtitle{
