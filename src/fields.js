@@ -112,7 +112,7 @@ export async function getFieldCards(){
     $('#cultivationSection').find(".loader").removeClass("d-none");
     $('#cultivationSection').removeClass("d-none");
     $('#fields').empty();
-    await getAll().then(fields =>{ 
+    await getAllFields().then(fields =>{ 
         for (let i = 0; i < fields.length; i++) {
             loadSingleFieldCard(fields[i]);
         }
@@ -120,8 +120,7 @@ export async function getFieldCards(){
     $('#cultivationSection').find(".loader").addClass("d-none");
 }
 
-export async function getAll(){
-
+export async function getAllFields(){
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const fields = await fieldhandler_instance
       .getAllFields.call()
@@ -139,7 +138,7 @@ export async function getAll(){
 
 export async function getHarvestableFields(filter) {
     var toFilter = filter.fields;
-    const fields = await getAll().then(fields =>{
+    const fields = await getAllFields().then(fields =>{
         let harvestable = [];
          for (let i = 0; i < fields.length; i++) {
             if(fields[i].harvestable){
@@ -274,7 +273,6 @@ export async function newField() {
     });
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
- 
     fieldhandler_instance.newField(
         name,
         long,
@@ -334,8 +332,8 @@ export async function openField(address) {
 
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    var reciept = await tx.doDummyTransaction(field_instance);
-    console.log(reciept);
+    var receipt = await tx.doDummyTransaction(field_instance);
+    console.log(receipt);
     let block = await web3.eth.getBlock("latest")
     console.log(block)
     return openField(address);

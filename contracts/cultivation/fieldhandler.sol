@@ -117,7 +117,7 @@ contract FieldHandler {
         emit StatusChanged(f, msg.sender); 
     }
 
-    /**
+    /**re
     * @dev Gets all fields
     * @return address array of all fields
     */
