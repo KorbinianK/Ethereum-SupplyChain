@@ -97,7 +97,6 @@ window.App = {
   },
 
   newField: function () {
-    
     Router.modules.FieldModule()
       .then(module => module.newField());
   },

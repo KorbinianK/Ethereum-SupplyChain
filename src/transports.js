@@ -219,10 +219,3 @@ export async function getAllTransactions(address) {
 
 
 // ############### END TRANSACTION FUNCTIONS ###############
-
-
-
-
-
-
-

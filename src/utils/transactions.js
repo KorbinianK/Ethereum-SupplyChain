@@ -5,7 +5,6 @@ export async function getTotalTransactionCount(instance){
             return res;
         }
     );
-    
     if (await txCount.toString() == undefined) {
         return 0;
     }
@@ -48,16 +47,13 @@ export async function doDummyTransaction(instance) {
 export async function addTransaction(instance,sender,data) {
     const account = await helper.getAccount();
     var hexData = web3.utils.stringToHex(data);
-    const res = await instance.addTransaction(
+    return await instance.addTransaction(
         sender,
         hexData, {
             from: account,
             gas: 400000
         }
-    ).then(result => {
-        return result;
-    });
-    return res;
+    );
 }
 
 
