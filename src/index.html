@@ -49,23 +49,32 @@
             <!-- FIELDS -->
             <section id="cultivationSection" class="col bg-light">
                 <h2>Cultivation</h2>
-                <div class="loader d-none"></div>
-
-                <div id="fields" class="row my-5">
-                    <!-- FIELDS LOADING -->
- 
+                <div class="divider"></div>
+                <div class="row pt-5">
+                    <a class="btn btn-outline-secondary btn-block btn-sm" data-toggle="collapse" href="#collapseFields" role="button" aria-expanded="false"
+                        aria-controls="collapseFields">
+                        Show Fields
+                    </a>
+                    <div class="collapse" id="collapseFields">
+                        <div class="loader d-none"></div>
+                        <div id="fields">
+                            <!-- FIELDS LOADING -->
+                        </div>
+                    </div>
                 </div>
-                <div id="newFieldArea" class="row my-5">
-                    <div class="col">
+               
+                <div id="newFieldArea" class="row pt-5">
+
+                    <div class="col aling-self-end pb-2">
                         <form id="newFieldForm">
                             <div class="form-group">
                                 <label for="fieldName">Field Name</label>
                                 <input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
                             </div>
                             <div class="form-group">
-                                    <label for="grapeType">Grape Type</label>
-                                    <input name="grapeType" type="text" class="form-control" id="grapeType" placeholder="Enter the GrapeType">
-                                </div>
+                                <label for="grapeType">Grape Type</label>
+                                <input name="grapeType" type="text" class="form-control" id="grapeType" placeholder="Enter the GrapeType">
+                            </div>
                             <div class="form-row">
                                 <div class="form-group col">
                                     <label for="fieldLat">Latitude</label>
@@ -88,6 +97,7 @@
 
             <section id="harvestSection" class=" col bg-light">
                 <h2>Harvest</h2>
+            <div class="divider"></div>
                 <div class="row ">
                     <div class="col">
 
@@ -97,23 +107,27 @@
                         </div>
                     </div>
                 </div>
-                <div class="row my-5">
+                <div class="row pt-5 h-100">
                     <div class="col-12">
                         <div id="harvestSelector" class="form-group">
                             <label for="harvestSelect ">Select Harvest</label>
                             <select class="form-control" id="harvestSelect">
                                 <!-- HARVEST SELECT  -->
                             </select>
-                            <button onclick="App.openHarvest(this)" class="btn btn-block btn-outline-secondary" type="button">Open</button>
+                            <button onclick="App.openHarvest(this)" class="btn btn-block  btn-outline-secondary" type="button">Open</button>
 
                         </div>
-                        
+
                     </div>
                     <div class="col-12 align-self-end">
                         <div class="form-group my-5 ">
-                            <label for="harvestSelect ">New Harvest</label>
-                            <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
-                            <button class="btn btn-primary btn-block" onclick="App.newHarvest()" type="button">New Harvest</button>
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="harvestSelect ">New Harvest</label>
+                                    <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block btn-lg" onclick="App.newHarvest()" type="button">New Harvest</button>
                         </div>
                     </div>
                 </div>
@@ -121,7 +135,51 @@
             <!-- HARVEST END -->
             <!-- TRANSPORT -->
             <section id="transportSection" class=" col bg-light">
-                <h2>Transport</h2>
+<h2>Transport</h2>
+<div class="divider"></div>
+<div class="row pt-5">
+    <a class="btn btn-outline-secondary btn-block btn-sm" data-toggle="collapse" href="#collapseTransports" role="button" aria-expanded="false"
+        aria-controls="collapseTransports">
+        Show Transports
+    </a>
+    <div class="collapse" id="collapseTransports">
+        <div class="loader d-none"></div>
+        <div id="transports">
+            <!-- FIELDS LOADING -->
+            <h5 id="transports-loading" class="text-lowercase text-muted text-center">loading...</h5>
+        </div>
+    </div>
+</div>
+
+<div id="newTransportArea" class="row pt-5">
+
+    <div class="col aling-self-end pb-2">
+        <form id="newTransportForm">
+            <div class="form-group">
+                <label for="fieldName">Field Name</label>
+                <input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
+            </div>
+            <div class="form-group">
+                <label for="grapeType">Grape Type</label>
+                <input name="grapeType" type="text" class="form-control" id="grapeType" placeholder="Enter the GrapeType">
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="fieldLat">Latitude</label>
+                    <input name="latitude" type="text" class="form-control" id="fieldLat" placeholder="Latitude">
+                </div>
+                <div class="form-group col">
+                    <label for="fieldLong">Longitude</label>
+                    <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
+                </div>
+            </div>
+
+           <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Transport</button>
+        </form>
+    </div>
+</div>
+                <!-- <h2>Transport</h2>
+                <div class="divider"></div>
                 <div class="loader d-none row"></div>
 
                 <div id="transportDetails" class="row">
@@ -130,15 +188,28 @@
                 <div id="transports" class="row my-5 mx-0 card-deck">>
                     <h5 id="transports-loading" class="text-lowercase text-muted text-center">loading...</h5>
                 </div>
-                <div class="row">
-                    <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">New Transport</button>
+                <div class="row pt-5 h-100">
+                   
+                    <div class="col-12 align-self-end">
+                        <div class="form-group my-5 ">
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="harvestSelect ">New Transport</label>
+                                    <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                                </div>
+                            </div>
+                            <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Transport</button>
+                        </div>
+                    </div>
+                </div> -->
 
-                </div>
+                
             </section>
             <!-- TRANSPORT END -->
             <!-- PROCESSING -->
             <section id="processingSection" class=" col bg-light">
                 <h2>Processing</h2>
+<div class="divider"></div>
                 <div class="loader d-none row"></div>
 
                 <div id="productionDetails" class="row">
@@ -153,12 +224,12 @@
         </div>
         <div class="row">
             <section id="details-section">
-            <h2>Details</h2>
+                <h2>Details</h2>
 
-            <div class="loader d-none"></div>
-            <div id="details" class="col w-100 bg-light">
-                
-            </div>
+                <div class="loader d-none"></div>
+                <div id="details" class="col w-100 bg-light">
+
+                </div>
             </section>
 
         </div>

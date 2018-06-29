@@ -3,9 +3,11 @@
         <h5 class="card-title text-white">
             <span class="field-name float-left">{{name}}</span>
         </h5>
-        <span class="ml-1 float-right badge badge-light">{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</span>
+        <span class="ml-1 float-right badge badge-light">&nbsp;{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</span>
         <h6 class="card-subtitle mb-2 text-white">
             <small>Address: {{address}}</small>
+            <br>
+            <small>Grape type: {{type}}</small>
         </h6>
     </div>
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">

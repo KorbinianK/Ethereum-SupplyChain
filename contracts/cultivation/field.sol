@@ -126,7 +126,7 @@ contract Field is TransactionOwner {
     
     /**
     * @dev Gets the name of the vineyard
-    * @return bytes of the name
+    * @return string of the name
     */
     function getName() public view returns(string) {
         return name;
@@ -134,7 +134,7 @@ contract Field is TransactionOwner {
     
     /**
     * @dev Gets the latitude of the vineyard
-    * @return bytes of the latitude
+    * @return string of the latitude
     */
     function getLatitude() public view returns(string) {
         return location.latitude;
@@ -142,15 +142,23 @@ contract Field is TransactionOwner {
 
     /**
     * @dev Gets the longitude of the vineyard
-    * @return bytes of the longitude
+    * @return string of the longitude
     */
     function getLongitude() public view returns(string) {
         return location.longitude;
     }
 
     /**
+    * @dev Gets the type of grapes of the vineyard
+    * @return string of the longitude
+    */
+    function getType() public view returns(string) {
+        return grapeType;
+    }
+
+    /**
     * @dev Gets the location of the vineyard
-    * @return bytes, string of the longitude and latitude
+    * @return string, string of the longitude and latitude
     */
     function getLocation() public view returns(string, string) {
         return (location.longitude, location.latitude);

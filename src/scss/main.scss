@@ -5,27 +5,34 @@
     transition: all $seconds linear;
 }
 
-section{
-    margin:5px !important;
+section {
+    margin: 5px !important;
     position: relative;
-    h2{
+    h2 {
         text-transform: uppercase;
         text-align: center;
         font-weight: 800;
         font-size: 1.5rem;
         letter-spacing: 2px;
     }
+    .divider{
+        background-color: white;
+            height: 10px;
+            left: 0;
+            width: 100%;
+            position: absolute;
+    }
 }
 
 .custom-control-label::before,
 .custom-control-label::after {
-    background-color:black;
+    background-color: black;
     top: -1rem;
     width: 1.25rem;
     height: 1.25rem;
 }
 
-.loader{
+.loader {
     background-image: url("../assets/loading.svg");
     width: 100%;
     height: 100px;
@@ -37,34 +44,44 @@ section{
     background-position: center;
 }
 
-#cultivationSection{
+#cultivationSection {
     width: 100%;
     position: relative;
 }
 
-.card-body{
-    button{
-        &.close{
-            position: absolute;
-            right: 10px;
-            top: 0;
-            font-size: 40px;
+.h-100 {
+    height: 100%;
+}
+
+.card {
+    .card-body {
+        button {
+            &.close {
+                position: absolute;
+                right: 10px;
+                top: 0;
+                font-size: 40px;
+            }
         }
+    }
+    .card-subtitle {
+        clear: both;
     }
 }
 
-.card-subtitle{
-    clear: both;
-}
-.list-group-item{
+.list-group-item {
     background-color: transparent;
 }
 
-.field-details{
-    flex:100% !important;
+.field-details {
+    flex: 100% !important;
 }
 
-$cards-per-line: ( xs: 1, sm: 1, md: 1, lg: 2, xl: 2);
+$cards-per-line: ( xs: 1,
+sm: 1,
+md: 1,
+lg: 2,
+xl: 2);
 @each $name,
 $breakpoint in $grid-breakpoints {
     @media (min-width: $breakpoint) {
