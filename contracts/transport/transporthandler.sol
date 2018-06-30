@@ -154,14 +154,13 @@ contract TransportHandler is Ownable {
      * @param _value unit256 the value to transfer
     */
     function addFromHarvest(address _harvest, address _transport, uint256 _value) public {
-        address harvest = currentHarvest();
         if(transportToHarvest[_harvest].length == 0){
             transportToHarvest[_transport].push(_harvest);
         }   
         uint256 totalBalance = harvestBalance(_harvest);
         require(totalBalance > 0);
         require(_value <= totalBalance);
-        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
+        require(_harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
     }
     
 

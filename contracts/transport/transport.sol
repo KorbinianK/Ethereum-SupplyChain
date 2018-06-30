@@ -25,12 +25,12 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
      * @param _longitude start Location longitude
      * @param _latitude end Location latitude
     */
-    constructor(uint _id, string _company, address _token, string _longitude, string _latitude) public {
+    constructor(uint _id, string _company, address _token, string _latitude, string _longitude) public {
         id = _id;
         company = _company;
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
-        setStartCoordinates(_longitude, _latitude);
+        setStartCoordinates(_latitude, _longitude);
         createdAt = now;
     }
 
@@ -50,6 +50,15 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
     function setStartCoordinates(string _latitude, string _longitude) public {
         start_latitude = _latitude;
         start_longitude = _longitude;
+    }
+
+     /** 
+     * @dev Gets the starting coordinates of the transport
+     * @return _longitude Location longitude
+     * @return _latitude Location latitude
+    */
+    function getStartCoordinates() public returns(string,string){
+        return(start_latitude, start_longitude);
     }
     
     /** 

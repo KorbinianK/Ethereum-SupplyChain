@@ -191,7 +191,6 @@ contract TransactionOwner {
     * @dev Constructor of the contract. Adds a default sender and transactio
     */
     constructor() public{
-        sender.push(0x0);
         addTransaction(0x0, "");
     }
 }

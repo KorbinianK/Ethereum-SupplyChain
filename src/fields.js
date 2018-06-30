@@ -299,20 +299,12 @@ export async function newField() {
     }).catch(err => console.error("woopsie",err));
 }
 
-function toggleLoader(area){
-    switch (area) {
-        case "cultivated":
-            $("#cultivationSection").find(".loader").toggleClass("d-none");
-            break;
-    
-        default:
-            break;
-    }
-}
+
 
 export async function openField(address) {
-    toggleLoader("cultivated");
-    $('#fields').toggleClass("d-none");
+    helper.clearDetails();
+    helper.toggleLoader("details",true);
+    $("#detailsModal").modal("show");
     const template_fielddetails = await helper.fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
     Mustache.parse(template_fielddetails);
     const field = await fieldAsJson(address).then(async(json)=>{
@@ -325,9 +317,8 @@ export async function openField(address) {
         );
         return output;
     });
-    toggleLoader("cultivated");
-    $('#fields').toggleClass("d-none");
-    return document.getElementById('fields').innerHTML = field;
+    helper.toggleLoader("details",false);
+    return document.getElementById('details').innerHTML = field;
 }
 
 export async function addFieldTransaction(address){

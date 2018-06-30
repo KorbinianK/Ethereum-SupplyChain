@@ -14,6 +14,27 @@ export async function fetchTemplate(url){
     return await template;
 }
 
+export function clearDetails(){
+    document.getElementById("details").innerHTML = "";
+}
+
+
+export function toggleLoader(type, status) {
+    switch (type) {
+        case "details":
+            let loader = $("#detailsModal").find(".loader");
+            if (status) {
+                loader.removeClass("d-none");
+            }else{
+                loader.addClass("d-none");
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 //based on https://stackoverflow.com/a/30196637
 export function objDiff(array1, array2) {
     var resultArray = []

@@ -1,11 +1,11 @@
 
     <div id="{{address}}-card" class="card col field-details {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
         <div class="card-body">
-            <button type="button" class="close" onclick="App.getFieldCards()">
+            <!-- <button type="button" class="close" onclick="App.closeDetails()">
                     <span aria-hidden="true">&times;</span>
-            </button>
+            </button> -->
             <h5 class="card-title">
-                <span class="field-name float-left">{{name}}</span>
+                <span class="field-name float-left">{{name}}&nbsp;</span>
                 <small>Stage: {{stage}} </small>
                 <h6 class="card-subtitle mb-2 text-muted">
                     <small>Address: {{address}}</small>

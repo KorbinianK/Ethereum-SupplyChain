@@ -64,8 +64,14 @@ window.App = {
       });
     App.getFieldCards();
     App.loadHarvests();
+    App.loadTransportSection();
     return App.bindEvents();
   },
+
+  // closeDetails: function(){
+  //   document.getElementById("details").innerHTML = "";
+  // },
+
   /***
    *  FIELDS
    */
@@ -206,7 +212,11 @@ window.App = {
       .TransportModule()
       .then(module => module.loadTransport());
   },
-
+  addHarvest: function(address){
+    Router.modules
+      .TransportModule()
+      .then(module => module.addHarvest(address));
+  },
   addData: function (address) {
      Router.modules
        .TransportModule()

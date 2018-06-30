@@ -1,12 +1,12 @@
-<div id="{{address}}-card" class="card mx-1">
+<div id="{{address}}-card" class="card mx-1 my-2">
     <div class="card-header">
         <h5 class="card-title ">
             <span class="transport-id float-left">ID: {{ID}}</span>
         </h5>
         
-        <h6 class="card-subtitle mb-2 text-muted">
+        <!-- <h6 class="card-subtitle mb-2 text-muted">
             <small>Address: {{address}}</small>
-        </h6>
+        </h6> -->
     </div>
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">
     
@@ -22,16 +22,14 @@
         <div class="collapse" id="{{address}}-collapse">
             <div class="card-body">
                 <p class="card-text">
-
-                   
-                    <strong>Longitude:</strong> {{longitude}}</p>
+                <strong>Start Latitude:</strong> {{start_latitude}}</p>
+<p class="card-text">
+    <strong>Start Longitude:</strong> {{start_longitude}}</p>
                 <p class="card-text"></p>
                 <p class="card-text">
                     <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
                 <p class="card-text">
                     <strong>Total TX:</strong> {{totalTransactions}}</p>
-                <p class="card-text">
-                    <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
 
         </div>
 

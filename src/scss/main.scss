@@ -5,15 +5,32 @@
     transition: all $seconds linear;
 }
 
+
+
 section {
+    
     margin: 5px !important;
     position: relative;
+    min-height: 80vh !important;
+    height: 100%;
+    &#details-section{
+        width: 100%;
+        h2{
+            text-align: left;
+        }
+    }
     h2 {
+        
         text-transform: uppercase;
         text-align: center;
         font-weight: 800;
         font-size: 1.5rem;
         letter-spacing: 2px;
+    }
+    .collapse,
+    .collapsing {
+        width: 100%;
+        padding-bottom: 3rem;
     }
     .divider{
         background-color: white;
@@ -21,6 +38,10 @@ section {
             left: 0;
             width: 100%;
             position: absolute;
+    }
+    .align-self-end{
+        position: absolute;
+        bottom:0;
     }
 }
 

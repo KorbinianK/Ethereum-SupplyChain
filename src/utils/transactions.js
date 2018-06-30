@@ -11,13 +11,10 @@ export async function getTotalTransactionCount(instance){
     return await txCount.toString();
 }
 
-
 export async function getTransactionTimeAtIndex(instance, index) {
     const time = await instance.getTransactionTimeAtIndex.call(index).then(result => {return result});
     return await time.toString();
 }
-
-
 
 export async function getTransactionSenderAtIndex(instance, index) {
     const sender = await instance.getTransactionSenderAtIndex.call(index).then(result => {return result});
@@ -56,12 +53,11 @@ export async function addTransaction(instance,sender,data) {
     );
 }
 
-
 export async function getBalance(instance) {
     const balance = await instance.getBalance.call().then(result =>{
         console.log("token balance",result.toString());
         return result.toString();
-    });
+    }).catch(error =>{console.error("No Balance?",error)});
     return await balance;
 }
 

@@ -7,24 +7,41 @@ import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 
 export async function newTransport() {
+     var details = $("#newTransportForm").serializeArray();
+     var lat,long;
+     $.each(details, function (i, item) {
+         switch (item.name) {
+             case "latitude":
+                 lat = item.value;
+                 break;
+             case "longitude":
+                 long = item.value;
+                 break;
+             default:
+                 break;
+         }
+     });
     const currentH = await currentHarvest();
+    
     const currentTransport = await getCurrentTransport();
+
     if (currentH != undefined && currentTransport != undefined) {
         var check = checkTransport(currentH, currentTransport);
     }
-    if(!check || check == undefined){
+    // if(!check || check == undefined){
         const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
         const account = await helper.getAccount();
-        const result = await transportHandler_instance.newTransport({
-            from: account
-        }).then((res) => {
+        const result = await transportHandler_instance.newTransport(
+            lat,
+            long,
+            {from: account}).then((res) => {
             return res
         });
-    }
-    else{
-        console.error("same harvest!");
-    }
-    
+        return getTransportCards();
+    // }
+    // else{
+    //     console.error("same harvest!");
+    // }
 }
 
 async function checkTransport(harvest,transport){
@@ -46,19 +63,15 @@ export async function getCurrentTransport(){
 
 export async function currentHarvest() {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const account = await helper.getAccount();
-    const result = await transportHandler_instance.currentHarvest({
-        from: account
-    }).then((res) => {
+    const result = await transportHandler_instance.currentHarvest.call().then((res) => {
         return res;
-    });
+    }).catch(error =>{return console.error("woopsie",error)});
     return result;
 }
 
 async function getHarvest(address) {
-    const account = await helper.getAccount();
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const harvest = await transportHandler_instance.getHarvestFromTransport(address,{from:account}).then(result => {
+    const harvest = await transportHandler_instance.getHarvestsFromTransport.call(address).then(result => {
         return result;
     });
     return harvest;
@@ -81,18 +94,25 @@ export async function transportAsJson(transport) {
     let end_longitude;
     let txSender = [];
     let harvests = [];
+
+    const startLocation = await transport_instance.getStartCoordinates.call().then(result => {
+        return result;
+    });
+    console.log("start",startLocation);
+    
     var json = {};
+
     json["address"] = transport;
     json["harvestAddress"] = await getHarvest(transport);
     json["ID"] = await getID(transport);
     json['transactions'] = await getAllTransactions(transport);
     json['tokenBalance'] = await tx.getBalance(transport_instance);
-
-    // json["start_latitude"] = await transport_instance.start_latitude.call().then(result => {return result;});
-    // json["start_longitude"] = await transport_instance.start_longitude.call().then(result => {return result;});
+    json["start_latitude"] = startLocation[0];
+    json["start_longitude"] = startLocation[1];
     // json["end_latitude"] = await transport_instance.end_latitude.call().then(result => {return result;});
     // json["end_longitude"] = await transport_instance.end_longitude.call().then(result => {return result;});
     json["totalTransactions"] = await getTotalTransactionCount(transport);
+
     txSender = await transport_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
     // for (let i = 0; i < txSender.length; i++) {
     //     let sender = {"address": txSender[i]};
@@ -117,19 +137,15 @@ export async function getTransportCards(){
     $('#transports').empty();
     await allTransports().then(transports =>{
         for (let i = 0; i < transports.length; i++) {
+            
             loadTransportCard(transports[i]);
         }
     });
-    $('#cultivationSection').find(".loader").addClass("d-none");
+    $('#transportSection').find(".loader").addClass("d-none");
 }
 
 
 async function allTransports() {
-    $("#transportSection")
-    .find(".loader")
-    .removeClass("d-none");
-    console.log("allTransports");
-    
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const transports = await transportHandler_instance.getTransports.call().then(async result => {
         var t = [];
@@ -138,32 +154,28 @@ async function allTransports() {
         }
         return t; 
     });
-    console.log("alltr",transports)
     if (transports.length == 0){
         document.getElementById("transports-loading").innerHTML = "No Transports found";
+    }else{
+         document.getElementById("transports-loading").innerHTML = "";
     }
-     $("#transportSection")
-         .find(".loader")
-         .addClass("d-none");
     return transports;
 }
 
 export async function loadSingleTransport(address) {
-      $("#transportDetails").empty();
-      $("#transportSection")
-          .find(".loader")
-          .removeClass("d-none");
-    const transport = await getCurrentTransport();
+    $("#details").empty();
+     helper.toggleLoader("details",true);
+    $("#detailsModal").modal("show");
     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
     Mustache.parse(template_transportdetails);
     const json = await transportAsJson(address);
     var output = Mustache.render(
         template_transportdetails, json
     );
-    document.getElementById('transportDetails').innerHTML = output;
-    $("#transportSection")
-        .find(".loader")
-        .addClass("d-none");
+     helper.toggleLoader("details", false);
+     if(output != null){
+        document.getElementById('details').innerHTML = output;
+     }
 }
 
 export async function addData(address) {
@@ -175,7 +187,19 @@ export async function addData(address) {
     });
 }
 
-
+export async function addHarvest(transport) {
+    const transporthandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+    const account = await helper.getAccount();
+    var harvest = $("#harvest-input").val();
+    var amount = $("#harvestValue-input").val();
+    console.log("from",harvest,"amout",amount);
+    return await transporthandler_instance.addFromHarvest(harvest, transport, amount, {
+        from: account
+    }).then(result => {
+        console.log(result);
+        return result
+    }).catch(err => (console.error("Not enough Balance?", err)));
+}
 
 // ############### START TRANSACTION FUNCTIONS ###############
 
@@ -206,12 +230,14 @@ export async function getTransactionTimeAtIndex(address, index) {
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);
     var json = [];
-    for (let i = 0; i < txCount; i++) {
-        let tx = {};
-        tx.sender = await getTransactionSenderAtIndex(address, i);
-        tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
-        tx.time = await getTransactionTimeAtIndex(address,i);
-        json.push(tx);
+    if(txCount >0){
+         for (let i = 0; i < txCount; i++) {
+             let tx = {};
+             tx.sender = await getTransactionSenderAtIndex(address, i);
+             tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+             tx.time = await getTransactionTimeAtIndex(address, i);
+             json.push(tx);
+         }
     }
     return json;
 }

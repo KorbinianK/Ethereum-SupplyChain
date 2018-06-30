@@ -1,34 +1,59 @@
 <div class="card col">
     <div class="card-body ">
         <h5 class="card-title float-left">ID: {{ID}}</h5>
-        <h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
+<h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
         <h6 class=" card-subtitle mb-2 text-muted">
             <small>{{address}}</small>
         </h6>
         <p class="card-text">
-<div id="harvestAddress">
-    <strong>Contains Harvest:</strong> {{harvestAddress}}</div>
+            <div id="harvestAddress">
+                <strong>Contains Harvest:</strong> {{harvestAddress}}</div>
         </p>
-<div class="row">
-    <div class="form-group col">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="transactionList"> Transactions:&nbsp;
-                    <span id="txCount">{{totalTransactions}}</span>
+        <!-- Harvest -->
+        <div class="row">
+            <div class="form-group col">
+                <label for="harvest-input"> Receive Harvest:&nbsp;
                 </label>
-            </div>
-            <select class="form-control" id="transactionList">
-                {{#transactions}}
-                <option value="{{address}}">{{sender}}-{{data}}</option>
-                {{/transactions}}
-            </select>
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button">Open Transaction</button>
-            </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="harvest-input">Harvest</label>
+                    </div>
+                    <input type="text" class="form-control" name="" id="harvest-input" placeholder="0x8e4c11cb...">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="harvestValue-input">Amount</label>
+                    </div>
+                    <input type="text" class="form-control" name="" id="harvestValue-input" placeholder="100">
 
+                    <div class="input-group-append">
+                        <label class="input-group-text" for="harvestValue-input">kg</label>
+                    </div>
+                </div>
+                <button class="btn btn-outline-secondary btn-block" onclick="App.addHarvest('{{address}}')" type="button">Add</button>
+            </div>
         </div>
-    </div>
-</div>
+        <!-- Transactions -->
+        <div class="row pt-5">
+            <div class="form-group col">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="transactionList"> Transactions:&nbsp;
+                            <span id="txCount">{{totalTransactions}}</span>
+                        </label>
+                    </div>
+                    <select class="form-control" id="transactionList">
+                        {{#transactions}}
+                        <option value="{{address}}">{{sender}}-{{data}}</option>
+                        {{/transactions}}
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">Open Transaction</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <div class="form-row">
             <div class="col">
                 <div class="input-group mb-3 ">
@@ -37,7 +62,7 @@
                     </div>
                     <select class="form-control" id="sensor-select">
                         <option value="0xf17f52151EbEF6C7334FAD080c5704D77216b732">GPS</option>
-<option value="0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef">Temperature</option>
+                        <option value="0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef">Temperature</option>
                     </select>
                 </div>
             </div>
@@ -46,13 +71,11 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="data-input">Data</label>
                     </div>
-<input type="text" class="form-control" name="" id="data-input" placeholder="">
-                  
+                    <input type="text" class="form-control" name="" id="data-input" placeholder="">
+
                 </div>
             </div>
         </div>
         <button type="button" name="transaction" id="transportBtn" onclick="App.addData('{{address}}')" class="btn btn-success btn-lg btn-block">Add Data</button>
     </div>
 </div>
-
-
