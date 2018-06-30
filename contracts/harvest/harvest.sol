@@ -4,13 +4,15 @@ import "../cultivation/field.sol";
 import "../general/transactionowner.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../general/erc20handler.sol";
+import "../general/strings.sol";
 
 
 /**
  * @title The Harvest contract
  */
 contract Harvest is TransactionOwner, Ownable, ERC20Handler {
-    
+     using strings for *;
+
     address[] private fieldArray;
     uint private year;
     address[] private permissionedAccounts;
@@ -50,6 +52,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     function harvestFields() public {
         for(uint i = 0; i < fieldArray.length; i++) {
             Field(fieldArray[i]).harvest(address(this));
+            updateTransaction(msg.sender,bytes("Harvested: ".toSlice().concat(this.addressToString().toSlice())));
         }
     }
 
@@ -62,6 +65,8 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
         addField(_fieldAddress);
         fieldBalance[_fieldAddress] += _value;
+        updateTransaction(msg.sender,bytes("Weighted: ".toSlice().concat(address(_fieldAddress).addressToString().toSlice())));
+
     }
 
    /**

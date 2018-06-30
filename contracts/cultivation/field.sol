@@ -1,13 +1,15 @@
 pragma solidity ^0.4.23;
 
 import "../general/transactionowner.sol"; 
+import "../general/strings.sol";
 
 /** 
  * @title Vineyard Contract 
  * @dev The vineyard contract, inheriting TransactionOwner
  */
 contract Field is TransactionOwner {
-    
+    using strings for *;
+
     address internal creator;
     string internal name;
     bytes internal picture;
@@ -81,7 +83,10 @@ contract Field is TransactionOwner {
         harvestPointer[_harvest] = totalTransactions;
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
-        // switchStatus();
+        // switchStatus();        
+        
+        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat(_harvest.addressToString().toSlice())));
+
     }
     
     /**
@@ -92,7 +97,6 @@ contract Field is TransactionOwner {
     function getHarvestPointer(address _harvest) public view returns(uint) {
         return harvestPointer[_harvest];
     } 
-
 
     /**
     * @dev Overloading the transaction function from TransactionOwner to check if a field can accept data
@@ -254,6 +258,7 @@ contract Field is TransactionOwner {
     */
     function setName(string _name) public onlyCreator returns(bool) {
         name = _name;
+        updateTransaction(msg.sender,bytes(("Name set to: ").toSlice().concat(_name.toSlice())));
         return true;
     }
 
@@ -264,6 +269,7 @@ contract Field is TransactionOwner {
     */
     function setType(string _type) public onlyCreator returns(bool) {
         grapeType = _type;
+        updateTransaction(msg.sender,bytes(("Type set to: ").toSlice().concat(_type.toSlice())));
         return true;
     }
 
@@ -277,6 +283,8 @@ contract Field is TransactionOwner {
     function setLocation(string _lat, string _long) public onlyCreator returns(bool) {
         location.latitude = _lat;
         location.longitude = _long;
+         updateTransaction(msg.sender,bytes(("Location set to: ").toSlice().concat(_lat.toSlice())));
+
         return true;
     }
 
@@ -287,6 +295,7 @@ contract Field is TransactionOwner {
     */
     function setPicture(bytes _picture) public onlyCreator returns(bool){
         picture = _picture;
+        updateTransaction(msg.sender,("Picture updated").stringToBytes());
         return true;
     }
 
@@ -298,6 +307,8 @@ contract Field is TransactionOwner {
     function addPermissionedAccount(address _sender) public onlyCreator returns(bool){
         permissionedAccounts.push(_sender);
         isAllowed[_sender] = true;
+        updateTransaction(msg.sender,bytes(("Permissioned account added:").toSlice().concat(_sender.addressToString().toSlice())));
+
     }
   
     /**
@@ -309,7 +320,8 @@ contract Field is TransactionOwner {
         }else{
             stage = Stages(uint(stage) + 1);
         }
-        
+        updateTransaction(msg.sender,("Stage updated").stringToBytes());
+
         emit NewStage(stage);
     }
 

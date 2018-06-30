@@ -87,6 +87,16 @@ contract TransactionOwner {
     }
 
     /**
+    * @dev Internal function to add data when changing the state of the contract
+    * @param _sender Address of the sender
+    * @param _data data attached to the transaction
+    */
+    function updateTransaction(address _sender, bytes _data) internal {
+        addTransaction(_sender, _data); 
+    }
+
+    
+    /**
     * @dev Gets transaction data at a index
     * @param _index pointer to check
     * @return bytes the data

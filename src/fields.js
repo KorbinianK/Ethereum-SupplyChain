@@ -11,18 +11,14 @@ export async function updateName(address,newName) {
 
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    // var dummyData = web3.utils.stringToHex("foo");
-
-    const res = await field_instance.setName(
+    await field_instance.setName(
         newName,
         { from: account }
     ).then(result => {
         console.log(result);
-        $("#" + address + "-card")
-            .find(".card-title").find(".field-name")
-            .text(newName);
         return result;
     });
+    return openField(address);
 }
 
 export async function changeStatus(address){

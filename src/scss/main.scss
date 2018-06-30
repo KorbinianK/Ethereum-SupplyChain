@@ -11,7 +11,6 @@ section {
     
     margin: 5px !important;
     position: relative;
-    min-height: 80vh !important;
     height: 100%;
     &#details-section{
         width: 100%;
@@ -40,8 +39,8 @@ section {
             position: absolute;
     }
     .align-self-end{
-        position: absolute;
-        bottom:0;
+        // position: absolute;
+        // bottom:0;
     }
 }
 
