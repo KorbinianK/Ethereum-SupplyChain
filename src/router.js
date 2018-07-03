@@ -2,12 +2,12 @@ const _modules = {
     Home: () => ("./index.js"),
     FieldModule: () =>
         import ('./fields.js'),
-        HarvestModule: () =>
-            import ('./harvests.js')
-    // Category: () => import('./category.js'),
-    // Product: () => import('./product.js'),
-    // Checkout: () => import('./checkout.js'),
-
+    HarvestModule: () =>
+        import ('./harvests.js'),
+    TransportModule: () =>
+        import ("./transports.js"),
+    ProcessingModule: () =>
+        import ("./processing.js")
 };
 
 export default class Router {

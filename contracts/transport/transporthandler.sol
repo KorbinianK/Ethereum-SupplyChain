@@ -1,21 +1,27 @@
 pragma solidity ^0.4.23;
 
 import "./transport.sol";
+// import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**
  * @title The Handler contract for the transports
  */
 contract TransportHandler is Ownable {
-    
+    // using SafeMath for uint256;
+
     uint private totalTransports;
     address[] private transportAddresses;
     address private currHarv;
     address public grapeToken;
     address public harvestHandler;
+    string public company;
 
     // Mapping of an index to a transport contract
     mapping(uint => address) private transports;
-    
+
+    // Mapping of a transport address to a harvest
+    mapping(address => address[]) private transportToHarvest;
+
     /** 
      * @dev Updates the token address
      * @param _tokenAddress the address of the token
@@ -113,23 +119,57 @@ contract TransportHandler is Ownable {
      * @dev Creates a new transport contract and retieves the entire balance from the current harvest
      * @return bool
     */
-    function newTransport() public returns(bool success) {
+    function newTransport(string _lat, string _long) public returns(bool success) {
         uint id = totalTransports;
-        address harvest = currentHarvest();
-        string memory latitude = "49.02091";
-        string memory longitude = "12.3047";
-        uint256 totalBalance = harvestBalance(harvest);
-        if (transports[id] == 0x0 && totalBalance > 0) {
-            Transport t = new Transport(id,grapeToken,latitude,longitude);
-            require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), t, totalBalance));
-            require(harvest.call(bytes4(keccak256("harvestFields()"))));
-            
+        string memory latitude = _lat;
+        string memory longitude = _long;
+        if (transports[id] == 0x0) {
+            Transport t = new Transport(id,company,grapeToken,latitude,longitude);
             transports[id] = t;
             transportAddresses.push(t);
             totalTransports++;
             return true;
         }
         return false;
+    }
+
+    /** 
+     * @dev Adds the entire last harvest to a transport
+     * @param _transport address of the transport
+    */
+    function addAllFromHarvest(address _transport) public {
+        address harvest = currentHarvest();
+        transportToHarvest[_transport].push(harvest);
+        uint256 totalBalance = harvestBalance(harvest);
+        require(totalBalance > 0);
+        require(harvest.call(bytes4(keccak256("switchStatus()"))));
+        require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
+        require(harvest.call(bytes4(keccak256("harvestFields()"))));
+    }
+
+    /** 
+     * @dev Adds part of a harvest to a transport
+     * @param _harvest address of the harvest
+     * @param _transport address of the transport
+     * @param _value unit256 the value to transfer
+    */
+    function addFromHarvest(address _harvest, address _transport, uint256 _value) public {
+        if(transportToHarvest[_harvest].length == 0){
+            transportToHarvest[_transport].push(_harvest);
+        }   
+        uint256 totalBalance = harvestBalance(_harvest);
+        require(totalBalance > 0);
+        require(_value <= totalBalance);
+        require(_harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
+    }
+    
+
+    /** 
+     * @dev Returns the harvest added to a transport
+     * @return address of the harvest
+    */
+    function getHarvestsFromTransport(address _transportAddress) public view returns (address[]){
+        return transportToHarvest[_transportAddress];
     }
 
     /** 

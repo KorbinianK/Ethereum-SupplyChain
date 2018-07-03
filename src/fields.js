@@ -11,18 +11,14 @@ export async function updateName(address,newName) {
 
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
-    // var dummyData = web3.utils.stringToHex("foo");
-
-    const res = await field_instance.setName(
+    await field_instance.setName(
         newName,
         { from: account }
     ).then(result => {
         console.log(result);
-        $("#" + address + "-card")
-            .find(".card-title").find(".field-name")
-            .text(newName);
         return result;
     });
+    return openField(address);
 }
 
 export async function changeStatus(address){
@@ -37,10 +33,7 @@ export async function changeStatus(address){
 
 export async function getStage(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
-    const status = await field_instance.stage({
-        from: account
-    }).then(
+    const status = await field_instance.stage.call().then(
         (res) => {
             console.log("status", res)
             return res;
@@ -63,24 +56,29 @@ export async function switchStatus(address) {
 export async function getTotalTransactionCount(address) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const txCount = await tx.getTotalTransactionCount(field_instance);
-    return await txCount;
+    return txCount;
 }
 
 export async function getTransactionSenderAtIndex(address,index) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const sender = await tx.getTransactionSenderAtIndex(field_instance, index);
-    return await sender;
+    return sender;
 }
 
 export async function getTransactionDataAtIndex(address, index) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const data = await tx.getTransactionDataAtIndex(field_instance, index);
-    return await data;
+    return data;
 }
 
+export async function getTransactionTimeAtIndex(address, index) {
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const time = await tx.getTransactionTimeAtIndex(field_instance, index);
+    return helper.makeUnixReadable(time);;
+}
+
+
 export async function getAllTransactions(address) {
-    const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
     const txCount = await getTotalTransactionCount(address);
     var json = 
        []
@@ -89,6 +87,7 @@ export async function getAllTransactions(address) {
         let tx = {};
         tx.sender = await getTransactionSenderAtIndex(address, i);
         tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+        tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
     return json;
@@ -101,30 +100,26 @@ export async function getAllTransactions(address) {
 
 export async function loadSingleField(address){
     const json = await fieldAsJson(address);
-
-
-   return loadFieldCard(json);
+   return loadSingleFieldCard(json);
 }
-
 
 
 export async function getFieldCards(){
-    $('#cultivationSection').find(".loader").toggleClass("d-none");
-    $('#newFieldArea').removeClass("d-none");
+    $('#cultivationSection').find(".loader").removeClass("d-none");
+    $('#cultivationSection').removeClass("d-none");
     $('#fields').empty();
-    await getAll().then(fields =>{
+    await getAllFields().then(fields =>{ 
         for (let i = 0; i < fields.length; i++) {
-            loadFieldCard(fields[i]);
+            loadSingleFieldCard(fields[i]);
         }
     });
-    $('#cultivationSection').find(".loader").toggleClass("d-none");
+    $('#cultivationSection').find(".loader").addClass("d-none");
 }
 
-export async function getAll(){
+export async function getAllFields(){
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
-    const account = await helper.getAccount();
     const fields = await fieldhandler_instance
-      .getAllFields({ from: account })
+      .getAllFields.call()
       .then(async receipt => {
         var fields = [];
         for (let i = 0; i < receipt.length; i++) {
@@ -139,7 +134,7 @@ export async function getAll(){
 
 export async function getHarvestableFields(filter) {
     var toFilter = filter.fields;
-    const fields = await getAll().then(fields =>{
+    const fields = await getAllFields().then(fields =>{
         let harvestable = [];
          for (let i = 0; i < fields.length; i++) {
             if(fields[i].harvestable){
@@ -163,8 +158,8 @@ export async function getHarvestableFields(filter) {
     return dropdown;
 }
 
-export async function loadFieldCard(json){
-        console.log("Json", json);
+export async function loadSingleFieldCard(json) {
+    console.log("Json", json);
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
     var output = Mustache.render(
@@ -176,8 +171,7 @@ export async function loadFieldCard(json){
 
 export async function checkHarvestable(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
-    const res = await field_instance.stage({from:account}).then(result =>{ // TODO!!!!
+    const res = await field_instance.stage.call().then(result =>{ // TODO!!!!
         if (result.toString() == "1"){
             return true;
         }
@@ -200,9 +194,8 @@ export async function fieldAsJson(address) {
     var totalTransactionCount = await getTotalTransactionCount(address);
     var json;
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const account = await helper.getAccount();
     
-    const res = await field_instance.getAllDetails({from:account}).then(async result =>{
+    const res = await field_instance.getAllDetails.call().then(async result =>{
         stage = result[0];
         if (stage == 0) {
             stage = "Uncultivated"
@@ -214,7 +207,7 @@ export async function fieldAsJson(address) {
         creator = result[1] ;
         owners = result[2] ;
         name = result[3] ;
-        picture = result[4] ;
+        picture = result[4];
         latitude = result[5] ;
         longitude = result[6] ;
         txHarvest = result[7];
@@ -245,23 +238,25 @@ export async function fieldAsJson(address) {
                 };
             json["txSender"].push(sender);
         }
-        
         return json;
-    })
+    });
    return res;
 }
 
-export async function newField(details) {
-    console.log("new field");
-    
+export async function newField() {
+    var details = $("#newFieldForm").serializeArray()
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-    var name,lat,long;
+    var name,lat,long,grapeType;
+    console.log(details);
     $.each(details, function(i, item) {
         switch (item.name) {
             case "name":
                  name = item.value;
             break;
+            case "grapeType":
+                grapeType = item.value;
+                break;
             case "latitude":
                  lat = item.value;
             break;
@@ -274,11 +269,11 @@ export async function newField(details) {
     });
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
     Mustache.parse(template_fields);
- 
     fieldhandler_instance.newField(
         name,
         long,
         lat,
+        grapeType,
         {
          from: account
         }
@@ -300,38 +295,33 @@ export async function newField(details) {
     }).catch(err => console.error("woopsie",err));
 }
 
-function toggleLoader(area){
-    switch (area) {
-        case "cultivated":
-            $("#cultivationSection").find(".loader").toggleClass("d-none");
-            break;
-    
-        default:
-            break;
-    }
-}
+
 
 export async function openField(address) {
-    toggleLoader("cultivated");
-    $('#fields').toggleClass("d-none");
+    helper.clearDetails();
+    helper.toggleLoader("details",true);
+    $("#detailsModal").modal("show");
     const template_fielddetails = await helper.fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
     Mustache.parse(template_fielddetails);
     const field = await fieldAsJson(address).then(async(json)=>{
         json["transactions"] = await getAllTransactions(address);
+        console.log(json);
+        
         Mustache.parse(template_fielddetails);
         var output = Mustache.render(
             template_fielddetails, json
         );
         return output;
     });
-    $('#newFieldArea').addClass("d-none");
-    toggleLoader("cultivated");
-    $('#fields').toggleClass("d-none");
-    return document.getElementById('fields').innerHTML = field;
+    helper.toggleLoader("details",false);
+    return document.getElementById('details').innerHTML = field;
 }
 
 export async function addFieldTransaction(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    await tx.doDummyTransaction(field_instance);
+    var receipt = await tx.doDummyTransaction(field_instance);
+    console.log(receipt);
+    let block = await web3.eth.getBlock("latest")
+    console.log(block)
     return openField(address);
 }

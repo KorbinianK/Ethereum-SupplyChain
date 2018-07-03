@@ -7,7 +7,7 @@ import "./field.sol";
  * @title The Handler contract for the vineyards        
  */
 contract FieldHandler {
-    
+     
     address[] internal allFields;
     address[] internal activeFieldsArray;
     
@@ -117,7 +117,7 @@ contract FieldHandler {
         emit StatusChanged(f, msg.sender); 
     }
 
-    /**
+    /**re
     * @dev Gets all fields
     * @return address array of all fields
     */
@@ -154,9 +154,10 @@ contract FieldHandler {
     function newField( 
         string _name,
         string _longitude,
-        string _latitude  
+        string _latitude,
+        string _grapeType 
         ) public returns(address) {
-        Field f = new Field(msg.sender, _name, _longitude, _latitude);
+        Field f = new Field(msg.sender, _name, _longitude, _latitude, _grapeType);
         allFields.push(f);
         activeFieldsArray.push(f);
         emit NewField(f, msg.sender);
@@ -170,7 +171,7 @@ contract FieldHandler {
     function currentField() public view returns(address){
         return activeFieldsArray[activeFieldsArray.length-1];
     }
-  
 }
+
 
 

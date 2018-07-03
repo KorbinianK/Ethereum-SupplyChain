@@ -3,7 +3,6 @@ pragma solidity ^0.4.23;
 import "./harvest.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-
 /**
  * @title The Handler contract for the harvests
  */

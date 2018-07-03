@@ -1,14 +1,17 @@
-<div class="card col">
+<div class="card w-100">
+    <div class="card-header">
+<h5 class="card-title float-left">Year: {{year}}</h5>
+<h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
+    </div>
     <div class="card-body ">
-        <h5 class="card-title float-left">Year: {{year}}</h5>
-        <h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
+        
         <h6 class=" card-subtitle mb-2 text-muted">
             <small>{{address}}</small>
         </h6>
         <p class="card-text">
 
             <div class="form-group">
-                <label for="fieldList"> Fields:
+                <label for="fieldList">Harvested Fields:
                     <span id="txCount">{{fieldCount}}</span>
                 </label>
                 <select class="form-control" id="fieldList">

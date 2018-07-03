@@ -33,7 +33,7 @@ contract MintableToken is StandardToken {
         _;
     }
 
-    modifier mintingRights() {
+    modifier hasMintingRights() {
         require(mintAllowed[msg.sender]==true);
         _;
     }

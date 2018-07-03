@@ -22,19 +22,19 @@
                     <a class="nav-link" href="#">Cultivation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="App.loadHarvestSection();" href="#">Harvests</a>
+                    <a class="nav-link" href="#">Harvests</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Transport</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manufacturing</a>
+                    <a class="nav-link" href="#">Processing</a>
                 </li>
             </ul>
 
         </div>
     </nav>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col">
                 <h1 class="my-2 font-weight-bold text-dark">
@@ -44,82 +44,203 @@
             </div>
         </div>
     </div>
-    <div id="content" class="container">
-        <!-- HARVEST -->
-        
-        <section id="harvestSection" class="d-none">
-<h2>Harvest:</h2>
-<div class="row my-5">
-    <div class="col">
+    <div id="content" class="container-fluid">
+        <div class="row d-flex justify-content-start">
+            <!-- FIELDS -->
+            <section id="cultivationSection" class="col bg-light">
+<h2>Cultivation</h2>
 
-        <div class="loader d-none row"></div>
-        <div id="harvestDetails" class="row">
-            <!-- HARVEST CARD LOADING  -->
+                <div class="row">
 
-        </div>
+<div class="divider"></div>
+
+                    <div class="col-12 pt-5">
+                        <a class="btn btn-outline-secondary btn-block btn-sm" data-toggle="collapse" href="#collapseFields" role="button" aria-expanded="false"
+                            aria-controls="collapseFields">
+                            Show Fields
+                        </a>
+                        <div class="collapse" id="collapseFields">
+                            <div class="loader d-none"></div>
+                            <div id="fields">
+                                <!-- FIELDS LOADING -->
+                            </div>
+                        </div>
+                    </div>
+<div id="newFieldArea" class="col-12 pt-5">
+
+    <div class="col align-self-end pb-3">
+        <form id="newFieldForm">
+            <div class="form-group">
+                <label for="fieldName">Field Name</label>
+                <input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
+            </div>
+            <div class="form-group">
+                <label for="grapeType">Grape Type</label>
+                <input name="grapeType" type="text" class="form-control" id="grapeType" placeholder="Enter the GrapeType">
+            </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="fieldLat">Latitude</label>
+                    <input name="latitude" type="text" class="form-control" id="fieldLat" placeholder="Latitude">
+                </div>
+                <div class="form-group col">
+                    <label for="fieldLong">Longitude</label>
+                    <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
+                </div>
+            </div>
+
+            <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary text-white btn-lg btn-block">New Field</button>
+        </form>
     </div>
 </div>
-            <div class="row">
-                <div class="col">
-                    <div id="harvestSelector" class="input-group row">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="harvestSelect ">Select Harvest</label>
-                        </div>
-                        <select class="form-control" id="harvestSelect">
-                            <!-- HARVEST SELECT  -->
-                        </select>
-                        <div class="input-group-append">
-                            <button onclick="App.openHarvest(this)" class="btn btn-outline-secondary" type="button">Open</button>
-                        </div>
+                </div>
 
-                    </div>
-                    <div class="row input-group my-5 ">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="harvestSelect ">New Harvest</label>
-                        </div>
-                        <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary " onclick="App.newHarvest()" type="button">New</button>
+
+
+                <!-- END FIELDS -->
+            </section>
+            <!-- HARVEST -->
+
+            <section id="harvestSection" class=" col bg-light">
+                <h2>Harvest</h2>
+                <div class="divider"></div>
+                <div class="row ">
+                    <div class="col">
+
+                        <div class="loader d-none "></div>
+                        <div id="harvestDetails">
+                            <!-- HARVEST CARD LOADING  -->
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <!-- END HARVEST -->
+                <div class="row pt-5 h-100">
+                    <div class="col-12">
+                        <div id="harvestSelector" class="form-group">
+                            <label for="harvestSelect ">Select Harvest</label>
+                            <select class="form-control" id="harvestSelect">
+                                <!-- HARVEST SELECT  -->
+                            </select>
+                            <button onclick="App.openHarvest(this)" class="btn btn-block  btn-outline-secondary" type="button">Open</button>
 
-        <!-- FIELDS -->
-        <section id="cultivationSection" class="d-block">
-            <div class="loader d-none"></div>
-            
-            <div id="fields" class="row my-5 mx-0 card-columns">
-                <!-- FIELDS LOADING -->
-                
-            </div>
-            <div id="newFieldArea" class="row my-5">
-                <div class="col">
-                    <form id="newFieldForm">
-                        <div class="form-group">
-                            <label for="fieldName">Field Name</label>
-                            <input name="name" type="text" class="form-control" id="fieldName" placeholder="Enter a name">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col">
-                                <label for="fieldLat">Latitude</label>
-                                <input name="latitude" type="text" class="form-control" id="fieldLat" placeholder="Latitude">
-                            </div>
-                            <div class="form-group col">
-                                <label for="fieldLong">Longitude</label>
-                                <input name="longitude" type="text" class="form-control" id="fieldLong" placeholder="Longitude">
-                            </div>
                         </div>
 
-                        <button type="button" name="newField" id="newFieldBtn" onclick="App.newField()" class="btn btn-primary text-white btn-lg btn-block">New Field</button>
-                    </form>
+                    </div>
+                    <div class="col-12 align-self-end">
+                        <div class="form-group pt-5 ">
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="harvestSelect ">New Harvest</label>
+                                    <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-block btn-lg" onclick="App.newHarvest()" type="button">New Harvest</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- HARVEST END -->
+            <!-- TRANSPORT -->
+            <section id="transportSection" class=" col bg-light">
+                <h2>Transport</h2>
+                <div class="divider"></div>
+                <div class="row pt-5">
+                    <a class="btn btn-outline-secondary btn-block btn-sm" data-toggle="collapse" href="#collapseTransports" role="button" aria-expanded="false"
+                        aria-controls="collapseTransports">
+                        Show Transports
+                    </a>
+                    <div class="collapse" id="collapseTransports">
+                        <div class="loader d-none"></div>
+                        <div id="transports">
+                            <!-- FIELDS LOADING -->
+                        </div>
+                        <h5 id="transports-loading" class="text-lowercase text-muted text-center py-3"></h5>
+
+                    </div>
+                </div>
+
+                <div id="newTransportArea" class="row pt-5">
+                    <div class="col align-self-end pb-3">
+                        <form id="newTransportForm">
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="startLat">Start Latitude</label>
+                                    <input name="latitude" type="text" class="form-control" id="startLat" placeholder="Latitude">
+                                </div>
+                                <div class="form-group col">
+                                    <label for="startLong">Start Longitude</label>
+                                    <input name="longitude" type="text" class="form-control" id="startLong" placeholder="Longitude">
+                                </div>
+                            </div>
+
+                            <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Transport</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- <h2>Transport</h2>
+                <div class="divider"></div>
+                <div class="loader d-none row"></div>
+
+                <div id="transportDetails" class="row">
+
+                </div>
+                <div id="transports" class="row my-5 mx-0 card-deck">>
+                </div>
+                <div class="row pt-5 h-100">
+                   
+                    <div class="col-12 align-self-end">
+                        <div class="form-group my-5 ">
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="harvestSelect ">New Transport</label>
+                                    <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
+                                </div>
+                            </div>
+                            <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Transport</button>
+                        </div>
+                    </div>
+                </div> -->
+
+
+            </section>
+            <!-- TRANSPORT END -->
+            <!-- PROCESSING -->
+            <section id="processingSection" class=" col bg-light">
+                <h2>Processing</h2>
+                <div class="divider"></div>
+                <div class="loader d-none row"></div>
+
+                <div id="productionDetails" class="row">
+
+                </div>
+                <div class="row">
+                    <button onclick="App.getBottle()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">Bottle</button>
+
+                </div>
+            </section>
+            <!-- PROCESSING END -->
+        </div>
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="loader d-none"></div>
+                        <div id="details">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- END FIELDS -->
-        </section>
     </div>
 </body>
 
