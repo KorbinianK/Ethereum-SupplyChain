@@ -21,36 +21,42 @@ export async function newTransport() {
                  break;
          }
      });
+
     const currentH = await currentHarvest();
-    
     const currentTransport = await getCurrentTransport();
 
-    if (currentH != undefined && currentTransport != undefined) {
-        var check = checkTransport(currentH, currentTransport);
-    }
+    // if (currentH != undefined && currentTransport != undefined) {
+    //     var check = checkTransport(currentH, currentTransport);
+    // }
     // if(!check || check == undefined){
         const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
         const account = await helper.getAccount();
-        const result = await transportHandler_instance.newTransport(
+        const address = await transportHandler_instance.newTransport(
             lat,
             long,
-            {from: account}).then((res) => {
-            return res
-        });
-        return getTransportCards();
-    // }
-    // else{
-    //     console.error("same harvest!");
-    // }
-}
+            {from: account})
+            .then(receipt => {
+                console.log("new transport",receipt);
+                for (var i = 0; i < receipt.logs.length; i++) {
+                    var log = receipt.logs[i];
+                    if (log.event == "NewTransport") {
+                        // return getTransportCards();
+                        var transpAddr = log.args.transport;
+                        return transpAddr;
+                    }
+                }
+            }).catch(err => console.error("woopsie",err));
+            var json = await transportAsJson(address);
+            return loadTransportCard(json);
+        }
 
-async function checkTransport(harvest,transport){
-    const current = harvest;
-    const newharvest = await getHarvest(transport);
-    if(current == newHarvest){
-        return false;
-    }return true;
-}
+// async function checkTransport(harvest,transport){
+//     const current = harvest;
+//     const newharvest = await getHarvest(transport);
+//     if(current == newHarvest){
+//         return false;
+//     }return true;
+// }
 
 export async function getCurrentTransport(){
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
@@ -127,6 +133,7 @@ async function loadTransportCard(json){
     var output = Mustache.render(
         template_transports, json
     );
+    document.getElementById("transports-loading").innerHTML = "";
     return document.getElementById('transports').innerHTML += output;
 }
 
@@ -137,7 +144,6 @@ export async function getTransportCards(){
     $('#transports').empty();
     await allTransports().then(transports =>{
         for (let i = 0; i < transports.length; i++) {
-            
             loadTransportCard(transports[i]);
         }
     });

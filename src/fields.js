@@ -8,16 +8,24 @@ import * as tx from "./utils/transactions";
 import { getFieldName } from "./harvests";
 
 export async function updateName(address,newName) {
-
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
     await field_instance.setName(
         newName,
         { from: account }
-    ).then(result => {
-        console.log(result);
-        return result;
-    });
+    ).then(receipt => {
+        console.log("?",receipt);
+        for (var i = 0; i < receipt.logs.length; i++) {
+            var log = receipt.logs[i];
+            console.log(log);
+            if (log.event == "NewTransaction") {
+                console.log("TX!");
+                return true;
+            }
+        };
+        }
+    ).catch(err => console.error("woopsie",err));
+    getFieldCards();
     return openField(address);
 }
 
@@ -85,8 +93,11 @@ export async function getAllTransactions(address) {
     ;
     for (let i = 0; i < txCount; i++) {
         let tx = {};
+        let data = await getTransactionDataAtIndex(address, i);
+        console.log("x",data);
+        
         tx.sender = await getTransactionSenderAtIndex(address, i);
-        tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+        tx.data = web3.utils.hexToString(data);
         tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
@@ -248,7 +259,6 @@ export async function newField() {
     const fieldhandler_instance = await fieldHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
     var name,lat,long,grapeType;
-    console.log(details);
     $.each(details, function(i, item) {
         switch (item.name) {
             case "name":
@@ -280,10 +290,9 @@ export async function newField() {
     ).then( async receipt =>  {
         for (var i = 0; i < receipt.logs.length; i++) {
             var log = receipt.logs[i];
+            console.log("new field",receipt);
             if (log.event == "NewField") {
-                console.log(log);
                 var fieldAddr = log.args.field;
-                console.log("addr:", fieldAddr);
                 var json = await fieldAsJson(fieldAddr);
                 var output = Mustache.render(
                     template_fields, json

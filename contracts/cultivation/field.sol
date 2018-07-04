@@ -79,14 +79,14 @@ contract Field is TransactionOwner {
     * @dev Harvests the current vineyard and moves it to the harvested stage
     * @param _harvest Address of the harvest contract that called this function
     */
-    function harvest(address _harvest) public atStage(Stages.Cultivated) transitionNext {
+    function harvest(address _harvest) public atStage(Stages.Cultivated)
+    //  transitionNext // deactivated for showcase 
+     {
         harvestPointer[_harvest] = totalTransactions;
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
-        // switchStatus();        
-        
-        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat(_harvest.addressToString().toSlice())));
-
+        // switchStatus();   // deactivated for showcase     
+        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat((_harvest.addressToString()).toSlice())));
     }
     
     /**

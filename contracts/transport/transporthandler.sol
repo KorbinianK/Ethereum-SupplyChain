@@ -22,6 +22,22 @@ contract TransportHandler is Ownable {
     // Mapping of a transport address to a harvest
     mapping(address => address[]) private transportToHarvest;
 
+    /**
+    * @dev Event that fires when a new transport gets created
+    * @param id Id of the transport
+    * @param transport the address of the newly created transport
+    * @param creator the address of the creator of the transport
+    */
+    event NewTransport(uint id, address transport, address creator);
+
+    /**
+    * @dev Event that fires when a harvest is received
+    * @param harvest the address of the harvest
+    * @param amount the amount recieved
+    */
+    event ReceiveHarvest(address harvest, uint amount);
+
+
     /** 
      * @dev Updates the token address
      * @param _tokenAddress the address of the token
@@ -128,6 +144,7 @@ contract TransportHandler is Ownable {
             transports[id] = t;
             transportAddresses.push(t);
             totalTransports++;
+            emit NewTransport(id,t,msg.sender);
             return true;
         }
         return false;
@@ -142,9 +159,10 @@ contract TransportHandler is Ownable {
         transportToHarvest[_transport].push(harvest);
         uint256 totalBalance = harvestBalance(harvest);
         require(totalBalance > 0);
-        require(harvest.call(bytes4(keccak256("switchStatus()"))));
+        // require(harvest.call(bytes4(keccak256("switchStatus()"))));
         require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
-        require(harvest.call(bytes4(keccak256("harvestFields()"))));
+        emit ReceiveHarvest(harvest,totalBalance);
+        // require(harvest.call(bytes4(keccak256("harvestFields()"))));
     }
 
     /** 
@@ -161,6 +179,8 @@ contract TransportHandler is Ownable {
         require(totalBalance > 0);
         require(_value <= totalBalance);
         require(_harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
+
+        emit ReceiveHarvest(_harvest, _value);
     }
     
 

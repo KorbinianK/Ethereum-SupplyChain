@@ -176,35 +176,47 @@
                         </form>
                     </div>
                 </div>
-                <!-- <h2>Transport</h2>
-                <div class="divider"></div>
-                <div class="loader d-none row"></div>
-
-                <div id="transportDetails" class="row">
-
-                </div>
-                <div id="transports" class="row my-5 mx-0 card-deck">>
-                </div>
-                <div class="row pt-5 h-100">
-                   
-                    <div class="col-12 align-self-end">
-                        <div class="form-group my-5 ">
-                            <div class="form-row">
-                                <div class="form-group col">
-                                    <label for="harvestSelect ">New Transport</label>
-                                    <input type="number" id="newHarvest" class="form-control" placeholder="Year " aria-label="newHarvest">
-                                </div>
-                            </div>
-                            <button onclick="App.newTransport()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Transport</button>
-                        </div>
-                    </div>
-                </div> -->
-
-
             </section>
             <!-- TRANSPORT END -->
             <!-- PROCESSING -->
             <section id="processingSection" class=" col bg-light">
+                <h2>Processing</h2>
+                <div class="divider"></div>
+                <div class="row pt-5">
+                    <a class="btn btn-outline-secondary btn-block btn-sm" data-toggle="collapse" href="#collapseProductions" role="button" aria-expanded="false"
+                        aria-controls="collapseProductions">
+                        Show Productions
+                    </a>
+                    <div class="collapse" id="collapseProductions">
+                        <div class="loader d-none"></div>
+                        <div id="productions">
+                            <!-- PRODUCTIONS LOADING -->
+                        </div>
+                        <h5 id="productions-loading" class="text-lowercase text-muted text-center py-3"></h5>
+
+                    </div>
+                </div>
+
+                <div id="newProductionArea" class="row pt-5">
+                    <div class="col align-self-end pb-3">
+                        <form id="newProductionForm">
+                            <div class="form-row">
+                                <!-- <div class="form-group col">
+                                    <label for="startLat">Start Latitude</label>
+                                    <input name="latitude" type="text" class="form-control" id="startLat" placeholder="Latitude">
+                                </div>
+                                <div class="form-group col">
+                                    <label for="startLong">Start Longitude</label>
+                                    <input name="longitude" type="text" class="form-control" id="startLong" placeholder="Longitude">
+                                </div> -->
+                            </div>
+
+                            <button onclick="App.newProduction()" type="button" name="" id="" class="btn btn-primary btn-block btn-lg">New Production</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            <!-- <section id="processingSection" class=" col bg-light">
                 <h2>Processing</h2>
                 <div class="divider"></div>
                 <div class="loader d-none row"></div>
@@ -216,7 +228,7 @@
                     <button onclick="App.getBottle()" type="button" name="" id="" class="btn btn-primary btn-lg btn-block text-white">Bottle</button>
 
                 </div>
-            </section>
+            </section> -->
             <!-- PROCESSING END -->
         </div>
         <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog">

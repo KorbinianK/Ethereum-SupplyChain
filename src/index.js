@@ -58,13 +58,10 @@ window.App = {
   },
 
   initContracts: function () {
-    web3.eth.subscribe('pendingTransactions', function (error, result) {})
-      .on("data", function (trxData) {
-        web3.eth.getTransaction(trxData).then(console.log);
-      });
     App.getFieldCards();
     App.loadHarvests();
     App.loadTransportSection();
+    App.loadProcessingSection();
     return App.bindEvents();
   },
 
@@ -177,12 +174,7 @@ window.App = {
 
   newHarvest: async function () {
     Router.modules.HarvestModule()
-      .then(module => module.newHarvest())
-      .then((result) => {
-        return result;
-      }).then(() => {
-        return App.loadHarvests();
-      });
+      .then(module => module.newHarvest());
   },
 
   harvest: function () {
@@ -230,11 +222,31 @@ window.App = {
   /**
    * Processing
    */
+
+   loadProcessingSection: function() {
+    Router.modules
+    .ProcessingModule()
+    .then(module => module.getProductionCards());
+   },
   getBottle: function() {
     Router.modules
     .ProcessingModule()
     .then(module => module.finalBottle());
-  }
+  },
+  newProduction: function() {
+    Router.modules
+    .ProcessingModule()
+    .then(module => module.newProduction());
+  },
+  openProduction: function (address) {
+    Router.modules.ProcessingModule()
+      .then(module => module.loadSingleProduction(address));
+  },
+  addTransport: function(address){
+    Router.modules
+      .ProcessingModule()
+      .then(module => module.addTransport(address));
+  },
 };
 window.addEventListener('load', function () {
   window.App.init();

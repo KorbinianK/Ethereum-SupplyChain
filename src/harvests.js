@@ -16,11 +16,15 @@ export async function weightInput(harvest, field, amount) {
         field,
         amount,
         { from: account })
-        .then( result => { 
-            console.log(result);
-            console.log(fields, "added to", harvest);
-            return openHarvest(harvest);
-    });
+        .then( receipt => { 
+            for (var i = 0; i < receipt.logs.length; i++) {
+                var log = receipt.logs[i];
+                if (log.event == "WeightInput") {
+                    return;
+                }
+            }
+        }).catch(err => console.error("woopsie",err));
+        return openHarvest(harvest);
 }
 
 export function loadHarvestFields(harvestAddress){
@@ -85,15 +89,20 @@ export async function newHarvest() {
     let harvestYear = $("#newHarvest").val();
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-    const harvest = await harvestHandler_instance.newHarvest(
+    await harvestHandler_instance.newHarvest(
         harvestYear,
         {
             from: account
         }
-    ).then((result) => {
-        return result;
+    ).then((receipt) => {
+        for (var i = 0; i < receipt.logs.length; i++) {
+            var log = receipt.logs[i];
+            if (log.event == "NewHarvest") {
+                return true;
+            }
+        };
     });
-    return await harvest;
+    return loadDropdown();
 }
 
 export async function openHarvest(address){

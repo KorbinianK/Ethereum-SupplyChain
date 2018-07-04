@@ -18,6 +18,15 @@ contract ProcessHandler is Ownable {
 
     // Mapping of a production address to a transport
     mapping(address => address[]) private productionToTransport;
+
+    /**
+    * @dev Event that fires when a new harvest gets created
+    * @param id Id of the production
+    * @param production the address of the newly created production
+    * @param creator the address of the creator of the production
+    */
+    event NewProduction(uint id, address production, address creator);
+
     /** 
      * @dev Updates the token address
      * @param _tokenAddress the address of the token
@@ -82,9 +91,7 @@ contract ProcessHandler is Ownable {
      * Based on code from https://medium.com/[at]blockchain101/calling-the-function-of-another-contract-in-solidity-f9edfa921f4c
     */
     function transportBalance(address transportAddress) public view returns (uint256 _balance) {
-        
         currTrans = transportAddress;
-        
         bytes4 sig = bytes4(keccak256("getBalance()"));
         assembly {
             // move pointer to free memory spot
@@ -123,6 +130,7 @@ contract ProcessHandler is Ownable {
             productions[id] = p;
             productionAddresses.push(p);
             totalProductions++;
+            emit NewProduction(id,p,msg.sender);
             return true;
         }
         return false;

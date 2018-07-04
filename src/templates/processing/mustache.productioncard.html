@@ -1,0 +1,32 @@
+<div id="{{address}}-card" class="card mx-1 my-2">
+    <div class="card-header">
+        <h5 class="card-title ">
+            <span class="transport-id float-left">ID: {{ID}}</span>
+        </h5>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}-collapse"
+            aria-expanded="false" aria-controls="{{address}}-collapse">
+            Details
+        </button>
+        <button class="btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openProduction('{{address}}')" data-address="{{address}}"
+            type="button">Open</button>
+    </div>
+    </p>
+    <div class="collapse" id="{{address}}-collapse">
+        <div class="card-body">
+            <p class="card-text">
+                <p class="card-text"></p>
+                <p class="card-text">
+                    <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
+                <p class="card-text">
+                    <strong>Total TX:</strong> {{totalTransactions}}</p>
+        </div>
+
+    </div>
+    <div class="card-footer">
+        <small>Address: {{address}}</small>
+    </div>
+
+</div>

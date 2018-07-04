@@ -16,6 +16,13 @@ contract HarvestHandler is Ownable {
     // Mapping of an index to a harvest contract
     mapping(uint => address) private harvests;
 
+    /**
+    * @dev Event that fires when a new harvest gets created
+    * @param year Id of the harvest
+    * @param harvest the address of the newly created harvest
+    * @param creator the address of the creator of the harvest
+    */
+    event NewHarvest(uint year, address harvest, address creator);
 
     /** 
      * @dev Low level call function to retrieve the current active field from the fieldHandler
@@ -77,6 +84,7 @@ contract HarvestHandler is Ownable {
             harvests[_year] = h;
             harvestAddresses.push(h);
             totalHarvests++;
+            emit NewHarvest(_year,h,msg.sender);
             return true;
         }
         return false;
