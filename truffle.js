@@ -15,7 +15,16 @@ module.exports = {
             from: "0x9e442f4c99f09764b904af8c0337dfdf8d7efe69",
             websockets: true,
             gas: 4712388
+        },
+        infura: {
+            host: "https://mainnet.infura.io/gzpHdNpMS5wLQ0dsSDog",
+            port: 8545,
+            network_id: "*",
+            from: "0x9e442f4c99f09764b904af8c0337dfdf8d7efe69",
+            websockets: true,
+            gas: 4712388
         }
+
     },
     solc: {
         optimizer: {

@@ -86,7 +86,7 @@ contract Field is TransactionOwner {
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
         // switchStatus();   // deactivated for showcase     
-        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat((_harvest.addressToString()).toSlice())));
+        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat(_harvest.addressToString().toSlice())));
     }
     
     /**

@@ -36,6 +36,7 @@ export async function newTransport() {
             long,
             {from: account})
             .then(receipt => {
+                $('#transportSection').find(".loader").removeClass("d-none");
                 console.log("new transport",receipt);
                 for (var i = 0; i < receipt.logs.length; i++) {
                     var log = receipt.logs[i];
@@ -47,6 +48,7 @@ export async function newTransport() {
                 }
             }).catch(err => console.error("woopsie",err));
             var json = await transportAsJson(address);
+             $('#transportSection').find(".loader").addClass("d-none");
             return loadTransportCard(json);
         }
 

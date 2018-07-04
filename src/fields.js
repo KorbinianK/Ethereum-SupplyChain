@@ -94,10 +94,8 @@ export async function getAllTransactions(address) {
     for (let i = 0; i < txCount; i++) {
         let tx = {};
         let data = await getTransactionDataAtIndex(address, i);
-        console.log("x",data);
-        
         tx.sender = await getTransactionSenderAtIndex(address, i);
-        tx.data = web3.utils.hexToString(data);
+        tx.data = web3.utils.hexToAscii(data);
         tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
@@ -326,11 +324,20 @@ export async function openField(address) {
     return document.getElementById('details').innerHTML = field;
 }
 
-export async function addFieldTransaction(address){
+
+export async function addFieldTransaction(address) {
+    let sensor = $('#sensor-select').val();
+    let data = $('#data-input').val();
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    var receipt = await tx.doDummyTransaction(field_instance);
-    console.log(receipt);
-    let block = await web3.eth.getBlock("latest")
-    console.log(block)
-    return openField(address);
+    return await tx.addTransaction(field_instance, sensor, data).then(result => {
+        console.log("tx sent", result)
+    });
 }
+// export async function addFieldTransaction(address){
+//     const field_instance = await field_contract(web3.currentProvider).at(address);
+//     var receipt = await tx.doDummyTransaction(field_instance);
+//     console.log(receipt);
+//     let block = await web3.eth.getBlock("latest")
+//     console.log(block)
+//     return openField(address);
+// }

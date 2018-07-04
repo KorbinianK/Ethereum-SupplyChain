@@ -717,14 +717,14 @@ library strings {
     }
 
 
-    function addressToString(address x) returns (string) {
+  function addressToString(address x) returns (string) {
         bytes memory b = new bytes(20);
         for (uint i = 0; i < 20; i++)
             b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
         return string(b);
     }
 
-//source https://ethereum.stackexchange.com/a/9152
+    //source https://ethereum.stackexchange.com/a/9152
     function stringToBytes(string memory source) public returns (bytes result) {
         bytes memory tempEmptyStringTest = bytes(source);
         uint c = tempEmptyStringTest.length;
@@ -734,11 +734,56 @@ library strings {
         }
     }
 
+    //https://stackoverflow.com/a/47137572
+    function uintToString(uint v) constant returns (string str) {
+        uint maxlength = 100;
+        bytes memory reversed = new bytes(maxlength);
+        uint i = 0;
+        while (v != 0) {
+            uint remainder = v % 10;
+            v = v / 10;
+            reversed[i++] = byte(48 + remainder);
+        }
+        bytes memory s = new bytes(i + 1);
+        for (uint j = 0; j <= i; j++) {
+            s[j] = reversed[i - j];
+        }
+        str = string(s);
+    }
+
+    function fromHexChar(uint c) public pure returns (uint) {
+        if (byte(c) >= byte('0') && byte(c) <= byte('9')) {
+            return c - uint(byte('0'));
+        }
+        if (byte(c) >= byte('a') && byte(c) <= byte('f')) {
+            return 10 + c - uint(byte('a'));
+        }
+        if (byte(c) >= byte('A') && byte(c) <= byte('F')) {
+            return 10 + c - uint(byte('A'));
+        }
+    }
+
+    // https://ethereum.stackexchange.com/a/40247 
+    // Convert an hexadecimal string to raw bytes
+    function toHex(string s) public pure returns (bytes) {
+        bytes memory ss = bytes(s);
+        require(ss.length%2 == 0); // length must be even
+        bytes memory r = new bytes(ss.length/2);
+        for (uint i=0; i<ss.length/2; ++i) {
+            r[i] = byte(fromHexChar(uint(ss[2*i])) * 16 + fromHexChar(uint(ss[2*i+1])));
+        }
+        return r;
+    }
+
+    function uintToBytes(uint256 x) returns (bytes b) {
+        b = new bytes(32);
+        assembly { mstore(add(b, 32), x) }
+    }
 
     /// @author Piper Merriam - <pipermerriam@gmail.com>
     /// @dev Converts an unsigned integert to its string representation.
     /// @param v The number to be converted.
-    function uintToBytes(uint v) public view returns (bytes32 ret) {
+    function uintToBytes32(uint v) public view returns (bytes32 ret) {
         if (v == 0) {
             ret = "0";
         }
