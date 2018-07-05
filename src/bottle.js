@@ -13,26 +13,22 @@ import * as tx from "./utils/transactions";
 
 
 export async function finalBottle() {
-    const bottle = await currentProduction().then(async production => {
-        console.log("Production:", await production);
-        return await getTransportFromProduction(await production).then(async transport => {
-            console.log("Transporter:", transport);
-            return await getHarvestFromTransport(await transport).then(async harvest => {
-                console.log("Harvest:", await harvest);
-                return await getFieldsFromHarvest(await harvest).then(async fields => {
-                    console.log("Fields:", await fields);
-                    return fields;
-                });
-            });
-        })
-    });
+    const production = await currentProduction()
+    console.log("Production:",  production);
+    const transport = await getTransportFromProduction(production)
+    console.log("Transporter:", transport);
+    const harvest = await getHarvestFromTransport( transport)
+    console.log("Harvest:",  harvest);
+    const fields = await getFieldsFromHarvest( harvest);
+    console.log("Fields:",  fields);
+
+    return;
+           
 }
 
 async function getTransportFromProduction(production) {
-    const production_instance = await production_contract(web3.currentProvider).at(production);
-    const transport = production_instance.getTransportFromProduction.call().then(result => {
-        return result
-    });
+    const processHandler_instance = await processHandler_contract(web3.currentProvider).at(production);
+    const transport = await processHandler_instance.getTransportFromProduction.call(production);
     return transport;
 }
 
@@ -70,7 +66,7 @@ async function getHarvestsFromTransport(transport) {
 // }
 
 async function currentProduction() {
-    const processHandler_instance = await processHandler_contract(web3.currentProvider).at(harvest);
+    const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     const production = await processHandler_instance.currentProduction.call().then((production) => {
         return production;
     });
