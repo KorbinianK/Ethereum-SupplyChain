@@ -181,6 +181,10 @@ contract ProcessHandler is Ownable {
     function getProduction(uint _id) public view returns(address) {
         return productions[_id];
     }
+
+    function getTransportFromProduction(address _production) public view returns(address){
+        return productionToTransport[_production][productionToTransport[_production].length-1];
+    }
     
     
     /** 

@@ -11,7 +11,6 @@ import "../general/strings.sol";
  * @title The Harvest contract
  */
 contract Harvest is TransactionOwner, Ownable, ERC20Handler {
-     using strings for *;
 
     address[] private fieldArray;
     uint private year;
@@ -53,8 +52,7 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     */
     function harvestFields() public {
         for(uint i = 0; i < fieldArray.length; i++) {
-            Field(fieldArray[i]).harvest(address(this));
-            updateTransaction(msg.sender,bytes("Harvested: ".toSlice().concat((this.addressToString()).toSlice())));
+            Field(fieldArray[i]).harvest(this);
         }
     }
 
@@ -67,10 +65,12 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
         addField(_fieldAddress);
         fieldBalance[_fieldAddress] += _value;
-        // updateTransaction(msg.sender,bytes("Weighted: ".toSlice().concat((address(_fieldAddress).addressToString()).toSlice())));
-        updateTransaction(msg.sender,bytes((address(_fieldAddress).addressToString())));
-        Field(_fieldAddress).harvest(this);
+        // Field(_fieldAddress).harvest(this);
         emit WeightInput(_value);
+    }
+
+    function finish() public {
+        harvestFields();
     }
 
    /**

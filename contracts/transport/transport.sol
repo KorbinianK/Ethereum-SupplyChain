@@ -57,7 +57,7 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
      * @return _longitude Location longitude
      * @return _latitude Location latitude
     */
-    function getStartCoordinates() public returns(string,string){
+    function getStartCoordinates() public view returns(string,string){
         return(start_latitude, start_longitude);
     }
     

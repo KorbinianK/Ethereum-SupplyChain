@@ -11,14 +11,6 @@ import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 
 
-export async function finalBottle(production) {
-    const transport = await currentTransport();
-    const harvest = await getHarvestsFromTransport(transport);
-    const fields = await getFieldsFromHarvest(harvest);
-    console.log("Transporter:",transport);
-    console.log("Harvest:",harvest);
-    console.log("Fields:",fields);
-}
 
 
 export async function newProduction() {
@@ -53,7 +45,7 @@ export async function newProduction() {
                         return prodAddr;
                 }
             };
-    }).catch(err => console.error("woopsie",err));
+    }).catch(err => console.error("ie",err));
     var json = await productionAsJson(address);
     return loadProductionCard(json);
 }
@@ -128,10 +120,13 @@ export async function addTransport(production) {
 
 export async function productionAsJson(production) {
     const production_instance = await production_contract(web3.currentProvider).at(production);
+    const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+
     let txSender;
     var json = {};
     
     json["address"] = production;
+    json["transport"] = await processhandler_instance.getTransportFromProduction.call(production).then(result => {return result;});
     json["ID"] = await production_instance.getID.call().then(result => {return result;});
     json['transactions'] = await getAllTransactions(production);
     json['tokenBalance'] = await tx.getBalance(production_instance);
@@ -141,6 +136,8 @@ export async function productionAsJson(production) {
     //     let sender = {"address": txSender[i]};
     //     json["txSender"].push(sender);
     //     }
+    console.log("j",json);
+    
     return json;
 }
 

@@ -101,7 +101,6 @@ contract TransactionOwner {
         addTransaction(_sender, _data); 
     }
 
-    
     /**
     * @dev Gets transaction data at a index
     * @param _index pointer to check
@@ -203,10 +202,10 @@ contract TransactionOwner {
         return false;
     }
 
-    /**
-    * @dev Constructor of the contract. Adds a default sender and transactio
-    */
-    constructor() public{
-        addTransaction(0x0, "");
-    }
+    // /**
+    // * @dev Constructor of the contract. Adds a default sender and transaction
+    // */
+    // constructor() public{
+    //     addTransaction(0x0, "");
+    // }
 }

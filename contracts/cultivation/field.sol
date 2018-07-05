@@ -66,7 +66,6 @@ contract Field is TransactionOwner {
         _;
     }
     
-    
     /**
     * @dev Simply struct for the Location of the vineyard
     */
@@ -86,7 +85,7 @@ contract Field is TransactionOwner {
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
         // switchStatus();   // deactivated for showcase     
-        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat(_harvest.addressToString().toSlice())));
+        updateTransaction(msg.sender,bytes("Harvested".toSlice().concat("".toSlice())));
     }
     
     /**
@@ -97,6 +96,15 @@ contract Field is TransactionOwner {
     function getHarvestPointer(address _harvest) public view returns(uint) {
         return harvestPointer[_harvest];
     } 
+
+    /**
+    * @dev Gets the previous harvest in relation to another
+    * @param _current Address of a current harvest contract
+    * @return address of the previous harvest
+    */
+    function getPreviousHarvest(address _current) public view returns (address){
+        return previousHarvest[_current];
+    }
 
     /**
     * @dev Overloading the transaction function from TransactionOwner to check if a field can accept data
@@ -269,7 +277,6 @@ contract Field is TransactionOwner {
     */
     function setType(string _type) public onlyCreator returns(bool) {
         grapeType = _type;
-        updateTransaction(msg.sender,bytes(("Type set to: ").toSlice().concat(_type.toSlice())));
         return true;
     }
 
@@ -283,7 +290,6 @@ contract Field is TransactionOwner {
     function setLocation(string _lat, string _long) public onlyCreator returns(bool) {
         location.latitude = _lat;
         location.longitude = _long;
-         updateTransaction(msg.sender,bytes(("Location set to: ").toSlice().concat(_lat.toSlice())));
 
         return true;
     }
@@ -295,7 +301,6 @@ contract Field is TransactionOwner {
     */
     function setPicture(bytes _picture) public onlyCreator returns(bool){
         picture = _picture;
-        updateTransaction(msg.sender,("Picture updated").stringToBytes());
         return true;
     }
 
@@ -307,8 +312,6 @@ contract Field is TransactionOwner {
     function addPermissionedAccount(address _sender) public onlyCreator returns(bool){
         permissionedAccounts.push(_sender);
         isAllowed[_sender] = true;
-        updateTransaction(msg.sender,bytes(("Permissioned account added:").toSlice().concat(_sender.addressToString().toSlice())));
-
     }
   
     /**
@@ -320,8 +323,6 @@ contract Field is TransactionOwner {
         }else{
             stage = Stages(uint(stage) + 1);
         }
-        updateTransaction(msg.sender,("Stage updated").stringToBytes());
-
         emit NewStage(stage);
     }
 

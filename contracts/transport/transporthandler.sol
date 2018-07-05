@@ -185,11 +185,19 @@ contract TransportHandler is Ownable {
     
 
     /** 
-     * @dev Returns the harvest added to a transport
-     * @return address of the harvest
+     * @dev Returns the harvests added to a transport
+     * @return address[] array of the harvests
     */
     function getHarvestsFromTransport(address _transportAddress) public view returns (address[]){
         return transportToHarvest[_transportAddress];
+    }
+
+    /** 
+     * @dev Returns the last harvest added to a transport
+     * @return address of the harvest
+    */
+    function getHarvestFromTransport(address _transportAddress) public view returns (address){
+        return transportToHarvest[_transportAddress][transportToHarvest[_transportAddress].length-1];
     }
 
     /** 

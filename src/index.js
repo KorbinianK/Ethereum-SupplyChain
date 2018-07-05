@@ -8,6 +8,7 @@ import * as FieldModule from "./fields.js";
 import * as HarvestModule from "./harvests.js";
 import * as TransportModule from "./transports.js";
 import * as ProcessingModule from "./processing.js";
+import * as BottleModule from "./bottle.js";
 import { 
   default as Web3
 } from 'web3';
@@ -75,19 +76,12 @@ window.App = {
 
   changeFieldStatus: async function (address) {
     await Router.modules.FieldModule()
-      .then(module => module.changeStatus(address)).then(() => {
-        Router.modules.FieldModule()
-          .then(module => module.openField(address));
-      });
+      .then(module => module.changeStatus(address));
 
   },
   addFieldTransaction: async function (address) {
     Router.modules.FieldModule()
-      .then(module => module.addFieldTransaction(address)).then(() => {
-        Router.modules.FieldModule()
-          .then(module => module.openField(address));
-      });
-
+      .then(module => module.addFieldTransaction(address));
   },
   getFieldCards: function () {
     Router.modules.FieldModule()
@@ -228,11 +222,7 @@ window.App = {
     .ProcessingModule()
     .then(module => module.getProductionCards());
    },
-  getBottle: function() {
-    Router.modules
-    .ProcessingModule()
-    .then(module => module.finalBottle());
-  },
+  
   newProduction: function() {
     Router.modules
     .ProcessingModule()
@@ -247,6 +237,15 @@ window.App = {
       .ProcessingModule()
       .then(module => module.addTransport(address));
   },
+
+// Bottle
+
+getBottle: function() {
+  Router.modules
+  .BottleModule()
+  .then(module => module.finalBottle());
+},
+
 };
 window.addEventListener('load', function () {
   window.App.init();

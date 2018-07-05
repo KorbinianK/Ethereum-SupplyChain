@@ -8,22 +8,22 @@ export async function getTotalTransactionCount(instance){
     if (await txCount.toString() == undefined) {
         return 0;
     }
-    return await txCount.toString();
+    return txCount.toString();
 }
 
 export async function getTransactionTimeAtIndex(instance, index) {
     const time = await instance.getTransactionTimeAtIndex.call(index).then(result => {return result});
-    return await time.toString();
+    return time.toString();
 }
 
 export async function getTransactionSenderAtIndex(instance, index) {
     const sender = await instance.getTransactionSenderAtIndex.call(index).then(result => {return result});
-    return await sender;
+    return sender;
 }
 
 export async function getTransactionDataAtIndex(instance, index) {
     const data = await instance.getTransactionDataAtIndex.call(index).then(result => {return result});
-    return await data;
+    return data;
 }
 
 export async function doDummyTransaction(instance) {
@@ -44,13 +44,17 @@ export async function doDummyTransaction(instance) {
 export async function addTransaction(instance,sender,data) {
     const account = await helper.getAccount();
     var hexData = web3.utils.stringToHex(data);
-    return await instance.addTransaction(
+    const receipt = await instance.addTransaction(
         sender,
         hexData, {
             from: account,
             gas: 400000
         }
-    );
+    ).then(receipt => {
+        return receipt;
+        }
+    ).catch(err => console.error("Cannot add Transaction",err));
+    return receipt;
 }
 
 export async function getBalance(instance) {

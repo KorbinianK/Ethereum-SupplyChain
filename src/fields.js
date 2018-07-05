@@ -24,7 +24,7 @@ export async function updateName(address,newName) {
             }
         };
         }
-    ).catch(err => console.error("woopsie",err));
+    ).catch(err => console.error("Error updating the name",err));
     getFieldCards();
     return openField(address);
 }
@@ -88,14 +88,11 @@ export async function getTransactionTimeAtIndex(address, index) {
 
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);
-    var json = 
-       []
-    ;
+    var json = [];
     for (let i = 0; i < txCount; i++) {
         let tx = {};
-        let data = await getTransactionDataAtIndex(address, i);
         tx.sender = await getTransactionSenderAtIndex(address, i);
-        tx.data = web3.utils.hexToAscii(data);
+        tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
         tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
@@ -108,18 +105,18 @@ export async function getAllTransactions(address) {
 
 
 export async function loadSingleField(address){
+    helper.toggleLoader("details",false);    
     const json = await fieldAsJson(address);
-   return loadSingleFieldCard(json);
+    return loadSingleFieldCard(json);
 }
 
 
 export async function getFieldCards(){
     $('#cultivationSection').find(".loader").removeClass("d-none");
-    $('#cultivationSection').removeClass("d-none");
     $('#fields').empty();
-    await getAllFields().then(fields =>{ 
+    await getAllFields().then(async fields =>{ 
         for (let i = 0; i < fields.length; i++) {
-            loadSingleFieldCard(fields[i]);
+            document.getElementById('fields').innerHTML += await loadSingleFieldCard(fields[i]);
         }
     });
     $('#cultivationSection').find(".loader").addClass("d-none");
@@ -142,45 +139,35 @@ export async function getAllFields(){
 
 
 export async function getHarvestableFields(filter) {
-    var toFilter = filter.fields;
-    const fields = await getAllFields().then(fields =>{
-        let harvestable = [];
-         for (let i = 0; i < fields.length; i++) {
-            if(fields[i].harvestable){
-                harvestable.push(fields[i]);
-            }
-         }
-         return harvestable;
-    });
-    // var difference = helper.objDiff(fields,toFilter);
+    var fields = await getAllFields();
     var dropdown = [];
-    // for (let i = 0; i < difference.length; i++) {
-    //     const element = difference[i];
-    //     var item = ("<option value='" + element.address + "'>" + element.name + "</option>");
-    //     dropdown.push(item);
-    // }
-     for (let i = 0; i < fields.length; i++) {
-         const element = fields[i];
-         var item = ("<option value='" + element.address + "'>" + element.name + "</option>");
-         dropdown.push(item);
-     }
+    let harvestable = [];
+    for (let i = 0; i < fields.length; i++) {
+        if(fields[i].harvestable){
+            harvestable.push(fields[i]);
+        }
+    }
+    for (let i = 0; i < harvestable.length; i++) {
+        const field = harvestable[i];
+        var item = ("<option value='" + field.address + "'>" + field.name + "</option>");
+        dropdown.push(item);
+    }
     return dropdown;
 }
 
 export async function loadSingleFieldCard(json) {
-    console.log("Json", json);
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
-    Mustache.parse(template_fields);
+    // Mustache.parse(template_fields);
     var output = Mustache.render(
         template_fields, json
     );
-    return document.getElementById('fields').innerHTML += output;
+    return output;
 }
 
 
 export async function checkHarvestable(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    const res = await field_instance.stage.call().then(result =>{ // TODO!!!!
+    const res = await field_instance.stage.call().then(result =>{
         if (result.toString() == "1"){
             return true;
         }
@@ -276,7 +263,7 @@ export async function newField() {
       }  
     });
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
-    Mustache.parse(template_fields);
+    // Mustache.parse(template_fields);
     fieldhandler_instance.newField(
         name,
         long,
@@ -288,7 +275,6 @@ export async function newField() {
     ).then( async receipt =>  {
         for (var i = 0; i < receipt.logs.length; i++) {
             var log = receipt.logs[i];
-            console.log("new field",receipt);
             if (log.event == "NewField") {
                 var fieldAddr = log.args.field;
                 var json = await fieldAsJson(fieldAddr);
@@ -299,7 +285,7 @@ export async function newField() {
                 return document.getElementById('fields').innerHTML += output;
             }
         }
-    }).catch(err => console.error("woopsie",err));
+    }).catch(err => console.error("Error creating a new field",err));
 }
 
 
@@ -309,12 +295,10 @@ export async function openField(address) {
     helper.toggleLoader("details",true);
     $("#detailsModal").modal("show");
     const template_fielddetails = await helper.fetchTemplate("src/templates/cultivation/mustache.fielddetails.html");
-    Mustache.parse(template_fielddetails);
+    // Mustache.parse(template_fielddetails);
     const field = await fieldAsJson(address).then(async(json)=>{
         json["transactions"] = await getAllTransactions(address);
-        console.log(json);
-        
-        Mustache.parse(template_fielddetails);
+        // Mustache.parse(template_fielddetails);
         var output = Mustache.render(
             template_fielddetails, json
         );
@@ -329,15 +313,16 @@ export async function addFieldTransaction(address) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
     const field_instance = await field_contract(web3.currentProvider).at(address);
-    return await tx.addTransaction(field_instance, sensor, data).then(result => {
-        console.log("tx sent", result)
-    });
-}
-// export async function addFieldTransaction(address){
-//     const field_instance = await field_contract(web3.currentProvider).at(address);
-//     var receipt = await tx.doDummyTransaction(field_instance);
-//     console.log(receipt);
-//     let block = await web3.eth.getBlock("latest")
-//     console.log(block)
-//     return openField(address);
-// }
+    await tx.addTransaction(field_instance, sensor, data).then(receipt => {
+        helper.toggleLoader("details",true);
+        for (var i = 0; i < receipt.logs.length; i++) {
+            var log = receipt.logs[i];
+            if (log.event == "NewTransaction") {
+                console.log("tx sent", receipt)
+                getFieldCards();
+                return openField(address);
+            }
+        };
+    }).catch(err => console.error("Error adding the transaction",err));
+    }
+

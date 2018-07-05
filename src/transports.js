@@ -5,6 +5,7 @@ import transportHandler_contract from "./utils/contracts/transporthandler_contra
 import transport_contract from "./utils/contracts/transport_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
+import { openHarvest } from "./harvests";
 
 export async function newTransport() {
      var details = $("#newTransportForm").serializeArray();
@@ -21,14 +22,6 @@ export async function newTransport() {
                  break;
          }
      });
-
-    const currentH = await currentHarvest();
-    const currentTransport = await getCurrentTransport();
-
-    // if (currentH != undefined && currentTransport != undefined) {
-    //     var check = checkTransport(currentH, currentTransport);
-    // }
-    // if(!check || check == undefined){
         const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
         const account = await helper.getAccount();
         const address = await transportHandler_instance.newTransport(
@@ -41,30 +34,21 @@ export async function newTransport() {
                 for (var i = 0; i < receipt.logs.length; i++) {
                     var log = receipt.logs[i];
                     if (log.event == "NewTransport") {
-                        // return getTransportCards();
                         var transpAddr = log.args.transport;
                         return transpAddr;
                     }
                 }
-            }).catch(err => console.error("woopsie",err));
+            }).catch(err => console.error("Error creating a new transprot",err));
             var json = await transportAsJson(address);
              $('#transportSection').find(".loader").addClass("d-none");
             return loadTransportCard(json);
         }
 
-// async function checkTransport(harvest,transport){
-//     const current = harvest;
-//     const newharvest = await getHarvest(transport);
-//     if(current == newHarvest){
-//         return false;
-//     }return true;
-// }
-
 export async function getCurrentTransport(){
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const transport = await transportHandler_instance.currentTransport.call().then((res) => {
         return res;
-    }).catch(err => console.error(err));
+    }).catch(error =>{return console.error("Error fetching the current transport",error)});
     
     return transport;
 }
@@ -73,7 +57,7 @@ export async function currentHarvest() {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const result = await transportHandler_instance.currentHarvest.call().then((res) => {
         return res;
-    }).catch(error =>{return console.error("woopsie",error)});
+    }).catch(error =>{return console.error("Error fetching the current harvest",error)});
     return result;
 }
 
@@ -81,7 +65,7 @@ async function getHarvest(address) {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const harvest = await transportHandler_instance.getHarvestsFromTransport.call(address).then(result => {
         return result;
-    });
+    }).catch(error =>{return console.error("Error fetching harvest:",address,error)});
     return harvest;
 }
 
@@ -89,27 +73,17 @@ async function getID(transport){
      const transport_instance = await transport_contract(web3.currentProvider).at(transport);
      const ID = transport_instance.getID.call().then(result => {
          return result;
-     });
-     return ID;
+        }).catch(error =>{return console.error("Error getting the ID",error)});
+        return ID;
 }
 
 export async function transportAsJson(transport) {
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
-
-    let start_latitude;
-    let start_longitude;
-    let end_latitude;
-    let end_longitude;
-    let txSender = [];
-    let harvests = [];
-
     const startLocation = await transport_instance.getStartCoordinates.call().then(result => {
         return result;
     });
-    console.log("start",startLocation);
-    
     var json = {};
-
+    json["txSender"] = [];
     json["address"] = transport;
     json["harvestAddress"] = await getHarvest(transport);
     json["ID"] = await getID(transport);
@@ -117,21 +91,19 @@ export async function transportAsJson(transport) {
     json['tokenBalance'] = await tx.getBalance(transport_instance);
     json["start_latitude"] = startLocation[0];
     json["start_longitude"] = startLocation[1];
-    // json["end_latitude"] = await transport_instance.end_latitude.call().then(result => {return result;});
-    // json["end_longitude"] = await transport_instance.end_longitude.call().then(result => {return result;});
     json["totalTransactions"] = await getTotalTransactionCount(transport);
 
-    txSender = await transport_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
-    // for (let i = 0; i < txSender.length; i++) {
-    //     let sender = {"address": txSender[i]};
-    //     json["txSender"].push(sender);
-    //     }
+    var txSender = await transport_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
+    for (let i = 0; i < txSender.length; i++) {
+        let sender = {"address": txSender[i]};
+        json["txSender"].push(sender);
+        }
     return json;
 }
 
 async function loadTransportCard(json){
     const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
-    Mustache.parse(template_transports);
+    // Mustache.parse(template_transports);
     var output = Mustache.render(
         template_transports, json
     );
@@ -175,7 +147,7 @@ export async function loadSingleTransport(address) {
      helper.toggleLoader("details",true);
     $("#detailsModal").modal("show");
     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
-    Mustache.parse(template_transportdetails);
+    // Mustache.parse(template_transportdetails);
     const json = await transportAsJson(address);
     var output = Mustache.render(
         template_transportdetails, json
@@ -186,13 +158,14 @@ export async function loadSingleTransport(address) {
      }
 }
 
-export async function addData(address) {
+export async function addData(transport) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
-    const transport_instance = await transport_contract(web3.currentProvider).at(address);
-    tx.addTransaction(transport_instance,sensor, data).then(result => {
+    const transport_instance = await transport_contract(web3.currentProvider).at(transport);
+    await tx.addTransaction(transport_instance,sensor, data).then(result => {
         console.log("tx sent",result)
-    });
+        return loadSingleTransport(transport);
+    }).catch(err => (console.error("Transaction failed", err)));
 }
 
 export async function addHarvest(transport) {
@@ -201,11 +174,11 @@ export async function addHarvest(transport) {
     var harvest = $("#harvest-input").val();
     var amount = $("#harvestValue-input").val();
     console.log("from",harvest,"amout",amount);
-    return await transporthandler_instance.addFromHarvest(harvest, transport, amount, {
+    await transporthandler_instance.addFromHarvest(harvest, transport, amount, {
         from: account
     }).then(result => {
         console.log(result);
-        return result
+        return loadSingleTransport(transport);
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
@@ -213,6 +186,7 @@ export async function addHarvest(transport) {
 
 export async function getTotalTransactionCount(address) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
+    console.log("transport",address);
     const txCount = await tx.getTotalTransactionCount(transport_instance);
     return txCount;
 }
@@ -238,14 +212,12 @@ export async function getTransactionTimeAtIndex(address, index) {
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);
     var json = [];
-    if(txCount >0){
          for (let i = 0; i < txCount; i++) {
              let tx = {};
              tx.sender = await getTransactionSenderAtIndex(address, i);
              tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
              tx.time = await getTransactionTimeAtIndex(address, i);
              json.push(tx);
-         }
     }
     return json;
 }
