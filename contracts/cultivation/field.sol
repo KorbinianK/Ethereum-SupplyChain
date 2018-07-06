@@ -86,7 +86,7 @@ contract Field is TransactionOwner {
         lastHarvest = _harvest;
         // switchStatus();   // deactivated for showcase     
         updateTransaction(msg.sender,bytes("Harvested".toSlice().concat("".toSlice())));
-    }
+    } 
     
     /**
     * @dev Gets the transaction count at the time of harvest
@@ -95,6 +95,26 @@ contract Field is TransactionOwner {
     */
     function getHarvestPointer(address _harvest) public view returns(uint) {
         return harvestPointer[_harvest];
+    } 
+
+    /**
+    * @dev Gets the transaction pointer for a harvest
+    * @param _harvest Address of a harvest contract
+    * @return uint transaction pointer
+    */
+    function getHarvestPointers(address _harvest) public view returns(uint, uint) {
+        address prev = getPreviousHarvest(_harvest);
+        uint start = harvestPointer[prev]+1;
+        uint end = harvestPointer[_harvest];
+        return (start, end);
+    } 
+
+    /**
+    * @dev Gets the address of the last harvest
+    * @return address of the harvest
+    */
+    function getLastHarvest() public view returns(address) {
+        return lastHarvest;
     } 
 
     /**
@@ -270,7 +290,7 @@ contract Field is TransactionOwner {
         return true;
     }
 
-     /**
+    /**
     * @dev Updates the grape type of the vineyard
     * @param _type the new type of grapes 
     * @return bool
@@ -279,7 +299,6 @@ contract Field is TransactionOwner {
         grapeType = _type;
         return true;
     }
-
 
     /**
     * @dev Updates the location of the vineyard

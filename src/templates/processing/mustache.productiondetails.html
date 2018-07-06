@@ -1,4 +1,4 @@
-<div class="card col">
+<div class="card col  {{#status}}border-success{{/status}}{{^status}} border-danger {{/status}}">
     <div class="card-body ">
         <h5 class="card-title float-left">ID: {{ID}}</h5>
 <h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
@@ -7,7 +7,7 @@
         </h6>
         <p class="card-text">
             <div id="transportAddress">
-                <strong>Contains Transports:</strong> {{transportAddress}}</div>
+                <strong>Contains Transports:</strong> {{transport}}</div>
         </p>
         <!-- Transport -->
         <div class="row">

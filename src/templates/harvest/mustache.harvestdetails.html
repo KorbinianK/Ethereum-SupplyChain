@@ -1,10 +1,12 @@
-<div class="card w-100">
+<div class="card w-100  {{#status}}border-success{{/status}}{{^status}} border-danger {{/status}}">
     <div class="card-header">
-<h5 class="card-title float-left">Year: {{year}}</h5>
-<h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
+
+        <h5 class="card-title float-left">Year: {{year}}</h5>
+        <span class="ml-1 badge {{#status}}badge-light {{/status}}{{^status}} text-white bg-danger {{/status}}">&nbsp;{{#status}}In progress{{/status}}{{^status}}finished{{/status}}</span>
+        <h5 class="float-right card-title">Balance: {{tokenBalance}}</h5>
     </div>
     <div class="card-body ">
-        
+
         <h6 class=" card-subtitle mb-2 text-muted">
             <small>{{address}}</small>
         </h6>
@@ -27,7 +29,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="harvestableFields-select">Field</label>
                     </div>
-                    <select class="form-control" id="harvestableFields-select">
+                    <select class="form-control" id="harvestableFields-select" {{^status}} disabled {{/status}}>
                     </select>
                 </div>
             </div>
@@ -36,7 +38,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="harvest-amount">Amout</label>
                     </div>
-                    <input type="number" class="form-control" name="" id="harvest-amount" placeholder="">
+                    <input type="number" class="form-control" name="" id="harvest-amount" placeholder="" {{^status}} disabled {{/status}}>
                     <div class="input-group-append">
                         <label class="input-group-text" for="harvest-amount">kg</label>
                     </div>
@@ -45,7 +47,7 @@
 
 
         </div>
-        <button type="button" name="harvest" id="harvestBtn" onclick="App.harvest()" class="btn btn-success btn-lg btn-block">Harvest</button>
+        <button type="button" name="harvest" {{^status}} disabled {{/status}} id="harvestBtn" onclick="App.harvest()" class="btn btn-lg btn-block {{#status}} btn-success {{/status}}{{^status}} btn-danger {{/status}}">Harvest</button>
         <!-- <button onclick="App.addFieldTransaction('{{address}}')" class="btn btn-link btn-sm card-link">Add Transaction</button> -->
         <!-- <a href="#" class="card-link">Another link</a> -->
     </div>

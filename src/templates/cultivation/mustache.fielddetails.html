@@ -1,74 +1,80 @@
+<div id="{{address}}-card" class="card col field-details {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
+    <div class="card-body">
 
-    <div id="{{address}}-card" class="card col field-details {{#harvestable}}border-success {{/harvestable}}{{^harvestable}} border-danger {{/harvestable}}mx-1">
-        <div class="card-body">
-            <!-- <button type="button" class="close" onclick="App.closeDetails()">
-                    <span aria-hidden="true">&times;</span>
-            </button> -->
-            <h5 class="card-title">
-                <span class="field-name float-left">{{name}}&nbsp;</span>
-                <small>Stage: {{stage}} </small>
-                <h6 class="card-subtitle mb-2 text-muted">
-                    <small>Address: {{address}}</small>
-                </h6>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <button class="text-white btn btn-secondary btn-block changeFieldName" data-address="{{address}}" type="button">Change Name</button>
-                    </div>
-                    <input type="text" id="{{address}}-nameInput" class="form-control" placeholder="New name " aria-label="Name" aria-describedby="nameLabel">
+        <h5 class="card-title">
+            <span class="field-name float-left">{{name}}&nbsp;</span>
+            <small>Stage: {{stage}} </small>
+            <h6 class="card-subtitle mb-2 text-muted">
+                <small>Address: {{address}}</small>
+            </h6>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <button class="text-white btn btn-secondary btn-block changeFieldName" data-address="{{address}}" type="button">Change Name</button>
                 </div>
-
-                <button class="text-white btn btn-secondary btn-block" onclick="App.changeFieldStatus('{{address}}')" data-address="{{address}}"
-                    type="button">Change Status</button>
-                <p class="card-text">
-                    <strong>Latitude:</strong> {{latitude}}
-                    <strong>Longitude:</strong> {{longitude}}</p>
-                <p class="card-text"></p>
-                <p class="card-text">
-                    <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
-                <p class="card-text">
-                    <strong>Total TX:</strong> {{totalTransactions}}</p>
-                <p class="card-text">
-                    <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
-<!-- Transactions -->
-<div class="row pt-5">
-    <div class="form-group col">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="transactionList"> Transactions:&nbsp;
-                    <span id="txCount">{{totalTransactions}}</span>
-                </label>
+                <input type="text" id="{{address}}-nameInput" class="form-control" placeholder="New name " aria-label="Name" aria-describedby="nameLabel">
             </div>
-            <select class="form-control" id="transactionList">
-                {{#transactions}}
-                <option value="{{sender}}">{{data}}</option>
-                {{/transactions}}
-            </select>
-        </div>
+
+            <button class="text-white btn btn-secondary btn-block" onclick="App.changeFieldStatus('{{address}}')" data-address="{{address}}"
+                type="button">Change Status</button>
+            <p class="card-text">
+                <strong>Latitude:</strong> {{latitude}}
+                <strong>Longitude:</strong> {{longitude}}</p>
+            <p class="card-text"></p>
+            <p class="card-text">
+                <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
+            <p class="card-text">
+                <strong>Total TX:</strong> {{totalTransactions}}</p>
+            <p class="card-text">
+                <strong>TX since last Harvest:</strong> {{transactionCountHarvest}}</p>
+            <!-- Transactions -->
+            <div class="row pt-5">
+                <div class="form-group col">
+                    <div class="form-group mb-3">
+                        <label for="transactionList"><strong>All Transactions:&nbsp;</strong> 
+                                {{totalTransactions}}
+                        </label>
+                       
+                        <select class="form-control" id="transactionList">
+                            {{#transactions}}
+                            <option value="{{sender}}">{{time}}-{{data}}</option>
+                            {{/transactions}}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="transactionListHarvest"><strong>T. since harvest:&nbsp;</strong> 
+                                {{transactionCountHarvest}}
+                        </label>
+                        <select class="form-control" id="transactionListHarvest">
+                            {{#transactions-harvest}}
+                            <option value="{{sender}}">{{time}}-{{data}}</option>
+                            {{/transactions-harvest}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col">
+                    <div class="input-group mb-3 ">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="sensor-select">Type</label>
+                        </div>
+                        <select class="form-control" id="sensor-select">
+                            <option value="0xf17f52151EbEF6C7334FAD080c5704D77216b732">Pesticide</option>
+                            <option value="0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef">Fertilzer</option>
+                            <option value="0x49cf3e81ca65b7866f4f83680750636d7a928549">Soil Sample</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group mb-3 ">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="data-input">Data</label>
+                        </div>
+                        <input type="text" class="form-control" name="" id="data-input" placeholder="">
+
+                    </div>
+                </div>
+            </div>
+            <button onclick="App.addFieldTransaction('{{address}}')" class="text-white btn-lg btn btn-primary btn-block card-link">Add Transaction</button>
     </div>
 </div>
-<div class="form-row">
-    <div class="col">
-        <div class="input-group mb-3 ">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="sensor-select">Type</label>
-            </div>
-            <select class="form-control" id="sensor-select">
-                <option value="0xf17f52151EbEF6C7334FAD080c5704D77216b732">Pesticide</option>
-                <option value="0xC5fdf4076b8F3A5357c5E395ab970B5B54098Fef">Fertilzer</option>
-                <option value="0x49cf3e81ca65b7866f4f83680750636d7a928549">Soil Sample</option>
-            </select>
-        </div>
-    </div>
-    <div class="col">
-        <div class="input-group mb-3 ">
-            <div class="input-group-prepend">
-                <label class="input-group-text" for="data-input">Data</label>
-            </div>
-            <input type="text" class="form-control" name="" id="data-input" placeholder="">
-
-        </div>
-    </div>
-</div>
-                <button onclick="App.addFieldTransaction('{{address}}')" class="text-white btn-lg btn btn-primary btn-block card-link">Add Transaction</button>
-        </div>
-    </div>

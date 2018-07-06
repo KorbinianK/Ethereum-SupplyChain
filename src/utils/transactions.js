@@ -69,7 +69,7 @@ export async function getBalance(instance) {
 export async function getStatus(instance) {
     const status = await instance.getStatus.call().then(result => {
         console.log("status", result.toString());
-        return result.toString();
+        return result;
     });
     return await status;
 }

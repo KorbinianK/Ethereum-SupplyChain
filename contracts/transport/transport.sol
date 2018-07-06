@@ -34,6 +34,26 @@ contract Transport is TransactionOwner, Ownable, ERC20Handler{
         createdAt = now;
     }
 
+    /**
+    * @dev Overloading the default transfer function to check if account is empty 
+    * @param to address of the receiver
+    * @param value the amount to transfer
+    */
+    function transfer(address to, uint256 value) public returns(bool){
+        if(getBalance() - value == 0){
+            finish();
+        }
+        super.transfer(to, value);
+        return true;
+    }
+
+    /**
+    * @dev Finished the transport and disables transactions to it
+    */
+    function finish() public {
+        switchStatus();
+    }
+
     /** 
      * @dev Adds a harvest to a transport
      * @param _harvest address of a harvest

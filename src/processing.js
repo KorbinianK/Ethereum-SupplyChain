@@ -126,12 +126,12 @@ export async function productionAsJson(production) {
     var json = {};
     
     json["address"] = production;
-    json["transport"] = await processhandler_instance.getTransportFromProduction.call(production).then(result => {return result;});
-    json["ID"] = await production_instance.getID.call().then(result => {return result;});
+    json["transport"] = await processhandler_instance.getTransportFromProduction.call(production);
+    json["ID"] = await production_instance.getID.call();
     json['transactions'] = await getAllTransactions(production);
     json['tokenBalance'] = await tx.getBalance(production_instance);
     json["totalTransactions"] = await getTotalTransactionCount(production);
-    json["txSender"] = await production_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
+    json["txSender"] = await production_instance.getAllUniqueTransactionSender.call();
     // for (let i = 0; i < txSender.length; i++) {
     //     let sender = {"address": txSender[i]};
     //     json["txSender"].push(sender);

@@ -84,7 +84,7 @@ export async function transportAsJson(transport) {
     });
     var json = {};
     json["txSender"] = [];
-    json["address"] = transport;
+    json["address"] = transport; 
     json["harvestAddress"] = await getHarvest(transport);
     json["ID"] = await getID(transport);
     json['transactions'] = await getAllTransactions(transport);
@@ -92,7 +92,7 @@ export async function transportAsJson(transport) {
     json["start_latitude"] = startLocation[0];
     json["start_longitude"] = startLocation[1];
     json["totalTransactions"] = await getTotalTransactionCount(transport);
-
+    json["status"] = await tx.getStatus(transport_instance);
     var txSender = await transport_instance.getAllUniqueTransactionSender.call().then(result => {return result;});
     for (let i = 0; i < txSender.length; i++) {
         let sender = {"address": txSender[i]};
@@ -186,7 +186,6 @@ export async function addHarvest(transport) {
 
 export async function getTotalTransactionCount(address) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
-    console.log("transport",address);
     const txCount = await tx.getTotalTransactionCount(transport_instance);
     return txCount;
 }

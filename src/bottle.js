@@ -12,23 +12,30 @@ import * as tx from "./utils/transactions";
 
 
 
+
+
+// field.getHarvestPointer!
+
+
 export async function finalBottle() {
     const production = await currentProduction()
     console.log("Production:",  production);
     const transport = await getTransportFromProduction(production)
     console.log("Transporter:", transport);
-    const harvest = await getHarvestFromTransport( transport)
+    const harvest = await getHarvestFromTransport(transport)
     console.log("Harvest:",  harvest);
-    const fields = await getFieldsFromHarvest( harvest);
-    console.log("Fields:",  fields);
+    const fields = await getFieldsFromHarvest(harvest);
+    console.log("Fields:", fields);
 
     return;
            
 }
 
 async function getTransportFromProduction(production) {
-    const processHandler_instance = await processHandler_contract(web3.currentProvider).at(production);
-    const transport = await processHandler_instance.getTransportFromProduction.call(production);
+    const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+    const transport =  await processhandler_instance.getTransportFromProduction.call(production);
+    console.log("?!",production);
+    
     return transport;
 }
 

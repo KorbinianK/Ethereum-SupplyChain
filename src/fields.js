@@ -96,8 +96,11 @@ export async function getAllTransactions(address) {
         tx.time = await getTransactionTimeAtIndex(address, i);
         json.push(tx);
     }    
+    json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
     return json;
 }
+
+
 
 
 
@@ -218,7 +221,7 @@ export async function fieldAsJson(address) {
             "picture": picture,
             "latitude": latitude,
             "longitude": longitude,
-            "transactionCountHarvest": txHarvest.toString(),
+            "transactionCountHarvest": await field_instance.transactionsSinceLastHarvest.call().then(s => {return s.toString()}),
             "totalTransactions" : totalTransactionCount,
             "txSender": [],
         }
@@ -237,6 +240,24 @@ export async function fieldAsJson(address) {
         return json;
     });
    return res;
+}
+
+async function getTransactionsSinceHarvest(address){
+    var json = [];
+    const field_instance = await field_contract(web3.currentProvider).at(address);
+    const lastHarvest = await field_instance.getLastHarvest.call();
+    // const previous = await field_instance.getPreviousHarvest.call(lastHarvest);
+    const startPointer = await field_instance.getHarvestPointer.call(lastHarvest).then(s => {return s.toString()});
+    const endPointer = await getTotalTransactionCount(address);
+    for (let i = startPointer; i < endPointer; i++) {
+            let tx = {};
+            tx.sender = await getTransactionSenderAtIndex(address, i);
+            tx.data = web3.utils.hexToString(await getTransactionDataAtIndex(address, i));
+            tx.time = await getTransactionTimeAtIndex(address, i);
+            json.push(tx);
+        }
+        json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
+    return json;
 }
 
 export async function newField() {
@@ -263,7 +284,6 @@ export async function newField() {
       }  
     });
     const template_fields = await helper.fetchTemplate("src/templates/cultivation/mustache.fieldcard.html");
-    // Mustache.parse(template_fields);
     fieldhandler_instance.newField(
         name,
         long,
@@ -298,7 +318,9 @@ export async function openField(address) {
     // Mustache.parse(template_fielddetails);
     const field = await fieldAsJson(address).then(async(json)=>{
         json["transactions"] = await getAllTransactions(address);
-        // Mustache.parse(template_fielddetails);
+        json["transactions-harvest"] = await getTransactionsSinceHarvest(address);
+        console.log("json",json);
+        
         var output = Mustache.render(
             template_fielddetails, json
         );

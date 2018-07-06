@@ -159,10 +159,8 @@ contract TransportHandler is Ownable {
         transportToHarvest[_transport].push(harvest);
         uint256 totalBalance = harvestBalance(harvest);
         require(totalBalance > 0);
-        // require(harvest.call(bytes4(keccak256("switchStatus()"))));
         require(harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, totalBalance));
         emit ReceiveHarvest(harvest,totalBalance);
-        // require(harvest.call(bytes4(keccak256("harvestFields()"))));
     }
 
     /** 
@@ -179,7 +177,6 @@ contract TransportHandler is Ownable {
         require(totalBalance > 0);
         require(_value <= totalBalance);
         require(_harvest.call(bytes4(keccak256("transfer(address,uint256)")), _transport, _value));
-
         emit ReceiveHarvest(_harvest, _value);
     }
     

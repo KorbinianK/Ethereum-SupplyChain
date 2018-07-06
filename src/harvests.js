@@ -50,15 +50,6 @@ export function loadHarvestFields(harvestAddress){
             }).catch(err => console.error(err));
 }
 
-export async function loadAll() { 
-
-    // console.log($(".navbar-nav").find(".active"))
-    // .each(function (e) {
-    //     console.log(e);
-    //     this.removeClass("active");
-    // })
-
-};
 
 export async function loadDropdown() {
     document.getElementById("harvestSelect").innerHTML = '';
@@ -76,11 +67,17 @@ export async function loadDropdown() {
             let year = {};
             year.address = result[i];
             year.year = await harvest_instance.getYear({from:account});
+            year.status = await tx.getStatus(harvest_instance);
             years.push(year);
         }
         let arr = _.sortBy(years, "year").reverse();
-        arr.forEach(element => {
-            document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
+        arr.forEach(harvest => {
+            if(harvest.status){
+                status = "";
+            }else{
+                status = " - finished";
+            }
+            document.getElementById('harvestSelect').innerHTML += ("<option value='" + harvest.address + "'>" + harvest.year +status+" </option>");
         });
         
     }).catch(err => console.error(err));
@@ -116,6 +113,8 @@ export async function openHarvest(address){
     var output = Mustache.render(
         template_harvestdetails, json
     );
+    console.log("Harvest:",json);
+    
     const options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
     helper.toggleLoader("details",false);
     document.getElementById('details').innerHTML = output;
