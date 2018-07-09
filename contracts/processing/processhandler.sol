@@ -183,10 +183,24 @@ contract ProcessHandler is Ownable {
     }
 
 
+    /**
+    @dev Gets the last Transport from the production
+    @param _production Address of the production
+    @return address of the transport
+     */
     function getTransportFromProduction(address _production) public view returns(address){
         return productionToTransport[_production][productionToTransport[_production].length-1];
     }
     
+
+    /**
+    @dev Gets all Transports from the production
+    @param _production Address of the production
+    @return address[] of the transports
+     */
+    function getTransportsFromProduction(address _production) public view returns(address[]){
+        return productionToTransport[_production];
+    }
     
     /** 
      * @dev The constructor function

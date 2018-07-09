@@ -1,4 +1,5 @@
 import * as helper from "./helper_scripts";
+import awaitTransactionMined from "await-transaction-mined";
 
 export async function getTotalTransactionCount(instance){
     const txCount = await instance.getTotalTransactionCount.call().then((res) => {
@@ -44,17 +45,18 @@ export async function doDummyTransaction(instance) {
 export async function addTransaction(instance,sender,data) {
     const account = await helper.getAccount();
     var hexData = web3.utils.stringToHex(data);
-    const receipt = await instance.addTransaction(
+    return await instance.addTransaction(
         sender,
         hexData, {
             from: account,
             gas: 400000
         }
-    ).then(receipt => {
-        return receipt;
+    ).then(async receipt => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(result =>{
+            return result;
+        });
         }
     ).catch(err => console.error("Cannot add Transaction",err));
-    return receipt;
 }
 
 export async function getBalance(instance) {

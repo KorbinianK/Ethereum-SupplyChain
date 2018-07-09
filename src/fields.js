@@ -6,6 +6,8 @@ import fieldHandler_contract from "./utils/contracts/fieldhandler_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 import { getFieldName } from "./harvests";
+import awaitTransactionMined from "await-transaction-mined";
+
 
 export async function updateName(address,newName) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
@@ -13,20 +15,23 @@ export async function updateName(address,newName) {
     await field_instance.setName(
         newName,
         { from: account }
-    ).then(receipt => {
-        console.log("?",receipt);
-        for (var i = 0; i < receipt.logs.length; i++) {
-            var log = receipt.logs[i];
-            console.log(log);
-            if (log.event == "NewTransaction") {
-                console.log("TX!");
-                return true;
-            }
-        };
+    ).then(async receipt => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(result =>{
+            console.log("!!",result)
+            getFieldCards();
+            return openField(address);
+        });
+        // for (var i = 0; i < receipt.logs.length; i++) {
+        //     var log = receipt.logs[i];
+        //     console.log(log);
+        //     if (log.event == "NewTransaction") {
+        //         console.log("TX!");
+        //         return true;
+        //     }
+        // };
         }
     ).catch(err => console.error("Error updating the name",err));
-    getFieldCards();
-    return openField(address);
+   
 }
 
 export async function changeStatus(address){
@@ -138,7 +143,7 @@ export async function getAllFields(){
         return fields; 
       });
     return fields;
-}
+} 
 
 
 export async function getHarvestableFields(filter) {
@@ -337,14 +342,8 @@ export async function addFieldTransaction(address) {
     const field_instance = await field_contract(web3.currentProvider).at(address);
     await tx.addTransaction(field_instance, sensor, data).then(receipt => {
         helper.toggleLoader("details",true);
-        for (var i = 0; i < receipt.logs.length; i++) {
-            var log = receipt.logs[i];
-            if (log.event == "NewTransaction") {
-                console.log("tx sent", receipt)
-                getFieldCards();
-                return openField(address);
-            }
-        };
+        getFieldCards();
+        return openField(address);
     }).catch(err => console.error("Error adding the transaction",err));
     }
 

@@ -44,7 +44,7 @@
                     </div>
                     <select class="form-control" id="transactionList">
                         {{#transactions}}
-                        <option value="{{address}}">{{sender}}-{{data}}</option>
+                        <option value="{{address}}">{{time}} &nbsp;&nbsp;->&nbsp;&nbsp; {{data}}</option>
                         {{/transactions}}
                     </select>
                     <div class="input-group-append">
@@ -76,6 +76,6 @@
                 </div>
             </div>
         </div>
-        <button type="button" name="transaction" id="transportBtn" onclick="App.addData('{{address}}')" class="btn btn-success btn-lg btn-block">Add Data</button>
+        <button type="button" name="transaction" id="transportBtn" onclick="App.addProductionData('{{address}}')" class="btn btn-success btn-lg btn-block">Add Data</button>
     </div>
 </div>

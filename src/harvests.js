@@ -9,6 +9,7 @@ import field_contract from "./utils/contracts/field_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 import { checkHarvestable } from "./fields.js";
+import awaitTransactionMined from "await-transaction-mined";
 
 export async function weightInput(harvest, field, amount) {
     const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
@@ -20,12 +21,9 @@ export async function weightInput(harvest, field, amount) {
         .then( receipt => { 
             return receipt;
         }).catch(err => console.error("Error adding the weigh-input",err));
-    for (var i = 0; i < receipt.logs.length; i++) {
-        var log = receipt.logs[i];
-        if (log.event == "WeightInput") {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
             return openHarvest(harvest);
-        }
-    }
+        });
 }
 
 export function loadHarvestFields(harvestAddress){
@@ -92,15 +90,12 @@ export async function newHarvest() {
         {
             from: account
         }
-    ).then((receipt) => {
-        for (var i = 0; i < receipt.logs.length; i++) {
-            var log = receipt.logs[i];
-            if (log.event == "NewHarvest") {
-                return true;
-            }
-        };
-    });
-    return loadDropdown();
+    ).then(async(receipt) => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
+            return loadDropdown();
+        });
+        
+    }).catch(err => console.error(err));
 }
 
 export async function openHarvest(address){

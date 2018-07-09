@@ -9,85 +9,84 @@ import harvest_contract from "./utils/contracts/harvest_contract";
 import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
-
-
+import awaitTransactionMined from "await-transaction-mined";
 
 
 export async function newProduction() {
-    // var details = $("#newTransportForm").serializeArray();
-    // var lat,long;
-    // $.each(details, function (i, item) {
-    //     switch (item.name) {
-    //         case "latitude":
-    //             lat = item.value;
-    //             break;
-    //         case "longitude":
-    //             long = item.value;
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // });
-//    const transport = await currentTransport();
-
-//    if (currentH != undefined && currentTransport != undefined) {
-//        var check = checkTransport(currentH, currentTransport);
-//    }
-   // if(!check || check == undefined){
-       const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
-       const account = await helper.getAccount();
-       const address = await processHandler_instance.newProduction(
-           {from: account}).then((receipt) => {
+        const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+        const account = await helper.getAccount();
+        await processHandler_instance.newProduction(
+           {from: account}).then(async(receipt) => {
             for (var i = 0; i < receipt.logs.length; i++) {
                 var log = receipt.logs[i];
                 var prodAddr = log.args.production;
                 if (log.event == "NewProduction") {
-                        return prodAddr;
+                    await awaitTransactionMined.awaitTx(web3,receipt.tx).then(async() =>{
+                        return addProductionCard(prodAddr);
+                    });
                 }
             };
-    }).catch(err => console.error("ie",err));
-    var json = await productionAsJson(address);
-    return loadProductionCard(json);
+    }).catch(err => console.error("Error creating new Production",err));
+    
 }
 
 export async function getProductionCards(){
     $('#processingSection').find(".loader").removeClass("d-none");
-    $('#productions').empty();
-    await allProductions().then(productions =>{
+    $('#transports').empty();
+    const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+    await processHandler_instance.getProductions.call().then(productions =>{
         for (let i = 0; i < productions.length; i++) {
-            loadProductionCard(productions[i]);
+            addProductionCard(productions[i]);
         }
     });
     $('#processingSection').find(".loader").addClass("d-none");
+   
 }
 
-async function allProductions() {
-    const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
-    const productions = await processHandler_instance.getProductions.call().then(async result => {
-        var p = [];
-        for (let i = 0; i < result.length; i++) {
-           p.push(await productionAsJson(result[i]));
-        }
-        return p; 
-    });
-    if (productions.length == 0){
-        document.getElementById("productions-loading").innerHTML = "No Productions found";
-    }else{
-        document.getElementById("productions-loading").innerHTML = "";
-    }
-    return productions;
-}
+// async function allProductions() {
+//     const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+//     const productions = await processHandler_instance.getProductions.call().then(async result => {
+//         var p = [];
+//         for (let i = 0; i < result.length; i++) {
+//            p.push(await productionAsJson(result[i]));
+//         }
+//         return p; 
+//     });
+//     if (productions.length == 0){
+//         document.getElementById("productions-loading").innerHTML = "No Productions found";
+//     }else{
+//         document.getElementById("productions-loading").innerHTML = "";
+//     }
+//     return productions;
+// }
 
-async function loadProductionCard(json){
-    const template_productions = await helper.fetchTemplate("src/templates/processing/mustache.productioncard.html");
-    Mustache.parse(template_productions);
+// async function loadProductionCard(json){
+//     const template_productions = await helper.fetchTemplate("src/templates/processing/mustache.productioncard.html");
+//     Mustache.parse(template_productions);
+//     var output = Mustache.render(
+//         template_productions, json
+//     );
+//     return document.getElementById('productions').innerHTML += output;
+// }
+
+export async function loadSingleProductionCard(address){
+    console.log(address);
+    
+    const template_production = await helper.fetchTemplate("src/templates/processing/mustache.productioncard.html");
+    var json = await productionAsJson(address);    
     var output = Mustache.render(
-        template_productions, json
+        template_production, json
     );
-    return document.getElementById('productions').innerHTML += output;
+    return output;
 }
 
-export async function loadSingleProduction(address) {
+export async function addProductionCard(address){
+    const card = await loadSingleProductionCard(address);
+    document.getElementById("productions-loading").innerHTML = "";
+    return document.getElementById('productions').innerHTML += card;
+}
+
+export async function openProduction(address) {
     $("#details").empty();
      helper.toggleLoader("details",true);
     $("#detailsModal").modal("show");
@@ -111,9 +110,10 @@ export async function addTransport(production) {
     console.log("from",transport,"amout",amount);
     return await processhandler_instance.addFromTransport(transport, production, amount, {
         from: account
-    }).then(result => {
-        console.log(result);
-        return result
+    }).then(async(receipt) => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
+            return openProduction(production);
+        });
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
@@ -121,23 +121,15 @@ export async function addTransport(production) {
 export async function productionAsJson(production) {
     const production_instance = await production_contract(web3.currentProvider).at(production);
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
-
-    let txSender;
     var json = {};
-    
     json["address"] = production;
     json["transport"] = await processhandler_instance.getTransportFromProduction.call(production);
     json["ID"] = await production_instance.getID.call();
     json['transactions'] = await getAllTransactions(production);
     json['tokenBalance'] = await tx.getBalance(production_instance);
     json["totalTransactions"] = await getTotalTransactionCount(production);
+    json["status"] = await tx.getStatus(production_instance);
     json["txSender"] = await production_instance.getAllUniqueTransactionSender.call();
-    // for (let i = 0; i < txSender.length; i++) {
-    //     let sender = {"address": txSender[i]};
-    //     json["txSender"].push(sender);
-    //     }
-    console.log("j",json);
-    
     return json;
 }
 
@@ -159,6 +151,14 @@ export async function currentTransport() {
         return res;
     });
     return result;
+}
+
+export async function addData(production) {
+    let sensor = $('#sensor-select').val();
+    let data = $('#data-input').val();
+    const production_instance = await production_contract(web3.currentProvider).at(production);
+    await tx.addTransaction(production_instance,sensor, data).catch(err => (console.error("Transaction failed", err)));
+    return openProduction(production);
 }
 
 
@@ -198,6 +198,7 @@ export async function getAllTransactions(address) {
         tx.time = await getTransactionTimeAtIndex(address,i);
         json.push(tx);
     }
+    json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
     return json;
 }
 // ############### END TRANSACTION FUNCTIONS ###############

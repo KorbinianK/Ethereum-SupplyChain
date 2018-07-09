@@ -46,7 +46,7 @@
                     </div>
                     <select class="form-control" id="transactionList">
                         {{#transactions}}
-                        <option value="{{address}}">{{sender}}-{{data}}</option>
+                        <option value="{{address}}">{{time}} &nbsp;&nbsp;->&nbsp;&nbsp; {{data}}</option>
                         {{/transactions}}
                     </select>
                 </div>
@@ -74,6 +74,6 @@
                 </div>
             </div>
         </div>
-        <button {{^status}} disabled {{/status}} type="button" name="transaction" id="transportBtn" onclick="App.addData('{{address}}')" class="btn {{#status}} btn-success {{/status}}{{^status}} btn-danger {{/status}} btn-lg btn-block">Add Data</button>
+        <button {{^status}} disabled {{/status}} type="button" name="transaction" id="transportBtn" onclick="App.addTransportData('{{address}}')" class="btn {{#status}} btn-success {{/status}}{{^status}} btn-danger {{/status}} btn-lg btn-block">Add Data</button>
     </div>
 </div>

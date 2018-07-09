@@ -6,6 +6,8 @@ import transport_contract from "./utils/contracts/transport_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 import { openHarvest } from "./harvests";
+import awaitTransactionMined from "await-transaction-mined";
+
 
 export async function newTransport() {
      var details = $("#newTransportForm").serializeArray();
@@ -28,20 +30,21 @@ export async function newTransport() {
             lat,
             long,
             {from: account})
-            .then(receipt => {
+            .then(async receipt => {
                 $('#transportSection').find(".loader").removeClass("d-none");
                 console.log("new transport",receipt);
                 for (var i = 0; i < receipt.logs.length; i++) {
                     var log = receipt.logs[i];
                     if (log.event == "NewTransport") {
                         var transpAddr = log.args.transport;
-                        return transpAddr;
+                        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(async() =>{
+                            return addTransportCard(transpAddr);
+                        });
                     }
                 }
             }).catch(err => console.error("Error creating a new transprot",err));
-            var json = await transportAsJson(address);
+           
              $('#transportSection').find(".loader").addClass("d-none");
-            return loadTransportCard(json);
         }
 
 export async function getCurrentTransport(){
@@ -101,71 +104,89 @@ export async function transportAsJson(transport) {
     return json;
 }
 
-async function loadTransportCard(json){
+export async function loadSingleTransportCard(address){
     const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
-    // Mustache.parse(template_transports);
+    var json = await transportAsJson(address);    
     var output = Mustache.render(
         template_transports, json
     );
-    document.getElementById("transports-loading").innerHTML = "";
-    return document.getElementById('transports').innerHTML += output;
+    return output;
 }
 
-
+export async function addTransportCard(address){
+    const card = await loadSingleTransportCard(address);
+    document.getElementById("transports-loading").innerHTML = "";
+    return document.getElementById('transports').innerHTML += card;
+}
 
 export async function getTransportCards(){
     $('#transportSection').find(".loader").removeClass("d-none");
     $('#transports').empty();
-    await allTransports().then(transports =>{
+    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+    await transportHandler_instance.getTransports.call().then(transports =>{
         for (let i = 0; i < transports.length; i++) {
-            loadTransportCard(transports[i]);
+            addTransportCard(transports[i]);
         }
     });
     $('#transportSection').find(".loader").addClass("d-none");
 }
 
 
-async function allTransports() {
-    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const transports = await transportHandler_instance.getTransports.call().then(async result => {
-        var t = [];
-        for (let i = 0; i < result.length; i++) {
-           t.push(await transportAsJson(result[i]));
-        }
-        return t; 
-    });
-    if (transports.length == 0){
-        document.getElementById("transports-loading").innerHTML = "No Transports found";
-    }else{
-         document.getElementById("transports-loading").innerHTML = "";
+// async function allTransports() {
+//     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+//     const transports = await transportHandler_instance.getTransports.call().then(async result => {
+//         var t = [];
+//         for (let i = 0; i < result.length; i++) {
+//            t.push(await transportAsJson(result[i]));
+//         }
+//         return t; 
+//     });
+//     if (transports.length == 0){
+//         document.getElementById("transports-loading").innerHTML = "No Transports found";
+//     }else{
+//          document.getElementById("transports-loading").innerHTML = "";
+//     }
+//     return transports;
+// }
+
+export async function openTransport(address){
+    $("#details").empty();
+    helper.toggleLoader("details",true);
+   $("#detailsModal").modal("show");
+   const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
+   // Mustache.parse(template_transportdetails);
+   const json = await transportAsJson(address);
+   var output = Mustache.render(
+       template_transportdetails, json
+   );
+    helper.toggleLoader("details", false);
+    if(output != null){
+       document.getElementById('details').innerHTML = output;
     }
-    return transports;
 }
 
-export async function loadSingleTransport(address) {
-    $("#details").empty();
-     helper.toggleLoader("details",true);
-    $("#detailsModal").modal("show");
-    const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
-    // Mustache.parse(template_transportdetails);
-    const json = await transportAsJson(address);
-    var output = Mustache.render(
-        template_transportdetails, json
-    );
-     helper.toggleLoader("details", false);
-     if(output != null){
-        document.getElementById('details').innerHTML = output;
-     }
-}
+// export async function loadSingleTransport(address) {
+//     $("#details").empty();
+//      helper.toggleLoader("details",true);
+//     $("#detailsModal").modal("show");
+//     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
+//     // Mustache.parse(template_transportdetails);
+//     const json = await transportAsJson(address);
+//     var output = Mustache.render(
+//         template_transportdetails, json
+//     );
+//      helper.toggleLoader("details", false);
+//      if(output != null){
+//         document.getElementById('details').innerHTML = output;
+//      }
+// }
 
 export async function addData(transport) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
-    await tx.addTransaction(transport_instance,sensor, data).then(result => {
-        console.log("tx sent",result)
-        return loadSingleTransport(transport);
-    }).catch(err => (console.error("Transaction failed", err)));
+    await tx.addTransaction(transport_instance,sensor, data).catch(err => (console.error("Transaction failed", err)));
+    return openTransport(transport);
 }
 
 export async function addHarvest(transport) {
@@ -176,9 +197,10 @@ export async function addHarvest(transport) {
     console.log("from",harvest,"amout",amount);
     await transporthandler_instance.addFromHarvest(harvest, transport, amount, {
         from: account
-    }).then(result => {
-        console.log(result);
-        return loadSingleTransport(transport);
+    }).then(async receipt => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
+            return openTransport(transport);
+        });
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
@@ -218,6 +240,7 @@ export async function getAllTransactions(address) {
              tx.time = await getTransactionTimeAtIndex(address, i);
              json.push(tx);
     }
+    json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
     return json;
 }
 

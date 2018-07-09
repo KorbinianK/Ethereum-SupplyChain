@@ -10,9 +10,10 @@ import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
 
-
-
-
+import {loadSingleField} from "./fields.js"
+import {loadSingleHarvest} from "./harvests.js" 
+import {loadSingleTransportCard} from "./transports.js" 
+import {loadSingleProductionCard} from "./processing.js" 
 
 // field.getHarvestPointer!
 
@@ -20,23 +21,64 @@ import * as tx from "./utils/transactions";
 export async function finalBottle() {
     const production = await currentProduction()
     console.log("Production:",  production);
+    loadProductionCard(production);
+
     const transport = await getTransportFromProduction(production)
     console.log("Transporter:", transport);
+    loadTransportCards(transport);
+
     const harvest = await getHarvestFromTransport(transport)
     console.log("Harvest:",  harvest);
-    const fields = await getFieldsFromHarvest(harvest);
-    console.log("Fields:", fields);
+    // loadHarvestCards(harvest);
 
+    const fields = await getFieldsFromHarvest(harvest);
+    await loadFieldCards(fields);
+    console.log("Fields:", fields);
     return;
            
+}
+
+
+async function loadProductionCard(production){
+    document.getElementById("bottle-productions").innerHTML +=  await loadSingleProductionCard(production);
+} 
+
+async function loadTransportCards(transports){
+    console.log(1,transports.length);
+        for (let i = 0; i < transports.length; i++) {
+            if(transports[i] != 0x0){
+                console.log(1,transports[i]);
+                document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports[i]);
+            }else{
+                console.log(2);
+                document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports);
+            }
+    }
+   
+}
+
+async function loadHarvestCards(harvests){
+    for (let i = 0; i < harvests.length; i++) {
+        document.getElementById("bottle-harvests").innerHTML +=  await loadSingleHarvest(harvests[i]);
+    }
+}
+
+async function loadFieldCards(fields){
+    for (let i = 0; i < fields.length; i++) {
+        document.getElementById("bottle-fields").innerHTML +=  await loadSingleField(fields[i]);
+    }
 }
 
 async function getTransportFromProduction(production) {
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     const transport =  await processhandler_instance.getTransportFromProduction.call(production);
-    console.log("?!",production);
-    
     return transport;
+}
+
+async function getTransportsFromProduction(production) {
+    const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
+    const transports =  await processhandler_instance.getTransportsFromProduction.call(production);
+    return transports;
 }
 
 
@@ -64,13 +106,6 @@ async function getHarvestsFromTransport(transport) {
     return harvest;
 }
 
-// async function currentTransport() {
-//     const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
-//     const transport = await processHandler_instance.currentTransport.call().then((transport) => {
-//         return transport;
-//     });
-//     return transport;
-// }
 
 async function currentProduction() {
     const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();

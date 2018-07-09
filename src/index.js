@@ -203,14 +203,14 @@ window.App = {
       .TransportModule()
       .then(module => module.addHarvest(address));
   },
-  addData: function (address) {
+  addTransportData: function (address) {
      Router.modules
        .TransportModule()
        .then(module => module.addData(address));
   },
   openTransport: function (address) {
     Router.modules.TransportModule()
-      .then(module => module.loadSingleTransport(address));
+      .then(module => module.openTransport(address));
   },
 
   /**
@@ -230,13 +230,18 @@ window.App = {
   },
   openProduction: function (address) {
     Router.modules.ProcessingModule()
-      .then(module => module.loadSingleProduction(address));
+      .then(module => module.openProduction(address));
   },
   addTransport: function(address){
     Router.modules
       .ProcessingModule()
       .then(module => module.addTransport(address));
   },
+  addProductionData: function (address) {
+    Router.modules
+      .ProcessingModule()
+      .then(module => module.addData(address));
+ },
 
 // Bottle
 
