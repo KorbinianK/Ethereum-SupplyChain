@@ -65,7 +65,7 @@ async function loadHarvestCards(harvests){
 
 async function loadFieldCards(fields){
     for (let i = 0; i < fields.length; i++) {
-        document.getElementById("bottle-fields").innerHTML +=  await loadSingleField(fields[i]);
+        document.getElementById("bottle-fields").innerHTML +=  await loadSingleField(fields[i],true);
     }
 }
 

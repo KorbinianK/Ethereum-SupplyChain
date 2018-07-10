@@ -1,6 +1,4 @@
 import Mustache from "mustache";
-// import Router from "./router.js";
-// import harvest_contract from "./utils/contracts/harvest_contract";
 import transportHandler_contract from "./utils/contracts/transporthandler_contract";
 import transport_contract from "./utils/contracts/transport_contract";
 import * as helper from "./utils/helper_scripts";
@@ -132,23 +130,6 @@ export async function getTransportCards(){
 }
 
 
-// async function allTransports() {
-//     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-//     const transports = await transportHandler_instance.getTransports.call().then(async result => {
-//         var t = [];
-//         for (let i = 0; i < result.length; i++) {
-//            t.push(await transportAsJson(result[i]));
-//         }
-//         return t; 
-//     });
-//     if (transports.length == 0){
-//         document.getElementById("transports-loading").innerHTML = "No Transports found";
-//     }else{
-//          document.getElementById("transports-loading").innerHTML = "";
-//     }
-//     return transports;
-// }
-
 export async function openTransport(address){
     $("#details").empty();
     helper.toggleLoader("details",true);
@@ -164,22 +145,6 @@ export async function openTransport(address){
        document.getElementById('details').innerHTML = output;
     }
 }
-
-// export async function loadSingleTransport(address) {
-//     $("#details").empty();
-//      helper.toggleLoader("details",true);
-//     $("#detailsModal").modal("show");
-//     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
-//     // Mustache.parse(template_transportdetails);
-//     const json = await transportAsJson(address);
-//     var output = Mustache.render(
-//         template_transportdetails, json
-//     );
-//      helper.toggleLoader("details", false);
-//      if(output != null){
-//         document.getElementById('details').innerHTML = output;
-//      }
-// }
 
 export async function addData(transport) {
     let sensor = $('#sensor-select').val();
@@ -206,30 +171,63 @@ export async function addHarvest(transport) {
 
 // ############### START TRANSACTION FUNCTIONS ###############
 
+/**
+ * Gets the total amount of transactions to this contract
+ *
+ * @param {*} address Address of the contract
+ * @returns Integer value of the total transactions
+ */ 
 export async function getTotalTransactionCount(address) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const txCount = await tx.getTotalTransactionCount(transport_instance);
     return txCount;
 }
 
+/**
+ * Gets a specific transaction sender with an index
+ *
+ * @param {*} address Address of the contract
+ * @param {*} index Integer value as index
+ * @returns {sender} Address of the sender
+ */
 export async function getTransactionSenderAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const sender = await tx.getTransactionSenderAtIndex(transport_instance, index);
     return sender;
 }
 
+/**
+ * Gets the data of a transaction with an index
+ *
+ * @param {*} address Address of the contract
+ * @param {*} index Integer value as index
+ * @returns {data} String of the data
+ */
 export async function getTransactionDataAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const data = await tx.getTransactionDataAtIndex(transport_instance, index);
     return data;
 }
 
+/**
+ * Gets the timestamp of a transaction 
+ *
+ * @param {*} address Address of the contract
+ * @param {*} index Integer value as index
+ * @returns {time} Readable timestamp
+ */
 export async function getTransactionTimeAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const time = await tx.getTransactionTimeAtIndex(transport_instance, index);
     return helper.makeUnixReadable(time);
 }
 
+/**
+ * Gets all transactions made to this contract
+ *
+ * @param {*} address Address of the contract
+ * @returns {json} Json file with all transactions
+ */
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);
     var json = [];
@@ -243,7 +241,5 @@ export async function getAllTransactions(address) {
     json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
     return json;
 }
-
-
 
 // ############### END TRANSACTION FUNCTIONS ###############
