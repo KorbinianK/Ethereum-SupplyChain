@@ -7,6 +7,9 @@ import { openHarvest } from "./harvests";
 import awaitTransactionMined from "await-transaction-mined";
 
 
+/**
+ * Creates a new Transport
+ */
 export async function newTransport() {
      var details = $("#newTransportForm").serializeArray();
      var lat,long;
@@ -45,6 +48,11 @@ export async function newTransport() {
              $('#transportSection').find(".loader").addClass("d-none");
         }
 
+/**
+ * Returns the current Transport (the last created -> showcase function)
+ *
+ * @returns {transport} The address of the transport contract
+ */
 export async function getCurrentTransport(){
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const transport = await transportHandler_instance.currentTransport.call().then((res) => {
@@ -54,22 +62,35 @@ export async function getCurrentTransport(){
     return transport;
 }
 
+/**
+ * Returns the current Harvest (the latest created -> showcase function)
+ *
+ * @returns {harvest} The address of the harvest contract
+ */
 export async function currentHarvest() {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const result = await transportHandler_instance.currentHarvest.call().then((res) => {
-        return res;
-    }).catch(error =>{return console.error("Error fetching the current harvest",error)});
-    return result;
-}
-
-async function getHarvest(address) {
-    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const harvest = await transportHandler_instance.getHarvestsFromTransport.call(address).then(result => {
-        return result;
-    }).catch(error =>{return console.error("Error fetching harvest:",address,error)});
+    const harvest = await transportHandler_instance.currentHarvest.call().catch(error =>{return console.error("Error fetching the current harvest",error)});
     return harvest;
 }
 
+/**
+ * Gets the added Harvest from the transport
+ *
+ * @param {*} transport Address of the transport
+ * @returns {harvest} Address of the harvest
+ */
+async function getHarvest(transport) {
+    const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+    const harvest = await transportHandler_instance.getHarvestsFromTransport.call(transport).catch(error =>{return console.error("Error fetching harvest:",transport,error)});
+    return harvest;
+}
+
+/**
+ * Returns the ID of a transport
+ *
+ * @param {*} transport Address of the transport contract
+ * @returns {ID} The ID
+ */
 async function getID(transport){
      const transport_instance = await transport_contract(web3.currentProvider).at(transport);
      const ID = transport_instance.getID.call().then(result => {
@@ -78,6 +99,13 @@ async function getID(transport){
         return ID;
 }
 
+
+/**
+ * Builds a JSON file with data from the transport
+ *
+ * @param {*} transport Address of the contract
+ * @returns {json} JSON data
+ */
 export async function transportAsJson(transport) {
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
     const startLocation = await transport_instance.getStartCoordinates.call().then(result => {
@@ -102,21 +130,35 @@ export async function transportAsJson(transport) {
     return json;
 }
 
-export async function loadSingleTransportCard(address){
+/**
+ * Loads a single transport card template and data
+ *
+ * @param {*} transport Address of the transport contract
+ * @returns {output} The transport as card element
+ */
+export async function loadSingleTransportCard(transport){
     const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
-    var json = await transportAsJson(address);    
+    var json = await transportAsJson(transport);    
     var output = Mustache.render(
         template_transports, json
     );
     return output;
 }
 
-export async function addTransportCard(address){
-    const card = await loadSingleTransportCard(address);
+/**
+ * Adds a transport card to the DOM
+ *
+ * @param {*} transport Address of the transport contract
+ */
+ async function addTransportCard(transport){
+    const card = await loadSingleTransportCard(transport);
     document.getElementById("transports-loading").innerHTML = "";
-    return document.getElementById('transports').innerHTML += card;
+    document.getElementById('transports').innerHTML += card;
 }
 
+/**
+ * Adds all transports as cards to the DOM
+ */
 export async function getTransportCards(){
     $('#transportSection').find(".loader").removeClass("d-none");
     $('#transports').empty();
@@ -130,6 +172,11 @@ export async function getTransportCards(){
 }
 
 
+/**
+ * Opends the Details Modal and loads a single transport
+ *
+ * @param {*} address Address of the transport to load
+ */
 export async function openTransport(address){
     $("#details").empty();
     helper.toggleLoader("details",true);
@@ -146,6 +193,12 @@ export async function openTransport(address){
     }
 }
 
+/**
+ * Adds a Data transaction to a transport
+ *
+ * @param {*} transport The address of the transport
+ * @returns {openTransport(transport)}
+ */
 export async function addData(transport) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
@@ -154,6 +207,11 @@ export async function addData(transport) {
     return openTransport(transport);
 }
 
+/**
+ * Adds Grapes from a Harvest to a transport
+ *
+ * @param {*} transport The address of the transport contract
+ */
 export async function addHarvest(transport) {
     const transporthandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
@@ -168,6 +226,7 @@ export async function addHarvest(transport) {
         });
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
+
 
 // ############### START TRANSACTION FUNCTIONS ###############
 
