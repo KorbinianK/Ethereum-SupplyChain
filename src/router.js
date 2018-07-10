@@ -7,7 +7,9 @@ const _modules = {
     TransportModule: () =>
         import ("./transports.js"),
     ProcessingModule: () =>
-        import ("./processing.js")
+        import ("./processing.js"),
+    BottleModule: () =>
+        import ("./bottle.js")
 };
 
 export default class Router {

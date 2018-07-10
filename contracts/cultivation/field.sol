@@ -66,7 +66,6 @@ contract Field is TransactionOwner {
         _;
     }
     
-    
     /**
     * @dev Simply struct for the Location of the vineyard
     */
@@ -79,15 +78,15 @@ contract Field is TransactionOwner {
     * @dev Harvests the current vineyard and moves it to the harvested stage
     * @param _harvest Address of the harvest contract that called this function
     */
-    function harvest(address _harvest) public atStage(Stages.Cultivated) transitionNext {
+    function harvest(address _harvest) public atStage(Stages.Cultivated)
+    //  transitionNext // deactivated for showcase 
+     {
         harvestPointer[_harvest] = totalTransactions;
         previousHarvest[_harvest] = lastHarvest;
         lastHarvest = _harvest;
-        // switchStatus();        
-        
-        updateTransaction(msg.sender,bytes("Harvested by: ".toSlice().concat(_harvest.addressToString().toSlice())));
-
-    }
+        // switchStatus();   // deactivated for showcase     
+        updateTransaction(msg.sender,bytes("Harvested".toSlice().concat("".toSlice())));
+    } 
     
     /**
     * @dev Gets the transaction count at the time of harvest
@@ -97,6 +96,35 @@ contract Field is TransactionOwner {
     function getHarvestPointer(address _harvest) public view returns(uint) {
         return harvestPointer[_harvest];
     } 
+
+    /**
+    * @dev Gets the transaction pointer for a harvest
+    * @param _harvest Address of a harvest contract
+    * @return uint transaction pointer
+    */
+    function getHarvestPointers(address _harvest) public view returns(uint, uint) {
+        address prev = getPreviousHarvest(_harvest);
+        uint start = harvestPointer[prev]+1;
+        uint end = harvestPointer[_harvest];
+        return (start, end);
+    } 
+
+    /**
+    * @dev Gets the address of the last harvest
+    * @return address of the harvest
+    */
+    function getLastHarvest() public view returns(address) {
+        return lastHarvest;
+    } 
+
+    /**
+    * @dev Gets the previous harvest in relation to another
+    * @param _current Address of a current harvest contract
+    * @return address of the previous harvest
+    */
+    function getPreviousHarvest(address _current) public view returns (address){
+        return previousHarvest[_current];
+    }
 
     /**
     * @dev Overloading the transaction function from TransactionOwner to check if a field can accept data
@@ -262,17 +290,15 @@ contract Field is TransactionOwner {
         return true;
     }
 
-     /**
+    /**
     * @dev Updates the grape type of the vineyard
     * @param _type the new type of grapes 
     * @return bool
     */
     function setType(string _type) public onlyCreator returns(bool) {
         grapeType = _type;
-        updateTransaction(msg.sender,bytes(("Type set to: ").toSlice().concat(_type.toSlice())));
         return true;
     }
-
 
     /**
     * @dev Updates the location of the vineyard
@@ -283,7 +309,6 @@ contract Field is TransactionOwner {
     function setLocation(string _lat, string _long) public onlyCreator returns(bool) {
         location.latitude = _lat;
         location.longitude = _long;
-         updateTransaction(msg.sender,bytes(("Location set to: ").toSlice().concat(_lat.toSlice())));
 
         return true;
     }
@@ -295,7 +320,6 @@ contract Field is TransactionOwner {
     */
     function setPicture(bytes _picture) public onlyCreator returns(bool){
         picture = _picture;
-        updateTransaction(msg.sender,("Picture updated").stringToBytes());
         return true;
     }
 
@@ -307,8 +331,6 @@ contract Field is TransactionOwner {
     function addPermissionedAccount(address _sender) public onlyCreator returns(bool){
         permissionedAccounts.push(_sender);
         isAllowed[_sender] = true;
-        updateTransaction(msg.sender,bytes(("Permissioned account added:").toSlice().concat(_sender.addressToString().toSlice())));
-
     }
   
     /**
@@ -320,8 +342,6 @@ contract Field is TransactionOwner {
         }else{
             stage = Stages(uint(stage) + 1);
         }
-        updateTransaction(msg.sender,("Stage updated").stringToBytes());
-
         emit NewStage(stage);
     }
 

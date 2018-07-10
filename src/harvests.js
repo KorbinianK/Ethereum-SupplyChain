@@ -8,19 +8,22 @@ import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
 import field_contract from "./utils/contracts/field_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
+import { checkHarvestable } from "./fields.js";
+import awaitTransactionMined from "await-transaction-mined";
 
 export async function weightInput(harvest, field, amount) {
     const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
     const account = await helper.getAccount();
-    const res = await harvest_instance.weightInput(
+    const receipt = await harvest_instance.weightInput(
         field,
         amount,
         { from: account })
-        .then( result => { 
-            console.log(result);
-            console.log(fields, "added to", harvest);
+        .then( receipt => { 
+            return receipt;
+        }).catch(err => console.error("Error adding the weigh-input",err));
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
             return openHarvest(harvest);
-    });
+        });
 }
 
 export function loadHarvestFields(harvestAddress){
@@ -45,15 +48,6 @@ export function loadHarvestFields(harvestAddress){
             }).catch(err => console.error(err));
 }
 
-export async function loadAll() { 
-
-    // console.log($(".navbar-nav").find(".active"))
-    // .each(function (e) {
-    //     console.log(e);
-    //     this.removeClass("active");
-    // })
-
-};
 
 export async function loadDropdown() {
     document.getElementById("harvestSelect").innerHTML = '';
@@ -71,11 +65,17 @@ export async function loadDropdown() {
             let year = {};
             year.address = result[i];
             year.year = await harvest_instance.getYear({from:account});
+            year.status = await tx.getStatus(harvest_instance);
             years.push(year);
         }
         let arr = _.sortBy(years, "year").reverse();
-        arr.forEach(element => {
-            document.getElementById('harvestSelect').innerHTML += ("<option value='" + element.address + "'>" + element.year + "</option>");
+        arr.forEach(harvest => {
+            if(harvest.status){
+                status = "";
+            }else{
+                status = " - finished";
+            }
+            document.getElementById('harvestSelect').innerHTML += ("<option value='" + harvest.address + "'>" + harvest.year +status+" </option>");
         });
         
     }).catch(err => console.error(err));
@@ -85,15 +85,17 @@ export async function newHarvest() {
     let harvestYear = $("#newHarvest").val();
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
-    const harvest = await harvestHandler_instance.newHarvest(
+    await harvestHandler_instance.newHarvest(
         harvestYear,
         {
             from: account
         }
-    ).then((result) => {
-        return result;
-    });
-    return await harvest;
+    ).then(async(receipt) => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(() =>{
+            return loadDropdown();
+        });
+        
+    }).catch(err => console.error(err));
 }
 
 export async function openHarvest(address){
@@ -103,11 +105,12 @@ export async function openHarvest(address){
     const template_harvestdetails = await helper.fetchTemplate("src/templates/harvest/mustache.harvestdetails.html");
     Mustache.parse(template_harvestdetails);
     const json = await harvestAsJson(address);
-    
     var output = Mustache.render(
         template_harvestdetails, json
     );
-    var options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
+    console.log("Harvest:",json);
+    
+    const options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
     helper.toggleLoader("details",false);
     document.getElementById('details').innerHTML = output;
     document.getElementById('harvestableFields-select').innerHTML = options;
@@ -115,7 +118,6 @@ export async function openHarvest(address){
 
 
 export async function harvestAsJson(address) { 
-    
     const harvest_instance = await harvest_contract(web3.currentProvider).at(address);
     var fields = [];
     let owners = [];
@@ -123,7 +125,7 @@ export async function harvestAsJson(address) {
     let picture;
     let transactionCount;
     let txSender = [];
-    const json = await harvest_instance.getAllDetails.call().then(async result => {
+    const json = await harvest_instance.getAllDetails.call().then(result => {
         var json;
         fields              = result[0];
         year                = result[1];
@@ -131,14 +133,12 @@ export async function harvestAsJson(address) {
         transactionCount    = result[3];
         txSender            = result[4];
         json = {
-            "tokenBalance": await tx.getBalance(harvest_instance),
             "address": address,
             "fields": [],
             "owners" : [],
             "year": year.toString(),
             "transactionCount": transactionCount.toString(),
-            "txSender": [],
-            "status": await tx.getStatus(harvest_instance)
+            "txSender": []
             }
         for (let i = 0; i < owners.length; i++) {
             let owner = {
@@ -154,16 +154,22 @@ export async function harvestAsJson(address) {
         }
         if(fields.length > 0){
             for (let i = 0; i < fields.length; i++) {
-                console.log("field in details:", fields[i]);
                 let field = {
                     "address": fields[i],
-                    "fieldName": await getFieldName(fields[i])
                 };
                 json["fields"].push(field);
             }
         }
-       return await json;
+       return json;
     }).catch(err=>console.error("Error while loading harvest JSON",err));
+    json["tokenBalance"] = await tx.getBalance(harvest_instance);
+    json["status"] = await tx.getStatus(harvest_instance);
+    if(json["fields"].length > 0){
+        for (let i = 0; i < json["fields"].length; i++) {
+            json["fields"][i].name = await getFieldName(fields[i]);
+            json["fields"][i].harvestable = await checkHarvestable(fields[i]);
+        }
+    }
     return json;
 };
 

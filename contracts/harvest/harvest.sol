@@ -11,7 +11,6 @@ import "../general/strings.sol";
  * @title The Harvest contract
  */
 contract Harvest is TransactionOwner, Ownable, ERC20Handler {
-     using strings for *;
 
     address[] private fieldArray;
     uint private year;
@@ -26,6 +25,8 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     
     // Event that fires when a new field has been added
     event FieldAdded(address field);
+
+    event WeightInput(uint amount);
     
     /**
     * @dev Checks if a field can be harvested
@@ -36,23 +37,15 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
         _;
     }
     
-    function transfer(address to, uint256 value) public returns(bool){
-       
-        if(getBalance() - value == 0){
-            harvestFields();
-            switchStatus();
-        }
-        super.transfer(to, value);
-        return true;
-    }
+    
+    
     
     /**
     * @dev Harvests all fields added to this contract
     */
-    function harvestFields() public {
+    function harvestFields() public isActive{
         for(uint i = 0; i < fieldArray.length; i++) {
-            Field(fieldArray[i]).harvest(address(this));
-            updateTransaction(msg.sender,bytes("Harvested: ".toSlice().concat(this.addressToString().toSlice())));
+            Field(fieldArray[i]).harvest(this);
         }
     }
 
@@ -61,12 +54,33 @@ contract Harvest is TransactionOwner, Ownable, ERC20Handler {
     * @param _fieldAddress address of the field
     * @param _value the amount of grapes to mint
     */
-    function weightInput(address _fieldAddress, uint _value) public harvestable(_fieldAddress) {
+    function weightInput(address _fieldAddress, uint _value) public harvestable(_fieldAddress) isActive{
         require(erc20.call(bytes4(keccak256("mint(address,uint256)")), this, _value));
         addField(_fieldAddress);
         fieldBalance[_fieldAddress] += _value;
-        updateTransaction(msg.sender,bytes("Weighted: ".toSlice().concat(address(_fieldAddress).addressToString().toSlice())));
+        // Field(_fieldAddress).harvest(this);
+        emit WeightInput(_value);
+    }
 
+    /**
+    * @dev Overloading the default transfer function to check if account is empty 
+    * @param to address of the receiver
+    * @param value the amount to transfer
+    */
+    function transfer(address to, uint256 value) public returns(bool){
+        if(getBalance() - value == 0){
+            finish();
+        }
+        super.transfer(to, value);
+        return true;
+    }
+
+    /**
+    * @dev Finished the harvest, disables it
+    */
+    function finish() public {
+        harvestFields();
+        switchStatus();
     }
 
    /**

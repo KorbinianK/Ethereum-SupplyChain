@@ -1,4 +1,5 @@
 import * as helper from "./helper_scripts";
+import awaitTransactionMined from "await-transaction-mined";
 
 export async function getTotalTransactionCount(instance){
     const txCount = await instance.getTotalTransactionCount.call().then((res) => {
@@ -8,22 +9,22 @@ export async function getTotalTransactionCount(instance){
     if (await txCount.toString() == undefined) {
         return 0;
     }
-    return await txCount.toString();
+    return txCount.toString();
 }
 
 export async function getTransactionTimeAtIndex(instance, index) {
     const time = await instance.getTransactionTimeAtIndex.call(index).then(result => {return result});
-    return await time.toString();
+    return time.toString();
 }
 
 export async function getTransactionSenderAtIndex(instance, index) {
     const sender = await instance.getTransactionSenderAtIndex.call(index).then(result => {return result});
-    return await sender;
+    return sender;
 }
 
 export async function getTransactionDataAtIndex(instance, index) {
     const data = await instance.getTransactionDataAtIndex.call(index).then(result => {return result});
-    return await data;
+    return data;
 }
 
 export async function doDummyTransaction(instance) {
@@ -50,7 +51,12 @@ export async function addTransaction(instance,sender,data) {
             from: account,
             gas: 400000
         }
-    );
+    ).then(async receipt => {
+        await awaitTransactionMined.awaitTx(web3,receipt.tx).then(result =>{
+            return result;
+        });
+        }
+    ).catch(err => console.error("Cannot add Transaction",err));
 }
 
 export async function getBalance(instance) {
@@ -65,7 +71,7 @@ export async function getBalance(instance) {
 export async function getStatus(instance) {
     const status = await instance.getStatus.call().then(result => {
         console.log("status", result.toString());
-        return result.toString();
+        return result;
     });
     return await status;
 }

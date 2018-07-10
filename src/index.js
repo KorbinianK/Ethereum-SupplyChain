@@ -8,6 +8,7 @@ import * as FieldModule from "./fields.js";
 import * as HarvestModule from "./harvests.js";
 import * as TransportModule from "./transports.js";
 import * as ProcessingModule from "./processing.js";
+import * as BottleModule from "./bottle.js";
 import { 
   default as Web3
 } from 'web3';
@@ -58,13 +59,10 @@ window.App = {
   },
 
   initContracts: function () {
-    web3.eth.subscribe('pendingTransactions', function (error, result) {})
-      .on("data", function (trxData) {
-        web3.eth.getTransaction(trxData).then(console.log);
-      });
     App.getFieldCards();
     App.loadHarvests();
     App.loadTransportSection();
+    App.loadProcessingSection();
     return App.bindEvents();
   },
 
@@ -78,19 +76,12 @@ window.App = {
 
   changeFieldStatus: async function (address) {
     await Router.modules.FieldModule()
-      .then(module => module.changeStatus(address)).then(() => {
-        Router.modules.FieldModule()
-          .then(module => module.openField(address));
-      });
+      .then(module => module.changeStatus(address));
 
   },
   addFieldTransaction: async function (address) {
     Router.modules.FieldModule()
-      .then(module => module.addFieldTransaction(address)).then(() => {
-        Router.modules.FieldModule()
-          .then(module => module.openField(address));
-      });
-
+      .then(module => module.addFieldTransaction(address));
   },
   getFieldCards: function () {
     Router.modules.FieldModule()
@@ -177,12 +168,7 @@ window.App = {
 
   newHarvest: async function () {
     Router.modules.HarvestModule()
-      .then(module => module.newHarvest())
-      .then((result) => {
-        return result;
-      }).then(() => {
-        return App.loadHarvests();
-      });
+      .then(module => module.newHarvest());
   },
 
   harvest: function () {
@@ -217,24 +203,54 @@ window.App = {
       .TransportModule()
       .then(module => module.addHarvest(address));
   },
-  addData: function (address) {
+  addTransportData: function (address) {
      Router.modules
        .TransportModule()
        .then(module => module.addData(address));
   },
   openTransport: function (address) {
     Router.modules.TransportModule()
-      .then(module => module.loadSingleTransport(address));
+      .then(module => module.openTransport(address));
   },
 
   /**
    * Processing
    */
-  getBottle: function() {
+
+   loadProcessingSection: function() {
     Router.modules
     .ProcessingModule()
-    .then(module => module.finalBottle());
-  }
+    .then(module => module.getProductionCards());
+   },
+  
+  newProduction: function() {
+    Router.modules
+    .ProcessingModule()
+    .then(module => module.newProduction());
+  },
+  openProduction: function (address) {
+    Router.modules.ProcessingModule()
+      .then(module => module.openProduction(address));
+  },
+  addTransport: function(address){
+    Router.modules
+      .ProcessingModule()
+      .then(module => module.addTransport(address));
+  },
+  addProductionData: function (address) {
+    Router.modules
+      .ProcessingModule()
+      .then(module => module.addData(address));
+ },
+
+// Bottle
+
+getBottle: function() {
+  Router.modules
+  .BottleModule()
+  .then(module => module.finalBottle());
+},
+
 };
 window.addEventListener('load', function () {
   window.App.init();

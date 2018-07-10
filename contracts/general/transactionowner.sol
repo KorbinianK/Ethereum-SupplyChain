@@ -10,6 +10,7 @@ contract TransactionOwner {
     address[] internal sender;
     Status public status;
 
+
     /**
     * @dev Enum for enabling/disabling transactions
     */
@@ -20,6 +21,9 @@ contract TransactionOwner {
     
     // Event that fires if the status changes
     event NewStatus(Status status);
+
+    event NewTransaction(address sender, bytes data, uint256 time);
+
 
     /**
     * @dev Checks if the contract can receive transactions
@@ -75,15 +79,17 @@ contract TransactionOwner {
     * @param _data the data in the transaction
     */
     function addTransaction(address _sender, bytes _data) public isActive {
+        uint256 time = now;
         if (!inArray(_sender)) {
             isSender[_sender] = true;
             sender.push(_sender);
         }
         TransactionSender storage tsender = transactionSender[_sender];
-        tsender.transactions[tsender.transactionCount] = TransactionStruct(_sender,_data, now);
-        transactions[totalTransactions] = TransactionStruct(_sender, _data, now);
+        tsender.transactions[tsender.transactionCount] = TransactionStruct(_sender,_data, time);
+        transactions[totalTransactions] = TransactionStruct(_sender, _data, time);
         tsender.transactionCount++;
         totalTransactions++;
+        emit NewTransaction(_sender, _data, time);
     }
 
     /**
@@ -95,7 +101,6 @@ contract TransactionOwner {
         addTransaction(_sender, _data); 
     }
 
-    
     /**
     * @dev Gets transaction data at a index
     * @param _index pointer to check
@@ -197,10 +202,10 @@ contract TransactionOwner {
         return false;
     }
 
-    /**
-    * @dev Constructor of the contract. Adds a default sender and transactio
-    */
-    constructor() public{
-        addTransaction(0x0, "");
-    }
+    // /**
+    // * @dev Constructor of the contract. Adds a default sender and transaction
+    // */
+    // constructor() public{
+    //     addTransaction(0x0, "");
+    // }
 }
