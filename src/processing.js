@@ -42,11 +42,12 @@ export async function getProductionCards(){
    
 }
 
-export async function loadSingleProductionCard(address){
+export async function loadSingleProductionCard(address,bottle=false){
     console.log(address);
     
     const template_production = await helper.fetchTemplate("src/templates/processing/mustache.productioncard.html");
-    var json = await productionAsJson(address);    
+    var json = await productionAsJson(address);
+    if(bottle)json['fromBottle'] = true;    
     var output = Mustache.render(
         template_production, json
     );
@@ -90,14 +91,21 @@ export async function addTransport(production) {
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
+export async function finish(production){
+    const production_instance = await production_contract(web3.currentProvider).at(production);
+    const account = await helper.getAccount();
+    await production_instance.finish({from:account}).catch(err => (console.error("Couldn't finish the production", err)));
+}
+
 
  async function productionAsJson(production) {
     const production_instance = await production_contract(web3.currentProvider).at(production);
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     var json = {};
     json["address"] = production;
+    // json["owner"] = await production_instance.getCreator.call()
     json["transport"] = await processhandler_instance.getTransportFromProduction.call(production).catch(err => (console.error("Production has not recieved a transport yet", err)));
-    json["ID"] = await production_instance.getID.call();
+    json["ID"] = await production_instance.getID.call().catch(err => (console.error("Error fetching the creator", err)));
     json['transactions'] = await getAllTransactions(production);
     json['tokenBalance'] = await tx.getBalance(production_instance);
     json["totalTransactions"] = await getTotalTransactionCount(production);

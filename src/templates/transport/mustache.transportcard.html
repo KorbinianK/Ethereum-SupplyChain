@@ -1,21 +1,23 @@
-<div id="{{address}}-card" class="card mx-1 my-2">
+<div id="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-card" class="card mx-1 my-2 {{#status}}border-success{{/status}}{{^status}} border-danger {{/status}}">
     <div class="card-header">
+        <small class="float-right">Transporter</small>
         <h5 class="card-title ">
             <span class="transport-id float-left">ID: {{ID}}</span>
-            <br>Balance: {{tokenBalance}}
+            {{#status}} <br>Balance: {{tokenBalance}}{{/status}}
         </h5>
         <span class="ml-1 float-right badge {{#status}}badge-light{{/status}}{{^status}}badge-danger{{/status}}">&nbsp;{{#status}}In progress{{/status}}{{^status}}finished{{/status}}</span>
     </div>
+    {{#status}}
     <div class="btn-group">
-        <button class="btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}-collapse"
-            aria-expanded="false" aria-controls="{{address}}-collapse">
+        <button class="btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
+            aria-expanded="false" aria-controls="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
             Details
         </button>
         <button class="btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openTransport('{{address}}')" data-address="{{address}}"
             type="button">Open</button>
     </div>
     </p>
-    <div class="collapse" id="{{address}}-collapse">
+    <div class="collapse" id="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
         <div class="card-body">
             <p class="card-text">
                 <strong>Start Latitude:</strong> {{start_latitude}}</p>
@@ -31,5 +33,5 @@
     <div class="card-footer">
         <small>Address: {{address}}</small>
     </div>
-
+    {{/status}}
 </div>

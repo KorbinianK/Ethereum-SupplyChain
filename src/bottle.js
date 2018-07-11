@@ -18,43 +18,43 @@ import {loadSingleProductionCard} from "./processing.js"
 // field.getHarvestPointer!
 
 
-export async function finalBottle() {
-    const production = await currentProduction()
-    console.log("Production:",  production);
-    loadProductionCard(production);
-
+export async function getBottleDetails(production) {
+    $("#detailsModal").modal("hide");
+    $("#bottle").removeClass("d-none");
+    $([document.documentElement, document.body]).animate({
+        scrollTop: $("#bottle").offset().top
+    }, 2000);
+    // const production = await currentProduction()
     const transport = await getTransportFromProduction(production)
-    console.log("Transporter:", transport);
-    loadTransportCards(transport);
-
     const harvest = await getHarvestFromTransport(transport)
-    console.log("Harvest:",  harvest);
-    // loadHarvestCards(harvest);
-
     const fields = await getFieldsFromHarvest(harvest);
-    await loadFieldCards(fields);
-    console.log("Fields:", fields);
+     loadFieldCards(fields);
+     loadTransportCards(transport);
+     loadProductionCard(production);
     return;
            
 }
 
 
 async function loadProductionCard(production){
-    document.getElementById("bottle-productions").innerHTML +=  await loadSingleProductionCard(production);
+    empty("productions");
+    $('#productions-col').find(".loader").removeClass("d-none");
+    document.getElementById("bottle-productions").innerHTML +=  await loadSingleProductionCard(production,true);
+    $('#productions-col').find(".loader").addClass("d-none");
+
 } 
 
 async function loadTransportCards(transports){
-    console.log(1,transports.length);
+    empty("transports");
+    $('#transports-col').find(".loader").removeClass("d-none");
+    if(transports instanceof Array){
         for (let i = 0; i < transports.length; i++) {
-            if(transports[i] != 0x0){
-                console.log(1,transports[i]);
-                document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports[i]);
-            }else{
-                console.log(2);
-                document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports);
-            }
+            document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports[i],true);
+        }
+    }else{
+        document.getElementById("bottle-transports").innerHTML +=  await loadSingleTransportCard(transports,true);
     }
-   
+    $('#transports-col').find(".loader").addClass("d-none");
 }
 
 async function loadHarvestCards(harvests){
@@ -64,15 +64,23 @@ async function loadHarvestCards(harvests){
 }
 
 async function loadFieldCards(fields){
+    empty("fields");
+    $('#fields-col').find(".loader").removeClass("d-none");
     for (let i = 0; i < fields.length; i++) {
         document.getElementById("bottle-fields").innerHTML +=  await loadSingleField(fields[i],true);
     }
+    $('#fields-col').find(".loader").addClass("d-none");
 }
 
 async function getTransportFromProduction(production) {
+    $('#productions-col').find(".loader").removeClass("d-none");
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     const transport =  await processhandler_instance.getTransportFromProduction.call(production);
     return transport;
+}
+
+function empty(id){
+    $("#bottle-"+id).empty();
 }
 
 async function getTransportsFromProduction(production) {

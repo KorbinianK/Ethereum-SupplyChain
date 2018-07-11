@@ -136,9 +136,10 @@ export async function transportAsJson(transport) {
  * @param {*} transport Address of the transport contract
  * @returns {output} The transport as card element
  */
-export async function loadSingleTransportCard(transport){
+export async function loadSingleTransportCard(transport,bottle=false){
     const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
     var json = await transportAsJson(transport);    
+    if(bottle)json['fromBottle'] = true; 
     var output = Mustache.render(
         template_transports, json
     );
@@ -182,7 +183,6 @@ export async function openTransport(address){
     helper.toggleLoader("details",true);
    $("#detailsModal").modal("show");
    const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
-   // Mustache.parse(template_transportdetails);
    const json = await transportAsJson(address);
    var output = Mustache.render(
        template_transportdetails, json

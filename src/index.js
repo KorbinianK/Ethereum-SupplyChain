@@ -63,7 +63,7 @@ window.App = {
     App.loadHarvests();
     App.loadTransportSection();
     App.loadProcessingSection();
-    return App.bindEvents();
+    // return App.bindEvents();
   },
 
   // closeDetails: function(){
@@ -103,40 +103,40 @@ window.App = {
       .then(module => module.openField(address));
   },
 
-  bindEvents: function () {
-    $(document).on("click", ".changeFieldName", App.changeFieldName);
-    // Navbar
-    $(".navbar-nav .nav-link").on("click", function () {
-      $(".navbar-nav").find(".active").removeClass("active");
-      $(this).addClass("active");
-      console.log(this.text);
-      switch (this.text) {
-        case "Cultivation":
-          $("#content").find("section").removeClass("d-block").addClass("d-none");
-          $("#content").find("#cultivationSection").addClass("d-block");
-          App.getFieldCards();
-          break;
-        case "Harvests":
-          $("#content").find("section").removeClass("d-block").addClass("d-none");
-          $("#content").find("#harvestSection").addClass("d-block");
-          App.loadHarvestSection();
-          break;
+  // bindEvents: function () {
+  //   $(document).on("click", ".changeFieldName", App.changeFieldName);
+  //   // Navbar
+  //   $(".navbar-nav .nav-link").on("click", function () {
+  //     $(".navbar-nav").find(".active").removeClass("active");
+  //     $(this).addClass("active");
+  //     console.log(this.text);
+  //     switch (this.text) {
+  //       case "Cultivation":
+  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
+  //         $("#content").find("#cultivationSection").addClass("d-block");
+  //         App.getFieldCards();
+  //         break;
+  //       case "Harvests":
+  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
+  //         $("#content").find("#harvestSection").addClass("d-block");
+  //         App.loadHarvestSection();
+  //         break;
 
-        case "Transport":
-          $("#content").find("section").removeClass("d-block").addClass("d-none");
-          $("#content").find("#transportSection").addClass("d-block");
-          App.loadTransportSection();
-          break;
+  //       case "Transport":
+  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
+  //         $("#content").find("#transportSection").addClass("d-block");
+  //         App.loadTransportSection();
+  //         break;
 
-        case "Processing":
+  //       case "Processing":
 
-          break;
-        default:
-          break;
-      }
+  //         break;
+  //       default:
+  //         break;
+  //     }
 
-    });
-  },
+  //   });
+  // },
 
   changeFieldName: function (event) {
     event.preventDefault();
@@ -242,13 +242,18 @@ window.App = {
       .ProcessingModule()
       .then(module => module.addData(address));
  },
+ finishProduction: function (address) {
+  Router.modules
+    .ProcessingModule()
+    .then(module => module.finish(address));
+},
 
 // Bottle
 
-getBottle: function() {
+getBottles: function(address) {
   Router.modules
   .BottleModule()
-  .then(module => module.finalBottle());
+  .then(module => module.getBottleDetails(address));
 },
 
 };

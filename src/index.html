@@ -11,8 +11,8 @@
 
 <body>
     <nav class="navbar navbar-dark bg-primary navbar-expand-lg ">
-        <a class="navbar-brand font-weight-bold " href="http://localhost:8080">KRONETH</a>
-        <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
+        <a class="navbar-brand font-weight-bold " href="http://localhost:8080">KRONETH - Supply Chain Interaction</a>
+        <!-- <button class="navbar-toggler hidden-lg-up" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -32,9 +32,9 @@
                 </li>
             </ul>
 
-        </div>
+        </div> -->
     </nav>
-    <div class="container-fluid">
+    <!-- <div class="container-fluid">
         <div class="row">
             <div class="col">
                 <h1 class="my-2 font-weight-bold text-dark">
@@ -43,7 +43,7 @@
                 <hr/>
             </div>
         </div>
-    </div>
+    </div> -->
     <div id="content" class="container-fluid">
         <div class="row d-flex justify-content-start">
             <!-- FIELDS -->
@@ -218,16 +218,29 @@
             </section>
             <!-- PROCESSING END -->
         </div>
-        <div class="row">
-            <button type="button" name="" id="" onclick="App.getBottle()" class="btn btn-lg btn-block">Get Bottle</button>
-            <div class="row">
-                <div id="bottle">
-                    <!-- Bottle Details -->
-                    <div class="row">
-                        <div id="bottle-fields" class="col"></div>
-                        <div id="bottle-harvests" class="col"></div>
-                        <div id="bottle-transports" class="col"></div>
-                        <div id="bottle-productions" class="col"></div>
+
+        <div class="row my-5 ">
+            <div id="bottle" class="container d-none">
+                <hr>
+               <h1 class="text-center text-capitalize">Wine Bottle Details</h1>
+                <!-- Bottle Details -->
+                <div class="row mt-4">
+                    <div id="fields-col" class="col-md-4">
+                        <h4>From Fields:</h4>
+                        <div class="loader d-none"></div>
+                        <div id="bottle-fields">
+                        </div>
+                    </div>
+                    <div id="transports-col" class="col-md-4">
+                        <h4>Transported with:</h4>
+                        <div class="loader d-none"></div>
+                        <div id="bottle-transports"></div>
+
+                    </div>
+                    <div id="productions-col" class="col-md-4">
+                        <h4>Production Information:</h4>
+                        <div class="loader d-none"></div>
+                        <div id="bottle-productions"></div>
                     </div>
                 </div>
             </div>

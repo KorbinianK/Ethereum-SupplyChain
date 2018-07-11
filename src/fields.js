@@ -58,6 +58,7 @@ export async function changeStatus(address){
 export async function loadSingleField(address,bottle=false){
     helper.toggleLoader("details",false);    
     const json = await fieldAsJson(address);
+    if(bottle)json['fromBottle'] = true;
     return loadSingleFieldCard(json);
 }
 
