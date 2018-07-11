@@ -3,35 +3,38 @@
         <small class="float-right">Transporter</small>
         <h5 class="card-title ">
             <span class="transport-id float-left">ID: {{ID}}</span>
-            {{#status}} <br>Balance: {{tokenBalance}}{{/status}}
+            {{#status}}
+            <br>Balance: {{tokenBalance}} {{/status}}
         </h5>
         <span class="ml-1 float-right badge {{#status}}badge-light{{/status}}{{^status}}badge-danger{{/status}}">&nbsp;{{#status}}In progress{{/status}}{{^status}}finished{{/status}}</span>
     </div>
-    {{#status}}
-    <div class="btn-group">
-        <button class="btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
-            aria-expanded="false" aria-controls="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
-            Details
-        </button>
-        <button class="btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openTransport('{{address}}')" data-address="{{address}}"
-            type="button">Open</button>
-    </div>
-    </p>
-    <div class="collapse" id="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
-        <div class="card-body">
-            <p class="card-text">
-                <strong>Start Latitude:</strong> {{start_latitude}}</p>
-            <p class="card-text">
-                <strong>Start Longitude:</strong> {{start_longitude}}</p>
-            <p class="card-text"></p>
-            <p class="card-text">
-                <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
-            <p class="card-text">
-                <strong>Total TX:</strong> {{totalTransactions}}</p>
+
+    <div class="{{#status}}d-block {{/status}}{{^status}} d-none{{/status}}{{#fromBottle}} d-block{{/fromBottle}} container">
+        <div class="row">
+            <button class="col btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
+                aria-expanded="false" aria-controls="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
+                Details
+            </button>
+            <button class="col btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openTransport('{{address}}')" data-address="{{address}}"
+                type="button">Open</button>
+        </div>
+        </p>
+        <div class="collapse" id="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Start Latitude:</strong> {{start_latitude}}</p>
+                <p class="card-text">
+                    <strong>Start Longitude:</strong> {{start_longitude}}</p>
+                <p class="card-text"></p>
+                <p class="card-text">
+                    <strong>Owner:</strong> {{#owners}} {{address}} {{/owners}}</p>
+                <p class="card-text">
+                    <strong>Total TX:</strong> {{totalTransactions}}</p>
+            </div>
         </div>
     </div>
     <div class="card-footer">
         <small>Address: {{address}}</small>
     </div>
-    {{/status}}
+
 </div>

@@ -3,15 +3,16 @@
         <h5 class="card-title ">
             <span class="transport-id float-left">ID: {{ID}}</span>
         </h5>
-        <span class="ml-1 float-right badge {{#status}}badge-light{{/status}}{{^status}}badge-danger{{/status}}">&nbsp;{{#status}}In progress{{/status}}{{^status}}finished{{/status}}</span>
+        <span class="ml-1 float-right badge clearfix {{#status}}badge-light{{/status}}{{^status}}badge-danger{{/status}}">&nbsp;{{#status}}In progress{{/status}}{{^status}}finished{{/status}}</span>
     </div>
-    {{#status}}
-    <div class="btn-group">
-        <button class="btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
+    <div class="{{#status}}d-block {{/status}}{{^status}} d-none{{/status}}{{#fromBottle}} d-block{{/fromBottle}} container">
+
+    <div class="row">
+        <button class="col btn btn-block btn-outline-dark mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
             aria-expanded="false" aria-controls="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
             Details
         </button>
-        <button class="btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openProduction('{{address}}')" data-address="{{address}}"
+        <button class="col btn btn-block btn-outline-dark mt-0" type="button" onclick="App.openProduction('{{address}}')" data-address="{{address}}"
             type="button">Open</button>
     </div>
     </p>
@@ -26,7 +27,7 @@
         </div>
 
     </div>
-    {{/status}}
+</div>
     <div class="card-footer">
         <small>Address: {{address}}</small>
     </div>

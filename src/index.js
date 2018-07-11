@@ -150,8 +150,8 @@ window.App = {
   /***
    *  HARVESTS
    */
-  openHarvest: function (event) {
-    var selectedHarvest = $(event).closest('#harvestSelector').find("#harvestSelect option:selected").val();
+  openHarvest: function (e) {
+    var selectedHarvest = $("#harvestSelect option:selected").val();
     Router.modules.HarvestModule()
       .then(module => module.openHarvest(selectedHarvest));
   },
