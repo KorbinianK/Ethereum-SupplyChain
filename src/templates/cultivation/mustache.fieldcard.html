@@ -1,26 +1,27 @@
-<div id="{{address}}-card" class="card text-white {{#harvestable}}bg-success {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1 my-2">
+<div id="{{address}}-card{{#fromBottle}}-bottle{{/fromBottle}}" class="card text-white {{#harvestable}}bg-success {{/harvestable}}{{^harvestable}} bg-danger {{/harvestable}}mx-1 my-2">
     <div class="card-header">
         <h5 class="card-title text-white">
             <span class="field-name float-left">{{name}}</span>
         </h5>
+        
         <span class="ml-1 float-right badge badge-light">&nbsp;{{#harvestable}}harvestable{{/harvestable}}{{^harvestable}}not harvestable{{/harvestable}}</span>
         <h6 class="card-subtitle mb-2 text-white">
             <small>Address: {{address}}</small>
             <br>
-            <small>Grape type: {{type}}</small>
+            <small>Grape type: {{grapeType}}</small>
         </h6>
     </div>
     <img class="card-img-top" src="{{image}}" alt="{{image_alt}}">
     <div class="btn-group">
-        <button class="btn btn-block btn-outline-light mt-0" type="button" data-toggle="collapse" data-target="#{{address}}-collapse"
-            aria-expanded="false" aria-controls="{{address}}-collapse">
+        <button class="btn btn-block btn-outline-light mt-0" type="button" data-toggle="collapse" data-target="#{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse"
+            aria-expanded="false" aria-controls="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
             Details
         </button>
         <button class="btn btn-block btn-outline-light mt-0" type="button" onclick="App.openField('{{address}}')" data-address="{{address}}"
             type="button">Open</button>
     </div>
     </p>
-    <div class="collapse" id="{{address}}-collapse">
+    <div class="collapse" id="{{address}}{{#fromBottle}}-bottle{{/fromBottle}}-collapse">
 
         <ul class="list-group list-group-flush ">
             <li class="list-group-item">

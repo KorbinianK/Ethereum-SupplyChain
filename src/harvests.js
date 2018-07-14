@@ -11,6 +11,13 @@ import * as tx from "./utils/transactions";
 import { checkHarvestable } from "./fields.js";
 import awaitTransactionMined from "await-transaction-mined";
 
+/**
+ * Function to mint the Grape Token when the grapes are weighed
+ *
+ * @param {*} harvest Address of the harvest the grapes should be added to
+ * @param {*} field Address of the vineyard, the grapes origin from
+ * @param {*} amount The weight of the grapes
+ */
 export async function weightInput(harvest, field, amount) {
     const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
     const account = await helper.getAccount();
@@ -26,29 +33,38 @@ export async function weightInput(harvest, field, amount) {
         });
 }
 
-export function loadHarvestFields(harvestAddress){
-        var harvestInstance;
-        App.contracts.Harvest.at(harvestAddress)
-            .then(function (instance) {
-                harvestInstance = instance;
-                return harvestInstance.getFields();
-            })
-            .then(function (result) {
-                var output = [];
-                for (let i = 0; i < result.length; i++) {
-                    output.push(App.loadField(result[i]));
-                }
-                Promise.all(output)
-                    .then(function (fields) {
-                        for (let i = fields.length - 1; i >= 0; i--) {
-                            console.log(fields[i]);
-                         }
-                    });
-                return result;
-            }).catch(err => console.error(err));
-}
+// /**
+//  * Loads
+//  *
+//  * @export
+//  * @param {*} harvestAddress
+//  */
+// export function loadHarvestFields(harvestAddress){
+//         var harvestInstance;
+//         App.contracts.Harvest.at(harvestAddress)
+//             .then(function (instance) {
+//                 harvestInstance = instance;
+//                 return harvestInstance.getFields();
+//             })
+//             .then(function (result) {
+//                 var output = [];
+//                 for (let i = 0; i < result.length; i++) {
+//                     output.push(App.loadField(result[i]));
+//                 }
+//                 Promise.all(output)
+//                     .then(function (fields) {
+//                         for (let i = fields.length - 1; i >= 0; i--) {
+//                             console.log(fields[i]);
+//                          }
+//                     });
+//                 return result;
+//             }).catch(err => console.error(err));
+// }
 
 
+/**
+ * Fills the dropdown with the harvests
+ */
 export async function loadDropdown() {
     document.getElementById("harvestSelect").innerHTML = '';
 
@@ -77,10 +93,12 @@ export async function loadDropdown() {
             }
             document.getElementById('harvestSelect').innerHTML += ("<option value='" + harvest.address + "'>" + harvest.year +status+" </option>");
         });
-        
     }).catch(err => console.error(err));
 }
 
+/**
+ * Creates a new Harvest
+ */
 export async function newHarvest() {
     let harvestYear = $("#newHarvest").val();
     const harvestHandler_instance = await harvestHandler_contract(web3.currentProvider).deployed();
@@ -98,6 +116,11 @@ export async function newHarvest() {
     }).catch(err => console.error(err));
 }
 
+/**
+ * Opens the details modal and adds the data of a single harvest
+ *
+ * @param {*} address Address of the harvest
+ */
 export async function openHarvest(address){
     helper.clearDetails();
     helper.toggleLoader("details", true);
@@ -108,8 +131,6 @@ export async function openHarvest(address){
     var output = Mustache.render(
         template_harvestdetails, json
     );
-    console.log("Harvest:",json);
-    
     const options = await Router.modules.FieldModule().then(module => module.getHarvestableFields(json));
     helper.toggleLoader("details",false);
     document.getElementById('details').innerHTML = output;
@@ -117,6 +138,12 @@ export async function openHarvest(address){
 }
 
 
+/**
+ * Loads the Harvest details and creates a JSON file with it
+ *
+ * @param {*} address The address of the harvest contract
+ * @returns {json} JSON file 
+ */
 export async function harvestAsJson(address) { 
     const harvest_instance = await harvest_contract(web3.currentProvider).at(address);
     var fields = [];
@@ -174,6 +201,12 @@ export async function harvestAsJson(address) {
 };
 
 
+/**
+ * Loads the name of a field
+ *
+ * @param {*} address Address of the field contract
+ * @returns {name} String of the name
+ */
 export async function getFieldName(address){
     const field_instance = await field_contract(web3.currentProvider).at(address);
     const account = await helper.getAccount();
