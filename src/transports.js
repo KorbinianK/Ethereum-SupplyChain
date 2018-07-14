@@ -1,4 +1,6 @@
 import Mustache from "mustache";
+// import Router from "./router.js";
+// import harvest_contract from "./utils/contracts/harvest_contract";
 import transportHandler_contract from "./utils/contracts/transporthandler_contract";
 import transport_contract from "./utils/contracts/transport_contract";
 import * as helper from "./utils/helper_scripts";
@@ -7,9 +9,6 @@ import { openHarvest } from "./harvests";
 import awaitTransactionMined from "await-transaction-mined";
 
 
-/**
- * Creates a new Transport
- */
 export async function newTransport() {
      var details = $("#newTransportForm").serializeArray();
      var lat,long;
@@ -48,11 +47,6 @@ export async function newTransport() {
              $('#transportSection').find(".loader").addClass("d-none");
         }
 
-/**
- * Returns the current Transport (the last created -> showcase function)
- *
- * @returns {transport} The address of the transport contract
- */
 export async function getCurrentTransport(){
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const transport = await transportHandler_instance.currentTransport.call().then((res) => {
@@ -62,35 +56,22 @@ export async function getCurrentTransport(){
     return transport;
 }
 
-/**
- * Returns the current Harvest (the latest created -> showcase function)
- *
- * @returns {harvest} The address of the harvest contract
- */
 export async function currentHarvest() {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const harvest = await transportHandler_instance.currentHarvest.call().catch(error =>{return console.error("Error fetching the current harvest",error)});
-    return harvest;
+    const result = await transportHandler_instance.currentHarvest.call().then((res) => {
+        return res;
+    }).catch(error =>{return console.error("Error fetching the current harvest",error)});
+    return result;
 }
 
-/**
- * Gets the added Harvest from the transport
- *
- * @param {*} transport Address of the transport
- * @returns {harvest} Address of the harvest
- */
-async function getHarvest(transport) {
+async function getHarvest(address) {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
-    const harvest = await transportHandler_instance.getHarvestsFromTransport.call(transport).catch(error =>{return console.error("Error fetching harvest:",transport,error)});
+    const harvest = await transportHandler_instance.getHarvestsFromTransport.call(address).then(result => {
+        return result;
+    }).catch(error =>{return console.error("Error fetching harvest:",address,error)});
     return harvest;
 }
 
-/**
- * Returns the ID of a transport
- *
- * @param {*} transport Address of the transport contract
- * @returns {ID} The ID
- */
 async function getID(transport){
      const transport_instance = await transport_contract(web3.currentProvider).at(transport);
      const ID = transport_instance.getID.call().then(result => {
@@ -99,13 +80,6 @@ async function getID(transport){
         return ID;
 }
 
-
-/**
- * Builds a JSON file with data from the transport
- *
- * @param {*} transport Address of the contract
- * @returns {json} JSON data
- */
 export async function transportAsJson(transport) {
     const transport_instance = await transport_contract(web3.currentProvider).at(transport);
     const startLocation = await transport_instance.getStartCoordinates.call().then(result => {
@@ -130,36 +104,21 @@ export async function transportAsJson(transport) {
     return json;
 }
 
-/**
- * Loads a single transport card template and data
- *
- * @param {*} transport Address of the transport contract
- * @returns {output} The transport as card element
- */
-export async function loadSingleTransportCard(transport,bottle=false){
+export async function loadSingleTransportCard(address){
     const template_transports = await helper.fetchTemplate("src/templates/transport/mustache.transportcard.html");
-    var json = await transportAsJson(transport);    
-    if(bottle)json['fromBottle'] = true; 
+    var json = await transportAsJson(address);    
     var output = Mustache.render(
         template_transports, json
     );
     return output;
 }
 
-/**
- * Adds a transport card to the DOM
- *
- * @param {*} transport Address of the transport contract
- */
- async function addTransportCard(transport){
-    const card = await loadSingleTransportCard(transport);
+export async function addTransportCard(address){
+    const card = await loadSingleTransportCard(address);
     document.getElementById("transports-loading").innerHTML = "";
-    document.getElementById('transports').innerHTML += card;
+    return document.getElementById('transports').innerHTML += card;
 }
 
-/**
- * Adds all transports as cards to the DOM
- */
 export async function getTransportCards(){
     $('#transportSection').find(".loader").removeClass("d-none");
     $('#transports').empty();
@@ -173,16 +132,29 @@ export async function getTransportCards(){
 }
 
 
-/**
- * Opends the Details Modal and loads a single transport
- *
- * @param {*} address Address of the transport to load
- */
+// async function allTransports() {
+//     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
+//     const transports = await transportHandler_instance.getTransports.call().then(async result => {
+//         var t = [];
+//         for (let i = 0; i < result.length; i++) {
+//            t.push(await transportAsJson(result[i]));
+//         }
+//         return t; 
+//     });
+//     if (transports.length == 0){
+//         document.getElementById("transports-loading").innerHTML = "No Transports found";
+//     }else{
+//          document.getElementById("transports-loading").innerHTML = "";
+//     }
+//     return transports;
+// }
+
 export async function openTransport(address){
     $("#details").empty();
     helper.toggleLoader("details",true);
    $("#detailsModal").modal("show");
    const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
+   // Mustache.parse(template_transportdetails);
    const json = await transportAsJson(address);
    var output = Mustache.render(
        template_transportdetails, json
@@ -193,12 +165,22 @@ export async function openTransport(address){
     }
 }
 
-/**
- * Adds a Data transaction to a transport
- *
- * @param {*} transport The address of the transport
- * @returns {openTransport(transport)}
- */
+// export async function loadSingleTransport(address) {
+//     $("#details").empty();
+//      helper.toggleLoader("details",true);
+//     $("#detailsModal").modal("show");
+//     const template_transportdetails = await helper.fetchTemplate("src/templates/transport/mustache.transportdetails.html");
+//     // Mustache.parse(template_transportdetails);
+//     const json = await transportAsJson(address);
+//     var output = Mustache.render(
+//         template_transportdetails, json
+//     );
+//      helper.toggleLoader("details", false);
+//      if(output != null){
+//         document.getElementById('details').innerHTML = output;
+//      }
+// }
+
 export async function addData(transport) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
@@ -207,11 +189,6 @@ export async function addData(transport) {
     return openTransport(transport);
 }
 
-/**
- * Adds Grapes from a Harvest to a transport
- *
- * @param {*} transport The address of the transport contract
- */
 export async function addHarvest(transport) {
     const transporthandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
@@ -227,66 +204,32 @@ export async function addHarvest(transport) {
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
-
 // ############### START TRANSACTION FUNCTIONS ###############
 
-/**
- * Gets the total amount of transactions to this contract
- *
- * @param {*} address Address of the contract
- * @returns Integer value of the total transactions
- */ 
 export async function getTotalTransactionCount(address) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const txCount = await tx.getTotalTransactionCount(transport_instance);
     return txCount;
 }
 
-/**
- * Gets a specific transaction sender with an index
- *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {sender} Address of the sender
- */
 export async function getTransactionSenderAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const sender = await tx.getTransactionSenderAtIndex(transport_instance, index);
     return sender;
 }
 
-/**
- * Gets the data of a transaction with an index
- *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {data} String of the data
- */
 export async function getTransactionDataAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const data = await tx.getTransactionDataAtIndex(transport_instance, index);
     return data;
 }
 
-/**
- * Gets the timestamp of a transaction 
- *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {time} Readable timestamp
- */
 export async function getTransactionTimeAtIndex(address, index) {
     const transport_instance = await transport_contract(web3.currentProvider).at(address);
     const time = await tx.getTransactionTimeAtIndex(transport_instance, index);
     return helper.makeUnixReadable(time);
 }
 
-/**
- * Gets all transactions made to this contract
- *
- * @param {*} address Address of the contract
- * @returns {json} Json file with all transactions
- */
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);
     var json = [];
@@ -300,5 +243,7 @@ export async function getAllTransactions(address) {
     json.sort((a, b) => parseFloat(a.time) - parseFloat(b.time)).reverse();
     return json;
 }
+
+
 
 // ############### END TRANSACTION FUNCTIONS ###############

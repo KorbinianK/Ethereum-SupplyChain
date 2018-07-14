@@ -7,7 +7,6 @@ import "../general/erc20handler.sol";
 contract Production is TransactionOwner, Ownable, ERC20Handler{
     uint private id;
     address[] private owners;
-    address public creator;
     address[] private permissionedAccounts;
     uint256 public createdAt;
     
@@ -16,7 +15,6 @@ contract Production is TransactionOwner, Ownable, ERC20Handler{
         erc20 = _token;
         permissionedAccounts.push(msg.sender);
         owners.push(msg.sender);
-        creator = msg.sender;
         createdAt = now;
     }
 
@@ -28,21 +26,5 @@ contract Production is TransactionOwner, Ownable, ERC20Handler{
         return id;
     }
     
-    /**
-    * @dev Finished the production and disables it
-    */
-    function finish() public {
-        switchStatus();
-    }
-
-
-    /** 
-     * @dev Gets the creator of the transport
-     * @return address Address of the creator
-    */
-    function getCreator() public view returns (address) {
-        return creator;
-    }
-
     
 }

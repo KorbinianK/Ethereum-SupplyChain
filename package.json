@@ -36,9 +36,7 @@
     "webpack": "^4.10.2",
     "webpack-cli": "^2.1.4",
     "webpack-dev-server": "^3.1.4",
-    "webpack-md5-hash": "^0.0.6",
-    "bignumber.js":"^7.2.1",
-    "darq-truffle": "~4.1.9-latest.0"
+    "webpack-md5-hash": "^0.0.6"
   },
   "dependencies": {
     "await-transaction-mined": "^1.0.10",
