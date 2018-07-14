@@ -12,6 +12,9 @@ import * as tx from "./utils/transactions";
 import awaitTransactionMined from "await-transaction-mined";
 
 
+/**
+ * Creates a new prodction and adds the card to the UI
+ */
 export async function newProduction() {
         const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
         const account = await helper.getAccount();
@@ -29,6 +32,9 @@ export async function newProduction() {
     }).catch(err => console.error("Error creating new Production",err));
 }
 
+/**
+ * Loads all production cards
+ */
 export async function getProductionCards(){
     $('#processingSection').find(".loader").removeClass("d-none");
     $('#transports').empty();
@@ -42,9 +48,14 @@ export async function getProductionCards(){
    
 }
 
+/**
+ * Loads a single production as card
+ *
+ * @param {string} address The address of the production
+ * @param {boolean} [bottle=false] Check if the card is loaded for the bottle section
+ * @returns The HTML object of the card
+ */
 export async function loadSingleProductionCard(address,bottle=false){
-    console.log(address);
-    
     const template_production = await helper.fetchTemplate("src/templates/processing/mustache.productioncard.html");
     var json = await productionAsJson(address);
     if(bottle)json['fromBottle'] = true;    
@@ -54,12 +65,22 @@ export async function loadSingleProductionCard(address,bottle=false){
     return output;
 }
 
-export async function addProductionCard(address){
+/**
+ * Adds a card to the UI
+ *
+ * @param {*} address Address of the production
+ */
+ async function addProductionCard(address){
     const card = await loadSingleProductionCard(address);
     document.getElementById("productions-loading").innerHTML = "";
-    return document.getElementById('productions').innerHTML += card;
+    document.getElementById('productions').innerHTML += card;
 }
 
+/**
+ * Opens the details modal and loads the production details
+ *
+ * @param {*} address The address of the production
+ */
 export async function openProduction(address) {
     $("#details").empty();
      helper.toggleLoader("details",true);
@@ -76,12 +97,16 @@ export async function openProduction(address) {
      }
 }
 
+/**
+ * Function to add a delivery from a transport to a production
+ *
+ * @param {*} production Address of the production
+ */
 export async function addTransport(production) {
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     const account = await helper.getAccount();
     var transport = $("#transport-input").val();
     var amount = $("#transportValue-input").val();
-    console.log("from",transport,"amout",amount);
     return await processhandler_instance.addFromTransport(transport, production, amount, {
         from: account
     }).then(async(receipt) => {
@@ -91,6 +116,11 @@ export async function addTransport(production) {
     }).catch(err => (console.error("Not enough Balance?", err)));
 }
 
+/**
+ * Finishes the production and disables the UI for it
+ *
+ * @param {*} production Address of the production
+ */
 export async function finish(production){
     const production_instance = await production_contract(web3.currentProvider).at(production);
     const account = await helper.getAccount();
@@ -98,12 +128,17 @@ export async function finish(production){
 }
 
 
+ /**
+  * Loads the production details and creates a JSON file with it
+  *
+  * @param {string} production Address of the production
+  * @returns The JSON file
+  */
  async function productionAsJson(production) {
     const production_instance = await production_contract(web3.currentProvider).at(production);
     const processhandler_instance = await processHandler_contract(web3.currentProvider).deployed();
     var json = {};
     json["address"] = production;
-    // json["owner"] = await production_instance.getCreator.call()
     json["transport"] = await processhandler_instance.getTransportFromProduction.call(production).catch(err => (console.error("Production has not recieved a transport yet", err)));
     json["ID"] = await production_instance.getID.call().catch(err => (console.error("Error fetching the creator", err)));
     json['transactions'] = await getAllTransactions(production);
@@ -114,30 +149,41 @@ export async function finish(production){
     return json;
 }
 
-export async function getFieldsFromHarvest(harvest) {
-    const harvest_instance = await harvest_contract(web3.currentProvider).at(harvest);
-    const fields = await harvest_instance.getFields.call().then((result)=>{return result;});
-    return fields;
-}
 
+/**
+ * Retrieves all harvests from a transport
+ *
+ * @param {string} transport Address of a transport
+ * @returns Addresses of the harvests
+ */
 export async function getHarvestsFromTransport(transport) {
     const transportHandler_instance = await transportHandler_contract(web3.currentProvider).deployed();
     const harvest = await transportHandler_instance.getHarvestFromTransport.call(transport).catch(err => (console.error("Error fetching harvests from production", err)));
     return harvest;
 }
 
+/**
+ * Fetches the current Transport
+ *
+ * @returns Address of the transport
+ */
 export async function currentTransport() {
     const processHandler_instance = await processHandler_contract(web3.currentProvider).deployed();
-    const result = await processHandler_instance.currentTransport.call().catch(err => (console.error("Error fetching current transport", err)));
-    return result;
+    const transport = await processHandler_instance.currentTransport.call().catch(err => (console.error("Error fetching current transport", err)));
+    return transport;
 }
 
+/**
+ * Adds a transaction to a production
+ *
+ * @param {string} production Address of the production
+ */
 export async function addData(production) {
     let sensor = $('#sensor-select').val();
     let data = $('#data-input').val();
     const production_instance = await production_contract(web3.currentProvider).at(production);
     await tx.addTransaction(production_instance,sensor, data).catch(err => (console.error("Transaction failed", err)));
-    return openProduction(production);
+    openProduction(production);
 }
 
 
@@ -146,7 +192,7 @@ export async function addData(production) {
 /**
  * Gets the total amount of transactions to this contract
  *
- * @param {*} address Address of the contract
+ * @param {string} address Address of the contract
  * @returns Integer value of the total transactions
  */ 
 export async function getTotalTransactionCount(address) {
@@ -158,9 +204,9 @@ export async function getTotalTransactionCount(address) {
 /**
  * Gets a specific transaction sender with an index
  *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {sender} Address of the sender
+ * @param {string} address Address of the contract
+ * @param {string} index Integer value as index
+ * @returns {string} Address of the sender
  */
 export async function getTransactionSenderAtIndex(address, index) {
     const production_instance = await production_contract(web3.currentProvider).at(address);
@@ -171,9 +217,9 @@ export async function getTransactionSenderAtIndex(address, index) {
 /**
  * Gets the data of a transaction with an index
  *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {data} String of the data
+ * @param {string} address Address of the contract
+ * @param {Integer} index Integer value as index
+ * @returns {string} string of the data
  */
 export async function getTransactionDataAtIndex(address, index) {
     const production_instance = await production_contract(web3.currentProvider).at(address);
@@ -184,9 +230,9 @@ export async function getTransactionDataAtIndex(address, index) {
 /**
  * Gets the timestamp of a transaction 
  *
- * @param {*} address Address of the contract
- * @param {*} index Integer value as index
- * @returns {time} Readable timestamp
+ * @param {string} address Address of the contract
+ * @param {Integer} index Integer value as index
+ * @returns {string} Readable timestamp
  */
 export async function getTransactionTimeAtIndex(address, index) {
     const production_instance = await production_contract(web3.currentProvider).at(address);
@@ -197,8 +243,8 @@ export async function getTransactionTimeAtIndex(address, index) {
 /**
  * Gets all transactions made to this contract
  *
- * @param {*} address Address of the contract
- * @returns {json} Json file with all transactions
+ * @param {string} address Address of the contract
+ * @returns {string} Json file with all transactions
  */
 export async function getAllTransactions(address) {
     const txCount = await getTotalTransactionCount(address);

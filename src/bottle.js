@@ -1,24 +1,18 @@
-import Mustache from "mustache";
 import processHandler_contract from "./utils/contracts/processhandler_contract";
-import production_contract from "./utils/contracts/production_contract";
-import field_contract from "./utils/contracts/field_contract";
-import fieldHandler_contract from "./utils/contracts/fieldhandler_contract";
 import transportHandler_contract from "./utils/contracts/transporthandler_contract";
-import transport_contract from "./utils/contracts/transport_contract";
 import harvest_contract from "./utils/contracts/harvest_contract";
-import harvestHandler_contract from "./utils/contracts/harvesthandler_contract";
-import * as helper from "./utils/helper_scripts";
-import * as tx from "./utils/transactions";
-
 import {loadSingleField} from "./fields.js"
-import {loadSingleHarvest} from "./harvests.js" 
 import {loadSingleTransportCard} from "./transports.js" 
 import {loadSingleProductionCard} from "./processing.js" 
 
-// field.getHarvestPointer!
+/**
+ * @fileOverview Module that handles the Bottle Output
+ * @author <a href="mailto:me@korbinian.rocks">Korbinian Kasberger</a>
+ */
+
 
 /**
- * Function that loads the cards for the final bottle
+ * Function that <tt>str</tt>  loads the cards for the final bottle
  */
 export async function getBottleDetails(production) {
     $("#detailsModal").modal("hide");
@@ -34,7 +28,6 @@ export async function getBottleDetails(production) {
      loadTransportCards(transport);
      loadProductionCard(production);
     return;
-           
 }
 
 
@@ -48,7 +41,6 @@ async function loadProductionCard(production){
     $('#productions-col').find(".loader").removeClass("d-none");
     document.getElementById("bottle-productions").innerHTML +=  await loadSingleProductionCard(production,true);
     $('#productions-col').find(".loader").addClass("d-none");
-
 } 
 
 /**

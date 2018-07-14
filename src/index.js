@@ -9,9 +9,13 @@ import * as HarvestModule from "./harvests.js";
 import * as TransportModule from "./transports.js";
 import * as ProcessingModule from "./processing.js";
 import * as BottleModule from "./bottle.js";
-import { 
-  default as Web3
-} from 'web3';
+import { default as Web3 } from 'web3';
+
+
+/**
+ * @fileOverview Main App file, used as Router and setup
+ * @author <a href="mailto:me@korbinian.rocks">Korbinian Kasberger</a>
+ */
 
 
 window.App = {
@@ -20,20 +24,29 @@ window.App = {
   fields: {},
   fieldsTemplate: null,
 
+  /**
+   *Iniatialized the App
+   *
+   * @returns {initWeb3()}
+   */
   init: function () {
     return App.initWeb3();
   },
 
+  /**
+   * Sets the web3 provider to an injected one or connects a local node
+   *
+   * @returns {initContracts()}
+   */
   initWeb3: function () {
-    // Initialize web3 and set the provider to the testRPC.
-
+    
     if (typeof web3 !== "undefined") {
       App.web3Provider = web3.currentProvider;
       web3 = new Web3(web3.currentProvider);
     } else {
       // set the provider you want from Web3.providers
       App.web3Provider = new Web3.providers.HttpProvider(
-        "http://127.0.0.1:9545"
+        "http://127.0.0.1:8545"
       );
       Web3.providers.HttpProvider.prototype.sendAsync =
         Web3.providers.HttpProvider.prototype.send;
@@ -42,37 +55,19 @@ window.App = {
     return App.initContracts();
   },
 
-  initTemplates: function () {
-    const template_fields = "src/templates/cultivation/mustache.fieldcard.html";
-    var fields_loaded;
-
-    fetch(template_fields)
-      .then(response => response.text())
-      .then(fields_template => {
-        fields_loaded = fields_template;
-        Mustache.parse(fields_loaded);
-        App.fieldsTemplate = fields_loaded;
-      })
-      .catch(error =>
-        console.log("Unable to get the template: ", error.message)
-      );
-  },
-
+  /**
+   * Loads all sections
+   */
   initContracts: function () {
     App.getFieldCards();
     App.loadHarvests();
     App.loadTransportSection();
     App.loadProcessingSection();
-    // return App.bindEvents();
   },
 
-  // closeDetails: function(){
-  //   document.getElementById("details").innerHTML = "";
-  // },
-
-  /***
-   *  FIELDS
-   */
+  /**
+   *  FIELDS SECTION
+   **/
 
   changeFieldStatus: async function (address) {
     await Router.modules.FieldModule()
@@ -102,41 +97,6 @@ window.App = {
     Router.modules.FieldModule()
       .then(module => module.openField(address));
   },
-
-  // bindEvents: function () {
-  //   $(document).on("click", ".changeFieldName", App.changeFieldName);
-  //   // Navbar
-  //   $(".navbar-nav .nav-link").on("click", function () {
-  //     $(".navbar-nav").find(".active").removeClass("active");
-  //     $(this).addClass("active");
-  //     console.log(this.text);
-  //     switch (this.text) {
-  //       case "Cultivation":
-  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
-  //         $("#content").find("#cultivationSection").addClass("d-block");
-  //         App.getFieldCards();
-  //         break;
-  //       case "Harvests":
-  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
-  //         $("#content").find("#harvestSection").addClass("d-block");
-  //         App.loadHarvestSection();
-  //         break;
-
-  //       case "Transport":
-  //         $("#content").find("section").removeClass("d-block").addClass("d-none");
-  //         $("#content").find("#transportSection").addClass("d-block");
-  //         App.loadTransportSection();
-  //         break;
-
-  //       case "Processing":
-
-  //         break;
-  //       default:
-  //         break;
-  //     }
-
-  //   });
-  // },
 
   changeFieldName: function (event) {
     event.preventDefault();
@@ -179,9 +139,10 @@ window.App = {
       .HarvestModule()
       .then(module => module.weightInput(selectedHarvest, address, amount));
   },
-  /***
-   *  Tranports
-   */
+
+  /**
+   *  TRANSPORTS SECTION
+   **/
 
   loadTransportSection: function () {
     Router.modules.TransportModule()
@@ -192,7 +153,6 @@ window.App = {
       .TransportModule()
       .then(module => module.newTransport());
   },
-
   loadTransports: function () {
     Router.modules
       .TransportModule()
@@ -214,15 +174,14 @@ window.App = {
   },
 
   /**
-   * Processing
-   */
+   * PROCESSING SECTION
+   **/
 
    loadProcessingSection: function() {
     Router.modules
     .ProcessingModule()
     .then(module => module.getProductionCards());
    },
-  
   newProduction: function() {
     Router.modules
     .ProcessingModule()
@@ -248,8 +207,9 @@ window.App = {
     .then(module => module.finish(address));
 },
 
-// Bottle
-
+  /**
+   * BOTTLE SECTION
+   **/
 getBottles: function(address) {
   Router.modules
   .BottleModule()

@@ -12,6 +12,12 @@ import { checkHarvestable } from "./fields.js";
 import awaitTransactionMined from "await-transaction-mined";
 
 /**
+ * @fileOverview Module that handles the interaction and display of the harvest cards
+ * @author <a href="mailto:me@korbinian.rocks">Korbinian Kasberger</a>
+ */
+
+
+/**
  * Function to mint the Grape Token when the grapes are weighed
  *
  * @param {*} harvest Address of the harvest the grapes should be added to
@@ -32,35 +38,6 @@ export async function weightInput(harvest, field, amount) {
             return openHarvest(harvest);
         });
 }
-
-// /**
-//  * Loads
-//  *
-//  * @export
-//  * @param {*} harvestAddress
-//  */
-// export function loadHarvestFields(harvestAddress){
-//         var harvestInstance;
-//         App.contracts.Harvest.at(harvestAddress)
-//             .then(function (instance) {
-//                 harvestInstance = instance;
-//                 return harvestInstance.getFields();
-//             })
-//             .then(function (result) {
-//                 var output = [];
-//                 for (let i = 0; i < result.length; i++) {
-//                     output.push(App.loadField(result[i]));
-//                 }
-//                 Promise.all(output)
-//                     .then(function (fields) {
-//                         for (let i = fields.length - 1; i >= 0; i--) {
-//                             console.log(fields[i]);
-//                          }
-//                     });
-//                 return result;
-//             }).catch(err => console.error(err));
-// }
-
 
 /**
  * Fills the dropdown with the harvests

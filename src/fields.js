@@ -5,8 +5,14 @@ import field_contract from "./utils/contracts/field_contract";
 import fieldHandler_contract from "./utils/contracts/fieldhandler_contract";
 import * as helper from "./utils/helper_scripts";
 import * as tx from "./utils/transactions";
-import { getFieldName } from "./harvests";
 import awaitTransactionMined from "await-transaction-mined";
+
+
+/**
+ * @fileOverview Module that handles the interaction and display of the vineyards cards
+ * @author <a href="mailto:me@korbinian.rocks">Korbinian Kasberger</a>
+ */
+
 
 /**
  * Updates the name of a vineyard
