@@ -1,8 +1,3 @@
-# Documentation
-[Go to JavaScript Documentation](js.md)
-
-[Go to Solidity Documentation](sol.md)
-
 # **Supply Chain ÐAPP** #
 <a target="_blank" href="https://opensource.org/licenses/GPL-3.0">
   <img src="https://img.shields.io/badge/License-GPL3.0-green.svg?longCache=true&style=flat-square">
@@ -11,6 +6,11 @@
 <a target="_blank" href="http://truffleframework.com/docs/" title="Truffle"><img src="https://img.shields.io/badge/Truffle-4.1.8-ff69b4.svg?longCache=true&style=flat-square"></a>
 <a target="_blank" href="https://web3js.readthedocs.io/en/1.0/" title="Web3.js"><img src="https://img.shields.io/badge/web3.js-1.0.0--beta.34-orange.svg?longCache=true&style=flat-square"></a>
 <a target="_blank" href="https://solidity.readthedocs.io/en/v0.4.24/" title="Solidity"><img src="https://img.shields.io/badge/Solidity-0.4.24-cyan.svg?longCache=true&style=flat-square"></a>
+
+# Documentation
+[Go to JavaScript Documentation](js.md)
+
+[Go to Solidity Documentation](sol.md)
 
 ## **Installation & Requirements**
 
