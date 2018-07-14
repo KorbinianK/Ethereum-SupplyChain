@@ -1,3 +1,8 @@
+---
+title: Decentralized Wine Supply Chain
+layout: page
+---
+
 # **Supply Chain ÐAPP** #
 <a target="_blank" href="https://opensource.org/licenses/GPL-3.0">
   <img src="https://img.shields.io/badge/License-GPL3.0-green.svg?longCache=true&style=flat-square">
