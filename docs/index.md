@@ -1,7 +1,7 @@
 # Documentation
-[Go to JavaScript Documentation](./js.md)
+[Go to JavaScript Documentation](js.md)
 
-[Go to Solidity Documentation](./sol.md)
+[Go to Solidity Documentation](sol.md)
 
 # **Supply Chain ÐAPP** #
 <a target="_blank" href="https://opensource.org/licenses/GPL-3.0">
