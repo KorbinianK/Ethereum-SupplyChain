@@ -1,6 +1,5 @@
 ---
 title: Decentralized Wine Supply Chain
-layout: page
 ---
 
 # **Supply Chain ÐAPP** #
