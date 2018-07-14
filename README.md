@@ -7,6 +7,10 @@
 <a target="_blank" href="https://web3js.readthedocs.io/en/1.0/" title="Web3.js"><img src="https://img.shields.io/badge/web3.js-1.0.0--beta.34-orange.svg?longCache=true&style=flat-square"></a>
 <a target="_blank" href="https://solidity.readthedocs.io/en/v0.4.24/" title="Solidity"><img src="https://img.shields.io/badge/Solidity-0.4.24-cyan.svg?longCache=true&style=flat-square"></a>
 
+# Documentation
+
+[Go to the documentation](https://korbiniank.github.io/SupplyChain/js.html)
+
 ## **Installation & Requirements**
 
 ### Blockchain Environment:
