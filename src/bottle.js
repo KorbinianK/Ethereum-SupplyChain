@@ -12,7 +12,7 @@ import {loadSingleProductionCard} from "./processing.js"
 
 
 /**
- * Function that <tt>str</tt>  loads the cards for the final bottle
+ * Function that loads the cards for the final bottle
  */
 export async function getBottleDetails(production) {
     $("#detailsModal").modal("hide");
@@ -20,14 +20,12 @@ export async function getBottleDetails(production) {
     $([document.documentElement, document.body]).animate({
         scrollTop: $("#bottle").offset().top
     }, 2000);
-    // const production = await currentProduction()
     const transport = await getTransportFromProduction(production)
     const harvest = await getHarvestFromTransport(transport)
     const fields = await getFieldsFromHarvest(harvest);
-     loadFieldCards(fields);
-     loadTransportCards(transport);
-     loadProductionCard(production);
-    return;
+    loadFieldCards(fields);
+    loadTransportCards(transport);
+    loadProductionCard(production);
 }
 
 
