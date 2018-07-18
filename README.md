@@ -9,13 +9,15 @@
 
 # Documentation
 
-[Go to the documentation](https://korbiniank.github.io/SupplyChain/js.html)
+[Go to the documentation](https://korbiniank.github.io/SupplyChain)
 
 ## **Installation & Requirements**
 
 ### Blockchain Environment:
 
 Start a local blockchain environment, for example with [Ganache](https://truffleframework.com/ganache)
+
+>**IMPORTANT NOTE:** When using Ganache or any local blockchain system that does not support **Websockets** the UI often needs to be refreshed manually in order to recieve the update. This not a bug but a limitation of the local environments.
 
 ### Installation:
 ```
