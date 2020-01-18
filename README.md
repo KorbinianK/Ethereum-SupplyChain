@@ -9,7 +9,7 @@
 
 # Documentation
 
-[Go to the documentation](https://korbiniank.github.io/SupplyChain)
+[Go to the documentation](https://korbiniank.github.io/Ethereum-SupplyChain)
 
 ## **Installation & Requirements**
 
